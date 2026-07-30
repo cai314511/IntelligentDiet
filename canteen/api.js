@@ -28,7 +28,8 @@ async function api(method, path, body) {
     return { status: 0, json: { code: 0, message: '网络错误' } };
   }
   const json = await res.json().catch(() => ({}));
-  if (res.status === 401) {
+  // 登录/注册自身的 401 由调用方提示，不做全局劫持
+  if (res.status === 401 && !path.startsWith('/users/login') && !path.startsWith('/users/register')) {
     clearSession();
     renderUserEntry();
     openLoginModal();

@@ -77,9 +77,12 @@ router.post('/', requireAuth, (req, res) => {
   }
 });
 
-// 获取用户订单列表
+// 获取用户订单列表（本人或管理员）
 router.get('/user/:userid', requireAuth, (req, res) => {
   try {
+    if (req.user.id !== Number(req.params.userid) && req.user.role !== 'admin') {
+      return res.status(403).json({ code: 403, message: '无权查看他人订单' });
+    }
     const orders = db.prepare(`
       SELECT id, orderid, caipinmingcheng, tupian, buyshu, total, status, pickup_code, addtime
       FROM orders 
@@ -131,7 +134,24 @@ router.put('/:orderid/status', requireAdmin, (req, res) => {
       return res.status(409).json({ code: 409, message: `订单不能从「${current}」变更为「${status}」` });
     }
 
-    db.prepare('UPDATE orders SET status = ? WHERE orderid = ?').run(status, req.params.orderid);
+    if (status === '已退款') {
+      // 退款：事务内回退资金 + 库存 + 月售，再改状态
+      const refund = db.transaction(() => {
+        const items = db.prepare(
+          'SELECT caipinxinxiid, buyshu, total, userid FROM orders WHERE orderid = ?'
+        ).all(req.params.orderid);
+        const totalRefund = items.reduce((sum, r) => sum + r.total, 0);
+        db.prepare('UPDATE yonghu SET jine = jine + ? WHERE id = ?').run(totalRefund, items[0].userid);
+        const restock = db.prepare(
+          'UPDATE caipinxinxi SET kucun = kucun + ?, yueshuxiao = MAX(yueshuxiao - ?, 0) WHERE id = ?'
+        );
+        for (const r of items) restock.run(r.buyshu, r.buyshu, r.caipinxinxiid);
+        db.prepare("UPDATE orders SET status = '已退款' WHERE orderid = ?").run(req.params.orderid);
+      });
+      refund();
+    } else {
+      db.prepare('UPDATE orders SET status = ? WHERE orderid = ?').run(status, req.params.orderid);
+    }
 
     res.json({ code: 200, message: '订单状态更新成功', data: { orderid: req.params.orderid, status } });
   } catch (error) {

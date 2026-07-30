@@ -54,7 +54,7 @@ async function apiCall(method, endpoint, data = null) {
 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-        if (response.status === 401) {
+        if (response.status === 401 && !endpoint.startsWith('/users/login')) {
             localStorage.removeItem('zx_admin_token');
             const overlay = document.getElementById('login-overlay');
             if (overlay) overlay.style.display = 'flex';
