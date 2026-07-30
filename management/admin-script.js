@@ -45,24 +45,24 @@ function showToast(message, type = 'info') {
 
 // 统一 API 请求封装
 async function apiCall(method, endpoint, data = null) {
-    const options = {
-        method,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
+    const headers = { 'Content-Type': 'application/json' };
+    const token = localStorage.getItem('zx_admin_token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    if (data) {
-        options.body = JSON.stringify(data);
-    }
+    const options = { method, headers };
+    if (data) options.body = JSON.stringify(data);
 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || '请求失败');
+        if (response.status === 401) {
+            localStorage.removeItem('zx_admin_token');
+            const overlay = document.getElementById('login-overlay');
+            if (overlay) overlay.style.display = 'flex';
+            throw new Error('登录已过期，请重新登录');
         }
-        return await response.json();
+        const json = await response.json();
+        if (!response.ok) throw new Error(json.message || '请求失败');
+        return json;
     } catch (error) {
         console.error(`API Error [${method} ${endpoint}]:`, error);
         throw error;
@@ -79,8 +79,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function init() {
         setupNavigation();
+        if (localStorage.getItem('zx_admin_token')) {
+            enterDashboard();
+        } else {
+            showLoginOverlay();
+        }
+    }
+
+    function showLoginOverlay() {
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+
+    function enterDashboard() {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('admin-name').innerText =
+            localStorage.getItem('zx_admin_name') || '管理员';
         loadModule('dashboard');
     }
+
+    // 管理员登录（onclick 调用，需挂 window）
+    window.submitAdminLogin = async function() {
+        const zhanghao = document.getElementById('login-account').value.trim();
+        const mima = document.getElementById('login-password').value;
+        if (!zhanghao || !mima) return showToast('请输入账号和密码', 'warning');
+        try {
+            const res = await apiCall('POST', '/users/login', { zhanghao, mima });
+            if (res.data?.user?.role !== 'admin') {
+                return showToast('该账号不是管理员，无权进入后勤系统', 'error');
+            }
+            localStorage.setItem('zx_admin_token', res.data.token);
+            localStorage.setItem('zx_admin_name', res.data.user.xingming);
+            showToast(`欢迎，${res.data.user.xingming}`, 'success');
+            enterDashboard();
+        } catch (e) {
+            showToast(e.message || '登录失败', 'error');
+        }
+    };
 
     // 导航设置
     function setupNavigation() {
@@ -109,10 +143,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 退出按钮
         document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('zx_admin_token');
+            localStorage.removeItem('zx_admin_name');
             showToast('已安全退出登录', 'success');
-            setTimeout(() => {
-                window.location.href = '../canteen/index.html';
-            }, 1000);
+            setTimeout(() => showLoginOverlay(), 600);
         });
     }
 
@@ -347,6 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     address: o.address,
                     phone: o.phone,
                     remark: o.remark,
+                    pickupCode: o.pickup_code,
                     items: [],
                     totalPrice: 0
                 };
@@ -436,10 +471,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                                  style="width: 44px; height: 34px; object-fit: cover; border-radius: 6px;"
                                                  onerror="this.src='../canteen/dish-placeholder.svg'">
                                         </td>
-                                        <td><strong>${dish.caipinmingcheng}</strong></td>
+                                        <td><strong>${dish.caipinmingcheng}</strong>${dish.shangjia === '否' ? ' <span class="badge badge-danger">已下架</span>' : ''}</td>
                                         <td><span class="badge badge-info">${dish.caipinfenlei}</span></td>
                                         <td><strong style="color: #0066cc;">¥${dish.jiage}</strong></td>
-                                        <td>${dish.kucun} 份</td>
+                                        <td style="${dish.kucun < 20 ? 'color: #ff3b30; font-weight: 700;' : ''}">
+                                            ${dish.kucun} 份${dish.kucun < 20 ? ' ⚠️' : ''}
+                                        </td>
                                         <td>${dish.yueshuxiao}</td>
                                         <td>⭐ ${dish.pinfen}</td>
                                         <td>
@@ -447,6 +484,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     onclick="editDish(${JSON.stringify(dish).replace(/"/g, '&quot;')})">编辑</button>
                                             <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px; margin-left: 4px;" 
                                                     onclick="deleteDish(${dish.id})">删除</button>
+                                            <button class="btn" style="padding: 6px 12px; font-size: 12px; margin-left: 4px; ${dish.shangjia === '否' ? 'background: #34c759; color: white;' : ''}"
+                                                    onclick="toggleDishSale(${dish.id}, '${dish.shangjia === '否' ? '是' : '否'}')">${dish.shangjia === '否' ? '上架' : '下架'}</button>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -499,21 +538,28 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </td>
                                         <td>
                                             <span class="badge ${
+                                                order.status === '待取餐' ? 'badge-warning' :
                                                 order.status === '已支付' ? 'badge-success' :
                                                 order.status === '制作中' ? 'badge-warning' :
                                                 order.status === '已完成' ? 'badge-success' : 'badge-danger'
                                             }">
                                                 ${order.status}
                                             </span>
+                                                ${order.pickupCode ? `<div style="font-size: 11px; color: #86868b; margin-top: 4px;">码: <b>${order.pickupCode}</b></div>` : ''}
                                         </td>
                                         <td>
-                                            <select style="padding: 6px 10px; border-radius: 8px; border: 1px solid #d2d2d7; font-size: 12px; outline: none; background: white;"
-                                                    onchange="updateOrderStatus('${order.orderid}', this.value)">
-                                                <option value="已支付" ${order.status === '已支付' ? 'selected' : ''}>已支付</option>
-                                                <option value="制作中" ${order.status === '制作中' ? 'selected' : ''}>制作中</option>
-                                                <option value="已完成" ${order.status === '已完成' ? 'selected' : ''}>已完成</option>
-                                                <option value="已退款" ${order.status === '已退款' ? 'selected' : ''}>已退款</option>
-                                            </select>
+                                            ${order.status === '已支付' ? `
+                                                <button class="btn btn-success" style="padding: 6px 14px; font-size: 12px;" onclick="acceptOrder('${order.orderid}')">接单</button>
+                                                <button class="btn" style="padding: 6px 10px; font-size: 12px; margin-left: 4px; color: #ff3b30;" onclick="refundOrder('${order.orderid}')">退款</button>
+                                            ` : order.status === '制作中' ? `
+                                                <button class="btn" style="padding: 6px 14px; font-size: 12px; background: #ff9500; color: white;" onclick="callOrder('${order.orderid}')">叫号取餐</button>
+                                            ` : order.status === '待取餐' ? `
+                                                <div style="display: flex; gap: 6px; align-items: center;">
+                                                    <input id="pickup-input-${order.orderid}" placeholder="取餐码" maxlength="4"
+                                                           style="width: 64px; padding: 6px 8px; border: 1px solid #d2d2d7; border-radius: 8px; font-size: 12px; text-transform: uppercase; outline: none;">
+                                                    <button class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" onclick="verifyPickup('${order.orderid}')">核销</button>
+                                                </div>
+                                            ` : `<span style="color: #86868b; font-size: 12px;">—</span>`}
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -1077,15 +1123,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // ==================== 订单交互：状态调整 ====================
-    window.updateOrderStatus = async function(orderId, newStatus) {
+    // 菜品上下架
+    window.toggleDishSale = async function(id, next) {
         try {
-            const res = await apiCall('PUT', `/orders/${orderId}/status`, { status: newStatus });
-            showToast(`订单 ${orderId.slice(-6)} 状态已更新为【${newStatus}】`, 'success');
-            loadModule('canteen');
-        } catch (error) {
-            showToast(error.message || '状态更新失败', 'error');
-        }
+            await apiCall('PUT', `/dishes/${id}`, { shangjia: next });
+            showToast(next === '是' ? '菜品已上架' : '菜品已下架', 'success');
+            await loadModule('canteen');
+            const tabs = document.querySelectorAll('.tab-button');
+            if (tabs[1]) tabs[1].click();
+        } catch (e) { showToast(e.message, 'error'); }
+    };
+
+    // ==================== 订单操作流：接单 → 叫号 → 核销 ====================
+    async function refreshOrderModule() {
+        await loadModule('canteen');
+        // 重新激活"订单管理"Tab（第 3 个 tab-button）
+        const tabs = document.querySelectorAll('.tab-button');
+        if (tabs[2]) tabs[2].click();
+    }
+
+    window.acceptOrder = async function(orderid) {
+        try {
+            await apiCall('PUT', `/orders/${orderid}/status`, { status: '制作中' });
+            showToast('已接单，开始制作', 'success');
+            await refreshOrderModule();
+        } catch (e) { showToast(e.message, 'error'); }
+    };
+
+    window.callOrder = async function(orderid) {
+        try {
+            await apiCall('PUT', `/orders/${orderid}/status`, { status: '待取餐' });
+            showToast('已叫号，等待学生取餐', 'success');
+            await refreshOrderModule();
+        } catch (e) { showToast(e.message, 'error'); }
+    };
+
+    window.verifyPickup = async function(orderid) {
+        const input = document.getElementById(`pickup-input-${orderid}`);
+        const pickupCode = (input?.value || '').trim().toUpperCase();
+        if (!pickupCode) return showToast('请输入学生出示的取餐码', 'warning');
+        try {
+            await apiCall('POST', `/orders/${orderid}/pickup`, { pickupCode });
+            showToast('核销成功，订单完成', 'success');
+            await refreshOrderModule();
+        } catch (e) { showToast(e.message, 'error'); }
+    };
+
+    window.refundOrder = async function(orderid) {
+        if (!confirm('确认对该订单退款？')) return;
+        try {
+            await apiCall('PUT', `/orders/${orderid}/status`, { status: '已退款' });
+            showToast('已退款', 'success');
+            await refreshOrderModule();
+        } catch (e) { showToast(e.message, 'error'); }
     };
 
     // ==================== 反馈留言交互：官方处理回复 ====================

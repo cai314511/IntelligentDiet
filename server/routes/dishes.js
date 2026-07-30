@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
     const category = req.query.category;
     let query = `
       SELECT id, caipinmingcheng, caipinfenlei, tupian, cailiao, 
-             guige, jiage, yingyang, yueshuxiao, pinfen, kucun 
+             guige, jiage, yingyang, yueshuxiao, pinfen, kucun, shangjia 
       FROM caipinxinxi
     `;
     let params = [];
@@ -44,7 +44,7 @@ router.get('/:id', (req, res) => {
   try {
     const dish = db.prepare(`
       SELECT id, caipinmingcheng, caipinfenlei, tupian, cailiao, 
-             guige, jiage, yingyang, yueshuxiao, pinfen, kucun 
+             guige, jiage, yingyang, yueshuxiao, pinfen, kucun, shangjia 
       FROM caipinxinxi 
       WHERE id = ?
     `).get(req.params.id);
@@ -104,7 +104,7 @@ router.post('/', requireAdmin, (req, res) => {
 // 修改菜品（管理员）
 router.put('/:id', requireAdmin, (req, res) => {
   try {
-    const { caipinmingcheng, caipinfenlei, tupian, cailiao, guige, jiage, yingyang, kucun } = req.body;
+    const { caipinmingcheng, caipinfenlei, tupian, cailiao, guige, jiage, yingyang, kucun, shangjia } = req.body;
 
     db.prepare(`
       UPDATE caipinxinxi 
@@ -115,9 +115,10 @@ router.put('/:id', requireAdmin, (req, res) => {
           guige = COALESCE(?, guige),
           jiage = COALESCE(?, jiage),
           yingyang = COALESCE(?, yingyang),
-          kucun = COALESCE(?, kucun)
+          kucun = COALESCE(?, kucun),
+          shangjia = COALESCE(?, shangjia)
       WHERE id = ?
-    `).run(caipinmingcheng, caipinfenlei, tupian, cailiao, guige, jiage, yingyang, kucun, req.params.id);
+    `).run(caipinmingcheng, caipinfenlei, tupian, cailiao, guige, jiage, yingyang, kucun, shangjia, req.params.id);
 
     res.json({ code: 200, message: '菜品修改成功' });
   } catch (error) {
