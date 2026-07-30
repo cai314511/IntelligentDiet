@@ -120,6 +120,7 @@
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.style.color = link.dataset.target === view ? '#0071E3' : '#424245';
             });
+            if (view === 'orders') startOrderPolling(); else stopOrderPolling();
             render();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -137,6 +138,7 @@
             else if (state.currentView === 'nutrition') renderNutritionView();
             else if (state.currentView === 'social') renderSocialView();
             else if (state.currentView === 'culture') renderCultureView();
+            else if (state.currentView === 'orders') renderOrdersView();
         }
 
         // ================= 模块1：智能点餐系统 =================
@@ -751,14 +753,219 @@
             document.getElementById('cart-drawer').classList.toggle('translate-x-full');
         }
 
+        // ================= 结算链路：确认 → 收银台 → 支付 → 取餐码 =================
+        function cartTotal() {
+            return state.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+        }
+
         function simulateCheckout() {
             if (state.cart.length === 0) return toast('请先添加菜品！', 'warning');
+            if (!requireLogin()) return;
             toggleCart();
-            if(!state.aiOpen) toggleAI();
-            setTimeout(() => {
-                renderAiMsg(`✅ 支付成功！总计 ${document.getElementById('cart-total').innerText}。<br><b>取餐码：A042</b><br>我会在餐好时语音提醒您。`);
-                state.cart = []; updateCartUI();
-            }, 600);
+            const user = currentUser();
+            const total = cartTotal();
+            modalRoot.innerHTML = `
+                <div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal" onclick="if(event.target===this)closeModal()">
+                    <div class="bg-white rounded-[28px] p-8 w-[92%] max-w-[480px] shadow-appleHover slide-up max-h-[85vh] overflow-y-auto">
+                        <h2 class="text-2xl font-bold mb-1">确认订单</h2>
+                        <p class="text-appleLightGray text-sm mb-6">核对菜品与取餐信息</p>
+                        <div class="space-y-3 mb-5">
+                            ${state.cart.map(i => `
+                                <div class="flex justify-between items-center bg-appleGray rounded-xl p-3">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="${i.img}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='dish-placeholder.svg'">
+                                        <span class="font-medium text-sm">${i.name} <span class="text-appleLightGray">x${i.qty}</span></span>
+                                    </div>
+                                    <span class="font-bold text-sm">¥${(i.price * i.qty).toFixed(2)}</span>
+                                </div>`).join('')}
+                        </div>
+                        <div class="mb-4">
+                            <label class="text-sm text-appleLightGray block mb-2">取餐食堂</label>
+                            <select id="checkout-address" class="w-full bg-appleGray rounded-xl px-4 py-3 outline-none text-sm">
+                                ${DB.restaurants.map(r => `<option value="${r.name}">${r.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="text-sm text-appleLightGray block mb-2">备注（口味偏好等）</label>
+                            <input id="checkout-remark" placeholder="少辣 / 不要香菜…" class="w-full bg-appleGray rounded-xl px-4 py-3 outline-none text-sm">
+                        </div>
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-appleLightGray text-sm">账户余额 <b class="text-appleDark">¥${Number(user.jine).toFixed(2)}</b></span>
+                            <span class="text-xl font-bold">合计 <span class="text-appleBlue">¥${total.toFixed(2)}</span></span>
+                        </div>
+                        <button onclick="confirmOrder()" class="w-full bg-appleBlue text-white py-3.5 rounded-full font-bold hover:opacity-90 transition glass-btn-active">去支付</button>
+                    </div>
+                </div>`;
+        }
+
+        async function confirmOrder() {
+            const items = state.cart.map(i => ({ dishId: i.id, quantity: i.qty }));
+            const address = document.getElementById('checkout-address').value;
+            const remark = document.getElementById('checkout-remark').value.trim();
+            const user = currentUser();
+            const btn = document.querySelector('#modal-container button[onclick="confirmOrder()"]');
+            if (btn) { btn.disabled = true; btn.innerText = '下单中…'; }
+
+            const { status, json } = await api('POST', '/orders', {
+                items, address, remark, phone: user.lianxifangshi || ''
+            });
+            if (status !== 200) {
+                if (btn) { btn.disabled = false; btn.innerText = '去支付'; }
+                return toast(json.message || '下单失败', 'error');
+            }
+            openCashier(json.data.orderid, json.data.totalPrice);
+        }
+
+        function openCashier(orderid, totalPrice) {
+            const user = currentUser();
+            const enough = Number(user.jine) >= totalPrice;
+            modalRoot.innerHTML = `
+                <div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal">
+                    <div class="bg-white rounded-[28px] p-8 w-[92%] max-w-[400px] shadow-appleHover slide-up text-center">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-appleGray flex items-center justify-center text-3xl">🍚</div>
+                        <p class="text-appleLightGray text-sm mb-1">校园卡余额支付</p>
+                        <p class="text-4xl font-bold mb-1">¥${totalPrice.toFixed(2)}</p>
+                        <p class="text-sm mb-6 ${enough ? 'text-appleLightGray' : 'text-red-500 font-medium'}">
+                            当前余额 ¥${Number(user.jine).toFixed(2)}${enough ? '' : '（余额不足）'}
+                        </p>
+                        <button id="pay-btn" onclick="payOrder('${orderid}')" ${enough ? '' : 'disabled'}
+                            class="w-full ${enough ? 'bg-appleBlue' : 'bg-gray-300 cursor-not-allowed'} text-white py-3.5 rounded-full font-bold transition glass-btn-active">
+                            确认支付
+                        </button>
+                        <button onclick="closeModal()" class="w-full text-appleLightGray text-sm mt-4 hover:text-appleDark transition">暂不支付（订单保留为未支付）</button>
+                    </div>
+                </div>`;
+        }
+
+        async function payOrder(orderid) {
+            const btn = document.getElementById('pay-btn');
+            if (btn) { btn.disabled = true; btn.innerText = '支付中…'; }
+            const { status, json } = await api('POST', `/orders/${orderid}/pay`);
+            if (status !== 200) {
+                if (btn) { btn.disabled = false; btn.innerText = '确认支付'; }
+                return toast(json.message || '支付失败', 'error');
+            }
+            // 更新本地余额
+            const user = currentUser();
+            user.jine = json.data.balance;
+            setSession(getToken(), user);
+            // 清空购物车
+            state.cart = [];
+            saveCart();
+            updateCartUI();
+            renderUserEntry();
+            showPickupCode(json.data.pickupCode);
+        }
+
+        function showPickupCode(pickupCode) {
+            modalRoot.innerHTML = `
+                <div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal">
+                    <div class="bg-white rounded-[28px] p-10 w-[92%] max-w-[400px] shadow-appleHover slide-up text-center">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
+                            <i class="fa-solid fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-1">支付成功</h2>
+                        <p class="text-appleLightGray text-sm mb-6">取餐时请向档口出示取餐码</p>
+                        <div class="bg-appleGray rounded-2xl py-6 mb-6">
+                            <span class="text-6xl font-black tracking-[0.2em] text-appleDark">${pickupCode}</span>
+                        </div>
+                        <button onclick="closeModal(); navigate('orders')" class="w-full bg-appleBlue text-white py-3.5 rounded-full font-bold hover:opacity-90 transition glass-btn-active">查看订单进度</button>
+                    </div>
+                </div>`;
+        }
+
+        // ================= 我的订单：状态时间线 + 3 秒轮询 =================
+        let orderPollTimer = null;
+
+        function startOrderPolling() {
+            stopOrderPolling();
+            orderPollTimer = setInterval(() => {
+                if (state.currentView === 'orders') renderOrdersView();
+                else stopOrderPolling();
+            }, 3000);
+        }
+
+        function stopOrderPolling() {
+            if (orderPollTimer) { clearInterval(orderPollTimer); orderPollTimer = null; }
+        }
+
+        const ORDER_FLOW = ['已支付', '制作中', '待取餐', '已完成'];
+
+        async function renderOrdersView() {
+            if (!getToken()) {
+                appRoot.innerHTML = `
+                    <div class="text-center py-24 fade-in">
+                        <div class="text-5xl mb-4">🔐</div>
+                        <p class="text-appleLightGray mb-6">登录后即可查看你的订单</p>
+                        <button onclick="openLoginModal()" class="bg-appleBlue text-white px-8 py-3 rounded-full font-bold glass-btn-active">去登录</button>
+                    </div>`;
+                return;
+            }
+
+            const { status, json } = await api('GET', `/orders/user/${currentUser().id}`);
+            if (status !== 200) {
+                appRoot.innerHTML = '<div class="text-center py-24 text-appleLightGray">订单加载失败，请稍后重试</div>';
+                return;
+            }
+
+            // 按 orderid 分组（订单表一行一菜品）
+            const groups = {};
+            for (const row of json.data) {
+                if (!groups[row.orderid]) groups[row.orderid] = { orderid: row.orderid, status: row.status, addtime: row.addtime, pickupCode: row.pickup_code, items: [], total: 0 };
+                groups[row.orderid].items.push({ name: row.caipinmingcheng, qty: row.buyshu, img: row.tupian });
+                groups[row.orderid].total += row.total;
+            }
+            const orders = Object.values(groups);
+
+            const stepIndex = s => ORDER_FLOW.indexOf(s);
+
+            appRoot.innerHTML = `
+                <div class="mb-8 flex items-end justify-between">
+                    <div>
+                        <h1 class="text-4xl font-bold tracking-tight">我的订单</h1>
+                        <p class="text-appleLightGray mt-1">状态每 3 秒自动刷新，餐好立即可见</p>
+                    </div>
+                    <span class="text-sm text-appleLightGray">${orders.length} 笔订单</span>
+                </div>
+                ${orders.length === 0 ? `
+                    <div class="text-center py-24 fade-in">
+                        <div class="text-5xl mb-4">🍽️</div>
+                        <p class="text-appleLightGray mb-6">还没有订单，去点一份心仪的美食吧</p>
+                        <button onclick="navigate('order')" class="bg-appleBlue text-white px-8 py-3 rounded-full font-bold glass-btn-active">去点餐</button>
+                    </div>` : orders.map(o => `
+                    <div class="bg-white rounded-[24px] p-6 shadow-apple border border-gray-100 mb-5 fade-in">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-xs text-appleLightGray">订单号 ${o.orderid.slice(-8)} · ${o.addtime}</span>
+                                <div class="mt-2 space-y-1">
+                                    ${o.items.map(i => `<p class="text-sm font-medium">• ${i.name} <span class="text-appleLightGray">x${i.qty}</span></p>`).join('')}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-lg">¥${o.total.toFixed(2)}</p>
+                                ${o.status === '待取餐' && o.pickupCode ? `
+                                    <div class="mt-2 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2 animate-pulse">
+                                        <span class="text-xs text-yellow-700 block">取餐码</span>
+                                        <span class="text-2xl font-black tracking-widest text-yellow-700">${o.pickupCode}</span>
+                                    </div>` : ''}
+                            </div>
+                        </div>
+                        ${ORDER_FLOW.includes(o.status) ? `
+                        <div class="flex items-center mt-4">
+                            ${ORDER_FLOW.map((s, idx) => `
+                                <div class="flex items-center ${idx < ORDER_FLOW.length - 1 ? 'flex-1' : ''}">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                                            ${idx <= stepIndex(o.status) ? (o.status === '待取餐' && idx === stepIndex(o.status) ? 'bg-yellow-400 text-white animate-pulse' : 'bg-appleBlue text-white') : 'bg-gray-200 text-gray-400'}">
+                                            ${idx < stepIndex(o.status) ? '✓' : idx + 1}
+                                        </div>
+                                        <span class="text-[11px] mt-1 ${idx <= stepIndex(o.status) ? 'text-appleDark font-medium' : 'text-gray-400'}">${s}</span>
+                                    </div>
+                                    ${idx < ORDER_FLOW.length - 1 ? `<div class="flex-1 h-0.5 mx-2 ${idx < stepIndex(o.status) ? 'bg-appleBlue' : 'bg-gray-200'}"></div>` : ''}
+                                </div>`).join('')}
+                        </div>` : `<p class="mt-4 text-sm font-medium ${o.status === '已取消' || o.status === '已退款' ? 'text-red-500' : 'text-appleLightGray'}">当前状态：${o.status}${o.status === '未支付' ? '（可到收银台继续支付）' : ''}</p>`}
+                    </div>`).join('')}
+            `;
         }
 
         // ================= AI 对话框交互 =================
