@@ -1,6 +1,7 @@
 import express from 'express';
 import { db } from '../database.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
+import { ORDER_STATUS, canTransition } from '../utils/orderState.js';
 
 const router = express.Router();
 
@@ -95,28 +96,38 @@ router.get('/:orderid', requireAuth, (req, res) => {
       WHERE orderid = ?
     `).all(req.params.orderid);
 
+    if (orders.length === 0) {
+      return res.status(404).json({ code: 404, message: '订单不存在' });
+    }
+
     res.json({ code: 200, data: orders });
   } catch (error) {
     res.status(500).json({ code: 500, message: error.message });
   }
 });
 
-// 更新订单状态
+// 更新订单状态（管理员，状态机校验）
 router.put('/:orderid/status', requireAdmin, (req, res) => {
   try {
     const { status } = req.body;
 
-    if (!status) {
-      return res.status(400).json({ code: 400, message: '状态不能为空' });
+    if (!status || !ORDER_STATUS.includes(status)) {
+      return res.status(400).json({ code: 400, message: '非法的订单状态' });
     }
 
-    db.prepare(`
-      UPDATE orders 
-      SET status = ?
-      WHERE orderid = ?
-    `).run(status, req.params.orderid);
+    const rows = db.prepare('SELECT DISTINCT status FROM orders WHERE orderid = ?').all(req.params.orderid);
+    if (rows.length === 0) {
+      return res.status(404).json({ code: 404, message: '订单不存在' });
+    }
 
-    res.json({ code: 200, message: '订单状态更新成功' });
+    const current = rows[0].status;
+    if (!canTransition(current, status)) {
+      return res.status(409).json({ code: 409, message: `订单不能从「${current}」变更为「${status}」` });
+    }
+
+    db.prepare('UPDATE orders SET status = ? WHERE orderid = ?').run(status, req.params.orderid);
+
+    res.json({ code: 200, message: '订单状态更新成功', data: { orderid: req.params.orderid, status } });
   } catch (error) {
     res.status(500).json({ code: 500, message: error.message });
   }
