@@ -1,95 +1,133 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智饷 - 高校智慧食堂智能移动平台</title>
-    <link rel="stylesheet" href="styles_v2.css">
+    <title>「智饷」高校智慧食堂 - 体验全新的校园就餐生活</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        appleBlue: '#0071E3',
+                        appleDark: '#1D1D1F',
+                        appleGray: '#F5F5F7',
+                        appleText: '#424245',
+                        appleLightGray: '#86868B',
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Helvetica Neue"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        apple: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                        appleHover: '0 10px 40px rgba(0, 0, 0, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="app.css">
 </head>
-<body>
-    <!-- 顶部导航栏 -->
-    <nav id="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <img src="logo.svg" alt="智饷Logo" class="logo-img">
+<body class="font-sans antialiased">
+
+    <nav class="glass-nav fixed top-0 w-full z-50 transition-all duration-300">
+        <div class="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="text-xl font-bold tracking-tight cursor-pointer" onclick="navigate('home')">
+                <i class="fa-solid fa-leaf text-appleBlue mr-2"></i>智饷校园
             </div>
-            <ul class="nav-menu">
-                <li><a href="#" data-page="home">首页</a></li>
-                <li><a href="#" data-page="order">智能点餐</a></li>
-                <li><a href="#" data-page="recommend">菜品推荐</a></li>
-                <li><a href="#" data-page="social">互动广场</a></li>
-                <li><a href="#" data-page="culture">文创活动</a></li>
-            </ul>
-            <div class="nav-user">
-                <button id="user-center">用户中心</button>
+            <div class="hidden md:flex space-x-8 text-[15px] font-medium text-appleText">
+                <a href="#" class="nav-link hover:text-appleBlue transition-colors" data-target="order">智能点餐</a>
+                <a href="#" class="nav-link hover:text-appleBlue transition-colors" data-target="nutrition">AI营养师</a>
+                <a href="#" class="nav-link hover:text-appleBlue transition-colors" data-target="social">食话广场</a>
+                <a href="#" class="nav-link hover:text-appleBlue transition-colors" data-target="culture">文创活动</a>
+                <a href="#" class="nav-link hover:text-appleBlue transition-colors" data-target="orders">我的订单</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleCart()" class="relative text-appleText hover:text-appleBlue transition">
+                    <i class="fa-solid fa-bag-shopping text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden cursor-pointer border border-gray-300">
+                    <img src="https://ui-avatars.com/api/?name=User&background=0066CC&color=fff" alt="User">
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- 主内容区域 -->
-    <main id="main-content">
-        <!-- 页面内容将动态加载在这里 -->
-    </main>
+    <main id="app-root" class="pt-24 pb-20 min-h-screen max-w-[1200px] mx-auto px-4 sm:px-6"></main>
 
-    <!-- AI精灵小智 -->
-    <div id="xiaozhi-icon" class="xiaozhi-floating" title="点击打开小智助手 🤖">
-        <img src="xiaozhi-logo.svg" alt="小智AI精灵" style="width: 100%; height: 100%;">
-    </div>
-
-    <!-- 小智对话面板 -->
-    <div id="xiaozhi-panel" class="xiaozhi-panel hidden">
-        <div class="panel-header">
-            <h3>小智AI精灵</h3>
-            <button id="close-panel">×</button>
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 w-96 glass-panel z-[60] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <div class="p-6 border-b border-gray-200/50 flex justify-between items-center">
+            <h2 class="text-2xl font-bold">我的餐盘</h2>
+            <button onclick="toggleCart()" class="text-gray-400 hover:text-appleDark"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
-        <div class="panel-content">
-            <div id="chat-history"></div>
-            <div class="quick-actions">
-                <button class="quick-btn" data-action="queue">查看排队</button>
-                <button class="quick-btn" data-action="diet">生成食谱</button>
-                <button class="quick-btn" data-action="activity">最新活动</button>
-                <button class="quick-btn" data-action="order">我的订单</button>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <div class="p-6 border-t border-gray-200/50 bg-gray-50/30">
+            <div class="flex justify-between mb-4 font-semibold text-lg">
+                <span>总计</span>
+                <span id="cart-total" class="text-appleBlue">¥0.00</span>
             </div>
-            <div class="input-area">
-                <input type="text" id="chat-input" placeholder="输入问题或指令...">
-                <button id="voice-btn">🎤</button>
-                <button id="send-btn">发送</button>
-            </div>
+            <button onclick="simulateCheckout()" class="w-full bg-appleBlue hover:bg-blue-600 text-white font-semibold py-3 rounded-2xl transition-colors shadow-md glass-btn-active">
+                一键下单 (Apple Pay模拟)
+            </button>
         </div>
     </div>
 
-    <!-- 用户登录/资料模态框 -->
-    <div id="user-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3 id="user-modal-title">登录</h3>
-            <div id="login-form">
-                <input type="text" id="username" placeholder="用户名">
-                <input type="password" id="password" placeholder="密码">
-                <button id="login-btn" class="btn">登录</button>
+    <div class="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
+        <div id="ai-panel" class="mb-4 w-80 sm:w-96 glass-panel rounded-[24px] overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-300 origin-bottom-right shadow-2xl flex flex-col relative" style="height: 500px;">
+            <div class="bg-gradient-to-r from-appleBlue to-blue-500 text-white p-4 flex justify-between items-center z-10">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><i class="fa-solid fa-robot"></i></div>
+                    <span class="font-semibold tracking-wide">小智 AI 助理</span>
+                </div>
+                <button onclick="toggleAI()" class="text-white/80 hover:text-white"><i class="fa-solid fa-chevron-down"></i></button>
             </div>
-            <div id="profile-form" class="hidden">
-                <label>身高(cm): <input type="number" id="profile-height"></label>
-                <label>体重(kg): <input type="number" id="profile-weight"></label>
-                <label>BMI: <input type="text" id="profile-bmi" readonly></label>
-                <label>健康目标: <input type="text" id="profile-goals"></label>
-                <button id="save-profile-btn" class="btn btn-success">保存资料</button>
+            
+            <div id="ai-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50/50 text-sm z-10">
+                <div class="flex items-start space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-appleBlue text-white flex shrink-0 items-center justify-center"><i class="fa-solid fa-robot text-xs"></i></div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-appleText">
+                        同学你好！我是小智。试试顶部的【塔罗牌测运势】，或者直接问我排队情况、帮你搭配减脂餐哦！
+                    </div>
+                </div>
             </div>
-            <button id="close-user-modal" class="btn btn-secondary">关闭</button>
+
+            <!-- 智能语音识别流体声波浮窗 -->
+            <div id="ai-speech-wave-container" class="hidden absolute bottom-16 left-4 right-4 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl p-4 shadow-xl flex items-center space-x-3 transition-all duration-300 z-50 pop-in">
+                <div class="flex items-center space-x-1 h-6 shrink-0">
+                    <div class="w-1 h-3 bg-red-400 rounded speech-wave-bar"></div>
+                    <div class="w-1 h-5 bg-red-500 rounded speech-wave-bar" style="animation-delay: 0.1s"></div>
+                    <div class="w-1 h-4 bg-red-500 rounded speech-wave-bar" style="animation-delay: 0.2s"></div>
+                    <div class="w-1 h-6 bg-red-600 rounded speech-wave-bar" style="animation-delay: 0.3s"></div>
+                    <div class="w-1 h-3 bg-red-400 rounded speech-wave-bar" style="animation-delay: 0.4s"></div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">智能声卡识别</p>
+                    <p id="ai-speech-text" class="text-xs font-semibold text-appleDark truncate leading-normal">正在聆听中，请说话...</p>
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-gray-200/50 bg-white/80 backdrop-blur flex items-center space-x-2 z-10">
+                <button id="ai-mic-btn" onclick="toggleSpeechRecognition()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors flex items-center justify-center"><i class="fa-solid fa-microphone"></i></button>
+                <input type="text" id="ai-input" placeholder="输入指令，例如：去二食堂占座..." class="flex-1 bg-gray-100 rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-appleBlue/50 text-sm">
+                <button onclick="handleAiInput()" class="w-10 h-10 rounded-full bg-appleBlue text-white hover:bg-blue-600 transition-colors shadow-sm glass-btn-active"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
         </div>
+
+        <button onclick="toggleAI()" class="w-16 h-16 rounded-full bg-appleBlue text-white shadow-[0_10px_25px_rgba(0,113,227,0.4)] flex items-center justify-center text-2xl hover:scale-105 transition-transform duration-300 relative glass-btn-active">
+            <i class="fa-solid fa-robot"></i>
+            <span class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+        </button>
     </div>
 
-    <!-- 页脚 -->
-    <footer id="footer">
-        <div class="footer-container">
-            <p>&copy; 2026 智饷高校智慧食堂系统. 中央财经大学活动支持项目.</p>
-            <div class="footer-links">
-                <a href="#">关于我们</a>
-                <a href="#">反馈建议</a>
-                <a href="#">合作高校</a>
-            </div>
-        </div>
-    </footer>
-    <script src="data.js"></script>
-    <script src="script_v3_api.js"></script>
+    <div id="modal-container"></div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

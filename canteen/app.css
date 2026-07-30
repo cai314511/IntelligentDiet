@@ -1,0 +1,76 @@
+        /* 基础苹果风重置与动画 */
+        body { background-color: #F5F5F7; color: #1D1D1F; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .glass-panel { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .glass-modal { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+        
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        /* 隐藏滚动条 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 呼吸动画 */
+        .pulse-red { animation: pulseRed 2s infinite; }
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
+
+        /* 塔罗牌 3D 翻转动效 */
+        .flip-card { perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .flip-card-front { background: linear-gradient(135deg, #1e1e24 0%, #0a0a10 100%); display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.1); }
+        .flip-card-back { transform: rotateY(180deg); background: white; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .card-pattern { opacity: 0.1; background-image: radial-gradient(#ffffff 2px, transparent 2px); background-size: 20px 20px; position: absolute; inset: 0; }
+        
+        /* 兴趣标签选中态 */
+        .interest-tag.active { background-color: #0071E3; color: white; border-color: #0071E3; transform: scale(1.05); }
+        
+        /* 营养师进度条动画 */
+        .progress-bar { transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        /* 动态流体渐变背景 */
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .bg-animated-gradient {
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+        }
+        
+        /* 毛玻璃悬浮按压 */
+        .glass-btn-active { cursor: pointer; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-btn-active:active { transform: scale(0.95); }
+        
+        /* 选项卡选中态（AI营养师模块） */
+        .option-tag { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .option-tag.active { background-color: #0071E3 !important; color: white !important; border-color: #0071E3 !important; transform: scale(1.05); }
+
+        /* CSS 饼状图 */
+        .pie-chart {
+            background: conic-gradient(
+                #FF3B30 0% 55%,  /* 碳水 55% */
+                #FF9500 55% 75%, /* 蛋白 20% */
+                #34C759 75% 100% /* 脂肪 25% */
+            );
+            border-radius: 50%;
+        }
+        /* 语音音波柱动画 */
+        @keyframes speechWaveJump {
+            0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
+            50% { transform: scaleY(1.3); opacity: 1; }
+        }
+        .speech-wave-bar {
+            transform-origin: center;
+            animation: speechWaveJump 0.8s ease-in-out infinite;
+        }
