@@ -1,0 +1,95 @@
+<DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智饷 - 高校智慧食堂智能移动平台</title>
+    <link rel="stylesheet" href="styles_v2.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="logo.svg" alt="智饷Logo" class="logo-img">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" data-page="home">首页</a></li>
+                <li><a href="#" data-page="order">智能点餐</a></li>
+                <li><a href="#" data-page="recommend">菜品推荐</a></li>
+                <li><a href="#" data-page="social">互动广场</a></li>
+                <li><a href="#" data-page="culture">文创活动</a></li>
+            </ul>
+            <div class="nav-user">
+                <button id="user-center">用户中心</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main id="main-content">
+        <!-- 页面内容将动态加载在这里 -->
+    </main>
+
+    <!-- AI精灵小智 -->
+    <div id="xiaozhi-icon" class="xiaozhi-floating" title="点击打开小智助手 🤖">
+        <img src="xiaozhi-logo.svg" alt="小智AI精灵" style="width: 100%; height: 100%;">
+    </div>
+
+    <!-- 小智对话面板 -->
+    <div id="xiaozhi-panel" class="xiaozhi-panel hidden">
+        <div class="panel-header">
+            <h3>小智AI精灵</h3>
+            <button id="close-panel">×</button>
+        </div>
+        <div class="panel-content">
+            <div id="chat-history"></div>
+            <div class="quick-actions">
+                <button class="quick-btn" data-action="queue">查看排队</button>
+                <button class="quick-btn" data-action="diet">生成食谱</button>
+                <button class="quick-btn" data-action="activity">最新活动</button>
+                <button class="quick-btn" data-action="order">我的订单</button>
+            </div>
+            <div class="input-area">
+                <input type="text" id="chat-input" placeholder="输入问题或指令...">
+                <button id="voice-btn">🎤</button>
+                <button id="send-btn">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户登录/资料模态框 -->
+    <div id="user-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="user-modal-title">登录</h3>
+            <div id="login-form">
+                <input type="text" id="username" placeholder="用户名">
+                <input type="password" id="password" placeholder="密码">
+                <button id="login-btn" class="btn">登录</button>
+            </div>
+            <div id="profile-form" class="hidden">
+                <label>身高(cm): <input type="number" id="profile-height"></label>
+                <label>体重(kg): <input type="number" id="profile-weight"></label>
+                <label>BMI: <input type="text" id="profile-bmi" readonly></label>
+                <label>健康目标: <input type="text" id="profile-goals"></label>
+                <button id="save-profile-btn" class="btn btn-success">保存资料</button>
+            </div>
+            <button id="close-user-modal" class="btn btn-secondary">关闭</button>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer id="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 智饷高校智慧食堂系统. 中央财经大学活动支持项目.</p>
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">反馈建议</a>
+                <a href="#">合作高校</a>
+            </div>
+        </div>
+    </footer>
+    <script src="data.js"></script>
+    <script src="script_v3_api.js"></script>
+</body>
+</html>

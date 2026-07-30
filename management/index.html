@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智饷高校后勤管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">智饷高校后勤管理系统</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" data-module="dashboard">数据大屏</a></li>
+                <li><a href="#" data-module="canteen">食堂管控</a></li>
+                <li><a href="#" data-module="safety">安全监管</a></li>
+                <li><a href="#" data-module="conservation">节约校园</a></li>
+                <li><a href="#" data-module="service">服务管理</a></li>
+            </ul>
+            <div class="nav-user">
+                <span id="admin-name">管理员</span>
+                <button id="logout-btn">退出</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 侧边栏菜单 -->
+    <aside id="sidebar">
+        <div class="sidebar-header">智饷管理后台</div>
+        <ul class="sidebar-menu">
+            <li><a href="#" data-module="dashboard" class="menu-item active">📊 数据统计与决策</a></li>
+            <li><a href="#" data-module="canteen" class="menu-item">🏪 食堂运营管控</a></li>
+            <li><a href="#" data-module="safety" class="menu-item">🔒 食品安全监管</a></li>
+            <li><a href="#" data-module="conservation" class="menu-item">🌱 节约型校园</a></li>
+            <li><a href="#" data-module="service" class="menu-item">💼 校园服务管理</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p>中央财经大学后勤处</p>
+            <p>2026年</p>
+        </div>
+    </aside>
+
+    <!-- 主内容区域 -->
+    <main id="main-content">
+        <!-- 页面内容将动态加载在这里 -->
+    </main>
+
+    <!-- 页脚 -->
+    <footer id="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 智饷高校后勤管理系统. 中央财经大学</p>
+        </div>
+    </footer>
+
+    <script src="admin-data.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>

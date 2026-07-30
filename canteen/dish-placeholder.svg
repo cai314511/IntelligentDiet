@@ -1,0 +1,38 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dishGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5F5F7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E8E8ED;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="400" height="300" fill="url(#dishGradient)"/>
+  
+  <!-- 装饰圆形 -->
+  <circle cx="200" cy="150" r="80" fill="#0066CC" opacity="0.1"/>
+  
+  <!-- 盘子 -->
+  <ellipse cx="200" cy="150" rx="70" ry="60" fill="#ffffff" stroke="#D2D2D7" stroke-width="2"/>
+  
+  <!-- 盘子投影 -->
+  <ellipse cx="200" cy="158" rx="65" ry="10" fill="#00000010"/>
+  
+  <!-- 食物示意图 -->
+  <g opacity="0.6">
+    <!-- 米饭堆 -->
+    <ellipse cx="170" cy="140" rx="25" ry="20" fill="#FFE4B5"/>
+    
+    <!-- 蔬菜 -->
+    <circle cx="215" cy="145" r="15" fill="#90EE90"/>
+    <circle cx="225" cy="135" r="12" fill="#98D98E"/>
+    
+    <!-- 肉类 -->
+    <rect x="240" y="150" width="20" height="18" rx="3" fill="#D2691E"/>
+  </g>
+  
+  <!-- 文字：图片加载中 -->
+  <text x="200" y="230" font-family="Arial, sans-serif" font-size="16" fill="#86868B" text-anchor="middle">
+    菜品图片
+  </text>
+</svg>
