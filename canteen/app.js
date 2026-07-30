@@ -33,6 +33,57 @@
             }
         };
 
+        // --- 真实数据接入：用后端数据覆盖 mock DB（字段映射回原结构，下游 UI 零改动） ---
+        function parseNutrition(yingyang) {
+            const text = yingyang || '';
+            const cal = text.match(/热量\s*(\d+)\s*kcal/);
+            const protein = text.match(/蛋白质\s*(\d+)\s*g/);
+            return { cal: cal ? Number(cal[1]) : 0, protein: protein ? Number(protein[1]) : 0 };
+        }
+
+        async function loadRemoteData() {
+            // 菜品
+            const dishRes = await api('GET', '/dishes');
+            if (dishRes.status === 200 && dishRes.json.data) {
+                const onSale = dishRes.json.data.filter(d => d.shangjia !== '否');
+                if (onSale.length > 0) {
+                    DB.menu = onSale.map(d => {
+                        const n = parseNutrition(d.yingyang);
+                        return {
+                            id: d.id,
+                            name: d.caipinmingcheng,
+                            category: d.caipinfenlei,
+                            price: d.jiage,
+                            img: (d.tupian && d.tupian.startsWith('http')) ? d.tupian : (d.tupian || 'dish-placeholder.svg'),
+                            cal: n.cal,
+                            protein: n.protein,
+                            tag: d.cailiao ? d.cailiao.split('，')[0] : '',
+                            sales: d.yueshuxiao || 0,
+                            rating: d.pinfen || 5.0,
+                            stock: d.kucun,
+                            isNew: (d.yueshuxiao || 0) < 20,
+                            overstocked: (d.kucun || 0) > 80,
+                            nutritionGoal: '',
+                            window: d.caipinfenlei
+                        };
+                    });
+                }
+            }
+            // 餐厅（后端目前为硬编码演示数据，做字段映射）
+            const restRes = await api('GET', '/restaurants');
+            if (restRes.status === 200 && Array.isArray(restRes.json.data) && restRes.json.data.length > 0) {
+                DB.restaurants = restRes.json.data.map((r, i) => ({
+                    id: r.id ?? i + 1,
+                    name: r.name,
+                    queues: r.queueCount ?? r.queues ?? 0,
+                    waitTime: r.queueTime ?? r.waitTime ?? 0,
+                    seats: r.availableSeats ?? r.seats ?? 0,
+                    totalSeats: r.totalSeats ?? 0,
+                    status: (r.queueTime ?? 0) > 20 ? 'warning' : ((r.queueCount ?? 0) === 0 ? 'empty' : 'good')
+                }));
+            }
+        }
+
         // 🚨 补充缺失的核心选项数组（用于 AI 营养师多步向导） 🚨
         const GOAL_OPTIONS = ['💪 减脂增肌', '🥬 低碳水', '🥚 高蛋白质', '😋 吃饱吃好', '🌶️ 无辣不欢', '🍵 清淡养生', '✨ 抗糖抗老', '💰 性价比最高'];
         const TASTE_OPTIONS = ['辛辣', '油腻', '清淡', '过甜', '重咸', '生冷', '酸涩'];
@@ -1064,9 +1115,6 @@
 
         // ================= 核心启动项 =================
         window.onload = () => {
-            navigate('order');
-            updateCartUI();
-
             // 监听键盘回车事件发送消息
             const aiInput = document.getElementById('ai-input');
             if (aiInput) {
@@ -1084,3 +1132,11 @@
                 }
             }, 800);
         };
+
+        // --- 启动引导 ---
+        renderUserEntry();
+        (async () => {
+            await loadRemoteData();
+            render();
+            updateCartUI();
+        })();
