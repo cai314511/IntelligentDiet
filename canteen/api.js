@@ -118,3 +118,20 @@ function renderUserEntry() {
        <button onclick="logout()" class="text-sm text-appleLightGray hover:text-appleDark transition">退出</button>`
     : `<button onclick="openLoginModal()" class="bg-appleBlue text-white text-sm px-5 py-2 rounded-full font-medium hover:opacity-90 transition glass-btn-active">登录 / 注册</button>`;
 }
+
+// ---- 全局 toast 通知 ----
+function toast(message, type = 'info') {
+  document.getElementById('zx-toast')?.remove();
+  const el = document.createElement('div');
+  el.id = 'zx-toast';
+  const colors = { info: '#0071E3', success: '#34c759', warning: '#ff9500', error: '#ff3b30' };
+  el.style.cssText = `
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+    background: ${colors[type] || colors.info}; color: #fff; padding: 12px 28px;
+    border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    z-index: 20000; font-weight: 600; font-size: 14px; transition: all .3s ease;
+  `;
+  el.innerText = message;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.marginTop = '-12px'; setTimeout(() => el.remove(), 300); }, 2600);
+}

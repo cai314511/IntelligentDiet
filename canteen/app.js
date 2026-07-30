@@ -279,7 +279,7 @@
         function savePreferencesAndContinue() {
             const specific = document.getElementById('specific-interest').value.trim();
             if (state.selectedTags.length === 0 && !specific) {
-                alert('请至少选择或输入一个你的爱好哦！');
+                toast('请至少选择或输入一个你的爱好哦！', 'warning');
                 return;
             }
             state.hasSetPreferences = true;
@@ -657,7 +657,7 @@
                                     <p class="text-sm text-gray-500 mb-4 line-clamp-2">${item.desc}</p>
                                     <div class="mt-auto flex justify-between items-center">
                                         <span class="text-appleDark font-bold text-lg">¥${item.price.toFixed(1)}</span>
-                                        <button onclick="alert('已加入购物车 (演示效果)');" class="bg-appleDark text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-black transition glass-btn-active">
+                                        <button onclick="toast('已加入购物车 (演示效果)', 'success');" class="bg-appleDark text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-black transition glass-btn-active">
                                             兑换/购买
                                         </button>
                                     </div>
@@ -682,24 +682,33 @@
         }
 
         // ================= 购物车与AI管家系统 =================
+        // --- 购物车：localStorage 持久化 + 同款合并 ---
+        function loadCart() {
+            try { state.cart = JSON.parse(localStorage.getItem('zx_cart')) || []; }
+            catch { state.cart = []; }
+        }
+
+        function saveCart() {
+            localStorage.setItem('zx_cart', JSON.stringify(state.cart));
+        }
+
         function addToCart(id) {
-            const item = DB.menu.find(m => m.id === id);
-            const existing = state.cart.find(c => c.id === id);
-            if (existing) existing.qty++;
-            else state.cart.push({ ...item, qty: 1 });
-            updateCartUI();
-            
-            if(event && event.currentTarget) {
-                const btn = event.currentTarget;
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-                btn.classList.add('bg-green-500', 'text-white');
-                setTimeout(() => { btn.innerHTML = originalHtml; btn.classList.remove('bg-green-500', 'text-white'); }, 800);
+            const dish = DB.menu.find(m => m.id === id);
+            if (!dish) return;
+            if (dish.stock !== undefined && dish.stock <= 0) {
+                return toast(`「${dish.name}」今日已售罄`, 'warning');
             }
+            const existing = state.cart.find(i => i.id === id);
+            if (existing) existing.qty += 1;
+            else state.cart.push({ id: dish.id, name: dish.name, price: dish.price, img: dish.img, qty: 1 });
+            saveCart();
+            updateCartUI();
+            toast(`${dish.name} 已加入餐盘`, 'success');
         }
 
         function removeFromCart(id) {
-            state.cart = state.cart.filter(c => c.id !== id);
+            state.cart = state.cart.filter(i => i.id !== id);
+            saveCart();
             updateCartUI();
         }
 
@@ -743,7 +752,7 @@
         }
 
         function simulateCheckout() {
-            if (state.cart.length === 0) return alert("请先添加菜品！");
+            if (state.cart.length === 0) return toast('请先添加菜品！', 'warning');
             toggleCart();
             if(!state.aiOpen) toggleAI();
             setTimeout(() => {
@@ -1134,6 +1143,7 @@
         };
 
         // --- 启动引导 ---
+        loadCart();
         renderUserEntry();
         (async () => {
             await loadRemoteData();
