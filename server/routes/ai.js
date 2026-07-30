@@ -31,10 +31,31 @@ router.post('/chat', async (req, res) => {
       };
 
       let reply = '';
-      for (const [key, value] of Object.entries(responses)) {
-        if (message.includes(key)) {
-          reply = value;
-          break;
+
+      // 推荐类提问：基于真实在售菜品库动态生成（数据驱动 mock）
+      const RECOMMEND_KEYS = ['推荐', '好吃', '吃什么', '便宜', '特色', '美食'];
+      if (RECOMMEND_KEYS.some(k => message.includes(k))) {
+        const topDishes = db.prepare(`
+          SELECT caipinmingcheng, jiage, caipinfenlei, yueshuxiao
+          FROM caipinxinxi
+          WHERE kucun > 0 AND shangjia = '是'
+          ORDER BY yueshuxiao DESC
+          LIMIT 3
+        `).all();
+        if (topDishes.length > 0) {
+          const lines = topDishes.map((d, i) =>
+            `${i + 1}. 「${d.caipinmingcheng}」¥${d.jiage}（${d.caipinfenlei}，月售 ${d.yueshuxiao}）`
+          ).join('\n');
+          reply = `🍽️ 收到！小智刚查了今日真实在售菜单，为你推荐：\n${lines}\n\n都是现做热乎菜，要尝尝吗？😋`;
+        }
+      }
+
+      if (!reply) {
+        for (const [key, value] of Object.entries(responses)) {
+          if (message.includes(key)) {
+            reply = value;
+            break;
+          }
         }
       }
 
