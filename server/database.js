@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import bcrypt from 'bcryptjs';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -151,6 +152,25 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_orders_userid ON orders(userid);
     CREATE INDEX IF NOT EXISTS idx_cart_userid ON cart(userid);
   `);
+
+  // ---- 幂等列迁移（重复执行安全）----
+  const addColumn = (table, column, ddl) => {
+    const cols = db.prepare(`PRAGMA table_info(${table})`).all().map(c => c.name);
+    if (!cols.includes(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  };
+  addColumn('orders', 'pickup_code', 'pickup_code TEXT');
+  addColumn('yonghu', 'role', "role TEXT DEFAULT 'user'");
+  addColumn('caipinxinxi', 'shangjia', "shangjia TEXT DEFAULT '是'");
+
+  // admin 账号角色修正
+  db.prepare("UPDATE yonghu SET role = 'admin' WHERE zhanghao = 'admin'").run();
+
+  // ---- 明文密码迁移为 bcrypt（幂等：已哈希的以 $2 开头，跳过）----
+  const plaintextUsers = db.prepare("SELECT id, mima FROM yonghu WHERE mima NOT LIKE '$2%'").all();
+  const updatePwd = db.prepare('UPDATE yonghu SET mima = ? WHERE id = ?');
+  for (const u of plaintextUsers) {
+    updatePwd.run(bcrypt.hashSync(u.mima, 10), u.id);
+  }
 
   console.log('✓ 数据库表创建成功');
 }

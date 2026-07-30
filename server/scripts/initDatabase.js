@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import bcrypt from 'bcryptjs';
 import { db, initDatabase } from '../database.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -93,42 +94,20 @@ async function seed() {
     // 3. 刷入默认用户数据 yonghu
     console.log('正在刷入默认测试用户...');
     const insertUser = db.prepare(`
-      INSERT OR IGNORE INTO yonghu (zhanghao, mima, xingming, touxiang, xingbie, lianxifangshi, jine)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO yonghu (zhanghao, mima, xingming, touxiang, xingbie, lianxifangshi, jine, role)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    // 默认测试学生 1
-    insertUser.run(
-      'student1',
-      'password123',
-      '张三',
+    insertUser.run('student1', bcrypt.hashSync('password123', 10), '张三',
       'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80',
-      '男',
-      '13800138000',
-      5000.00
-    );
+      '男', '13800138000', 5000.00, 'user');
 
-    // 默认测试学生 2 (对应小智的就餐历史用户)
-    insertUser.run(
-      'student2',
-      'password123',
-      '种菜闪餐小队长',
+    insertUser.run('student2', bcrypt.hashSync('password123', 10), '种菜闪餐小队长',
       'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80',
-      '女',
-      '13900139000',
-      10000.00
-    );
+      '女', '13900139000', 10000.00, 'user');
 
-    // 管理员账号
-    insertUser.run(
-      'admin',
-      'admin123',
-      '后勤处管理员',
-      '',
-      '男',
-      '13500135000',
-      99999.00
-    );
+    insertUser.run('admin', bcrypt.hashSync('admin123', 10), '后勤处管理员',
+      '', '男', '13500135000', 99999.00, 'admin');
     console.log(`✓ 默认用户 (student1, student2, admin) 刷入完成！`);
 
     // 4. 刷入默认地址数据 address
