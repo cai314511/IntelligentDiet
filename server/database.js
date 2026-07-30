@@ -5,11 +5,12 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbDir = path.join(__dirname, 'data');
-const dbPath = path.join(dbDir, 'zhixiang.db');
+const dbPath = process.env.DB_PATH || path.join(dbDir, 'zhixiang.db');
 
 // 确保数据库目录存在
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+const dbParentDir = path.dirname(dbPath);
+if (!fs.existsSync(dbParentDir)) {
+  fs.mkdirSync(dbParentDir, { recursive: true });
 }
 
 // 创建/连接数据库
