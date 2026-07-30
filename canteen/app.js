@@ -1357,3 +1357,42 @@
             render();
             updateCartUI();
         })();
+
+        // ================= 个人中心：资料编辑 =================
+        function openProfileModal() {
+            const user = currentUser();
+            if (!user) return openLoginModal();
+            modalRoot.innerHTML = `
+                <div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal" onclick="if(event.target===this)closeModal()">
+                    <div class="bg-white rounded-[28px] p-8 w-[92%] max-w-[400px] shadow-appleHover slide-up">
+                        <h2 class="text-2xl font-bold mb-1">个人资料</h2>
+                        <p class="text-appleLightGray text-sm mb-6">账号 ${user.zhanghao} · 余额 ¥${Number(user.jine).toFixed(2)}</p>
+                        <label class="text-sm text-appleLightGray block mb-2">姓名</label>
+                        <input id="profile-name" value="${user.xingming || ''}" class="w-full bg-appleGray rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 ring-appleBlue/50 text-sm">
+                        <label class="text-sm text-appleLightGray block mb-2">性别</label>
+                        <select id="profile-gender" class="w-full bg-appleGray rounded-xl px-4 py-3 mb-4 outline-none text-sm">
+                            <option value="男" ${user.xingbie === '男' ? 'selected' : ''}>男</option>
+                            <option value="女" ${user.xingbie === '女' ? 'selected' : ''}>女</option>
+                        </select>
+                        <label class="text-sm text-appleLightGray block mb-2">联系方式</label>
+                        <input id="profile-phone" value="${user.lianxifangshi || ''}" class="w-full bg-appleGray rounded-xl px-4 py-3 mb-6 outline-none focus:ring-2 ring-appleBlue/50 text-sm">
+                        <button onclick="saveProfile()" class="w-full bg-appleBlue text-white py-3 rounded-full font-bold hover:opacity-90 transition glass-btn-active">保存</button>
+                    </div>
+                </div>`;
+        }
+
+        async function saveProfile() {
+            const user = currentUser();
+            const payload = {
+                xingming: document.getElementById('profile-name').value.trim(),
+                xingbie: document.getElementById('profile-gender').value,
+                lianxifangshi: document.getElementById('profile-phone').value.trim()
+            };
+            if (!payload.xingming) return toast('姓名不能为空', 'warning');
+            const { status, json } = await api('PUT', `/users/${user.id}`, payload);
+            if (status !== 200) return toast(json.message || '保存失败', 'error');
+            setSession(getToken(), { ...user, ...payload });
+            closeModal();
+            renderUserEntry();
+            toast('资料已保存', 'success');
+        }

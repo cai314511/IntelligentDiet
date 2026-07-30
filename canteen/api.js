@@ -114,7 +114,7 @@ function renderUserEntry() {
   if (!slot) return;
   const user = currentUser();
   slot.innerHTML = user
-    ? `<span class="text-sm font-medium mr-3">👋 ${user.xingming} <span class="text-appleBlue font-bold">¥${Number(user.jine).toFixed(2)}</span></span>
+    ? `<a href="javascript:void(0)" onclick="openProfileModal()" class="text-sm font-medium mr-3 hover:opacity-80 transition" title="编辑资料">👋 ${user.xingming} <span class="text-appleBlue font-bold">¥${Number(user.jine).toFixed(2)}</span></a>
        <button onclick="logout()" class="text-sm text-appleLightGray hover:text-appleDark transition">退出</button>`
     : `<button onclick="openLoginModal()" class="bg-appleBlue text-white text-sm px-5 py-2 rounded-full font-medium hover:opacity-90 transition glass-btn-active">登录 / 注册</button>`;
 }
