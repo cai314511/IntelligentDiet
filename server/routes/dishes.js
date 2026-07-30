@@ -1,5 +1,6 @@
 import express from 'express';
 import { db } from '../database.js';
+import { requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -76,7 +77,7 @@ router.get('/search/:keyword', (req, res) => {
 });
 
 // 添加菜品（管理员）
-router.post('/', (req, res) => {
+router.post('/', requireAdmin, (req, res) => {
   try {
     const { caipinmingcheng, caipinfenlei, tupian, cailiao, guige, jiage, yingyang } = req.body;
 
@@ -101,7 +102,7 @@ router.post('/', (req, res) => {
 });
 
 // 修改菜品（管理员）
-router.put('/:id', (req, res) => {
+router.put('/:id', requireAdmin, (req, res) => {
   try {
     const { caipinmingcheng, caipinfenlei, tupian, cailiao, guige, jiage, yingyang, kucun } = req.body;
 
@@ -125,7 +126,7 @@ router.put('/:id', (req, res) => {
 });
 
 // 删除菜品（管理员）
-router.delete('/:id', (req, res) => {
+router.delete('/:id', requireAdmin, (req, res) => {
   try {
     db.prepare('DELETE FROM caipinxinxi WHERE id = ?').run(req.params.id);
     res.json({ code: 200, message: '菜品删除成功' });

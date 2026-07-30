@@ -1,10 +1,11 @@
 import express from 'express';
 import { db } from '../database.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // 获取所有订单列表
-router.get('/', (req, res) => {
+router.get('/', requireAdmin, (req, res) => {
   try {
     const orders = db.prepare(`
       SELECT id, orderid, userid, caipinmingcheng, tupian, buyshu, price, total, status, address, phone, remark, addtime
@@ -19,7 +20,7 @@ router.get('/', (req, res) => {
 });
 
 // 创建订单
-router.post('/', (req, res) => {
+router.post('/', requireAuth, (req, res) => {
   try {
     const { userid, items, address, phone, remark } = req.body;
 
@@ -70,7 +71,7 @@ router.post('/', (req, res) => {
 });
 
 // 获取用户订单列表
-router.get('/user/:userid', (req, res) => {
+router.get('/user/:userid', requireAuth, (req, res) => {
   try {
     const orders = db.prepare(`
       SELECT id, orderid, caipinmingcheng, tupian, buyshu, total, status, addtime
@@ -86,7 +87,7 @@ router.get('/user/:userid', (req, res) => {
 });
 
 // 获取订单详情
-router.get('/:orderid', (req, res) => {
+router.get('/:orderid', requireAuth, (req, res) => {
   try {
     const orders = db.prepare(`
       SELECT id, orderid, caipinmingcheng, tupian, buyshu, price, total, status, address, phone, addtime
@@ -101,7 +102,7 @@ router.get('/:orderid', (req, res) => {
 });
 
 // 更新订单状态
-router.put('/:orderid/status', (req, res) => {
+router.put('/:orderid/status', requireAdmin, (req, res) => {
   try {
     const { status } = req.body;
 

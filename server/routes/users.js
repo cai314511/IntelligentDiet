@@ -1,5 +1,7 @@
 import express from 'express';
 import { db } from '../database.js';
+import bcrypt from 'bcryptjs';
+import { signToken, requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -13,22 +15,22 @@ router.post('/login', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, zhanghao, xingming, touxiang, lianxifangshi, jine
+      SELECT id, zhanghao, mima, xingming, touxiang, lianxifangshi, jine, role
       FROM yonghu 
-      WHERE zhanghao = ? AND mima = ?
-    `).get(zhanghao, mima);
+      WHERE zhanghao = ?
+    `).get(zhanghao);
 
-    if (!user) {
+    if (!user || !bcrypt.compareSync(mima, user.mima)) {
       return res.status(401).json({ code: 401, message: '账号或密码错误' });
     }
 
-    // 生成token（简单实现）
-    const token = Buffer.from(JSON.stringify({ id: user.id, time: Date.now() })).toString('base64');
+    const token = signToken(user);
+    const { mima: _omit, ...safeUser } = user;
 
-    res.json({ 
-      code: 200, 
+    res.json({
+      code: 200,
       message: '登录成功',
-      data: { token, user }
+      data: { token, user: safeUser }
     });
   } catch (error) {
     res.status(500).json({ code: 500, message: error.message });
@@ -51,9 +53,9 @@ router.post('/register', (req, res) => {
     }
 
     const result = db.prepare(`
-      INSERT INTO yonghu (zhanghao, mima, xingming, lianxifangshi, jine)
-      VALUES (?, ?, ?, ?, 10000)
-    `).run(zhanghao, mima, xingming, lianxifangshi || '');
+      INSERT INTO yonghu (zhanghao, mima, xingming, lianxifangshi, jine, role)
+      VALUES (?, ?, ?, ?, 10000, 'user')
+    `).run(zhanghao, bcrypt.hashSync(mima, 10), xingming, lianxifangshi || '');
 
     res.json({ 
       code: 200, 
@@ -85,8 +87,11 @@ router.get('/:id', (req, res) => {
 });
 
 // 更新用户信息
-router.put('/:id', (req, res) => {
+router.put('/:id', requireAuth, (req, res) => {
   try {
+    if (req.user.id !== Number(req.params.id) && req.user.role !== 'admin') {
+      return res.status(403).json({ code: 403, message: '只能修改本人资料' });
+    }
     const { xingming, xingbie, lianxifangshi, touxiang } = req.body;
 
     db.prepare(`

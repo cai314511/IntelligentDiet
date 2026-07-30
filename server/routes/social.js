@@ -1,5 +1,6 @@
 import express from 'express';
 import { db } from '../database.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ router.get('/reviews/:dishId', (req, res) => {
 });
 
 // 发布评论
-router.post('/reviews', (req, res) => {
+router.post('/reviews', requireAuth, (req, res) => {
   try {
     const { dishId, userId, username, comment } = req.body;
 
@@ -86,7 +87,7 @@ router.get('/messages', (req, res) => {
 });
 
 // 发布留言
-router.post('/messages', (req, res) => {
+router.post('/messages', requireAuth, (req, res) => {
   try {
     const { userId, username, content } = req.body;
 
@@ -106,7 +107,7 @@ router.post('/messages', (req, res) => {
 });
 
 // 回复留言（管理员）
-router.put('/messages/:id/reply', (req, res) => {
+router.put('/messages/:id/reply', requireAdmin, (req, res) => {
   try {
     const { replycontent } = req.body;
 
