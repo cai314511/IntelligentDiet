@@ -14,3 +14,10 @@ export const ALLOWED_TRANSITIONS = {
 export function canTransition(from, to) {
   return (ALLOWED_TRANSITIONS[from] || []).includes(to);
 }
+
+// 生成取餐码：1 大写字母 + 3 位数字（如 A042）
+export function generatePickupCode() {
+  const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  const digits = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+  return `${letter}${digits}`;
+}
