@@ -20,49 +20,55 @@ router.get('/', requireAdmin, (req, res) => {
   }
 });
 
-// 创建订单
+// 创建订单（事务 + 库存校验）
 router.post('/', requireAuth, (req, res) => {
   try {
-    const { userid, items, address, phone, remark } = req.body;
+    const { items, address, phone, remark } = req.body;
+    const userid = req.user.id;
 
-    if (!userid || !items || items.length === 0) {
+    if (!items || items.length === 0) {
       return res.status(400).json({ code: 400, message: '缺少必要参数' });
     }
 
-    // 生成订单号
+    // 前置校验：菜品存在性与库存（在事务外快速失败）
+    const getDish = db.prepare('SELECT id, caipinmingcheng, jiage, kucun, tupian FROM caipinxinxi WHERE id = ?');
+    const checked = [];
+    for (const item of items) {
+      const dish = getDish.get(item.dishId);
+      if (!dish) {
+        return res.status(404).json({ code: 404, message: `菜品 ${item.dishId} 不存在` });
+      }
+      if (!item.quantity || item.quantity < 1) {
+        return res.status(400).json({ code: 400, message: '购买数量非法' });
+      }
+      if (dish.kucun < item.quantity) {
+        return res.status(409).json({ code: 409, message: `「${dish.caipinmingcheng}」库存不足（剩 ${dish.kucun} 份）` });
+      }
+      checked.push({ dish, quantity: item.quantity });
+    }
+
     const orderid = `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     let totalPrice = 0;
 
-    // 插入订单项
-    for (const item of items) {
-      const dish = db.prepare('SELECT jiage FROM caipinxinxi WHERE id = ?').get(item.dishId);
-      const itemTotal = (dish?.jiage || 0) * item.quantity;
-      totalPrice += itemTotal;
-
-      db.prepare(`
+    const createOrder = db.transaction(() => {
+      const insert = db.prepare(`
         INSERT INTO orders 
         (orderid, userid, caipinxinxiid, caipinmingcheng, tupian, buyshu, price, total, address, phone, remark)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        orderid,
-        userid,
-        item.dishId,
-        item.dishName,
-        item.image,
-        item.quantity,
-        dish?.jiage || 0,
-        itemTotal,
-        address,
-        phone,
-        remark || ''
-      );
-    }
+      `);
+      for (const { dish, quantity } of checked) {
+        const itemTotal = dish.jiage * quantity;
+        totalPrice += itemTotal;
+        insert.run(orderid, userid, dish.id, dish.caipinmingcheng, dish.tupian,
+          quantity, dish.jiage, itemTotal, address || '学校食堂', phone || '', remark || '');
+      }
+      // 清空购物车
+      db.prepare('DELETE FROM cart WHERE userid = ?').run(userid);
+    });
+    createOrder();
 
-    // 清空购物车
-    db.prepare('DELETE FROM cart WHERE userid = ?').run(userid);
-
-    res.json({ 
-      code: 200, 
+    res.json({
+      code: 200,
       message: '订单创建成功',
       data: { orderid, totalPrice }
     });
