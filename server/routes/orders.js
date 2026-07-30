@@ -183,7 +183,15 @@ router.post('/:orderid/pay', requireAuth, (req, res) => {
       return res.status(409).json({ code: 409, message: `余额不足，当前余额 ¥${user.jine.toFixed(2)}` });
     }
 
-    const pickupCode = generatePickupCode();
+    // 取餐码与活跃订单查重，撞码重试（最多 5 次）
+    let pickupCode = generatePickupCode();
+    const codeClash = db.prepare(`
+      SELECT COUNT(*) AS c FROM orders
+      WHERE pickup_code = ? AND status NOT IN ('已完成', '已取消', '已退款')
+    `);
+    for (let i = 0; i < 5 && codeClash.get(pickupCode).c > 0; i++) {
+      pickupCode = generatePickupCode();
+    }
 
     const pay = db.transaction(() => {
       // 扣库存（二次校验，防并发超卖）

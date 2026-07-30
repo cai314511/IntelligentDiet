@@ -9,36 +9,47 @@ router.get('/', (req, res) => {
     const restaurants = [
       {
         id: 1,
-        name: "食尚苑食堂",
-        queueTime: 10,
-        queueCount: 47,
+        name: "沙河校区·东区一楼餐厅",
+        queueTime: 26,
+        queueCount: 120,
         totalSeats: 200,
-        availableSeats: 47,
-        image: "https://via.placeholder.com/200x150/0066CC/FFFFFF?text=食堂1",
-        rating: 4.8,
-        description: "学校主食堂，提供多样化饮食选择"
+        availableSeats: 28,
+        image: "https://via.placeholder.com/200x150/0066CC/FFFFFF?text=东区一楼",
+        rating: 4.6,
+        description: "学校主食堂，大众自选与面食档口，高峰期建议错峰"
       },
       {
         id: 2,
-        name: "美食广场",
-        queueTime: 15,
-        queueCount: 65,
-        totalSeats: 150,
-        availableSeats: 65,
-        image: "https://via.placeholder.com/200x150/0071E3/FFFFFF?text=食堂2",
-        rating: 4.6,
-        description: "创意美食集聚地，汇集各地风味"
+        name: "沙河校区·子衿食园",
+        queueTime: 6,
+        queueCount: 73,
+        totalSeats: 130,
+        availableSeats: 60,
+        image: "https://via.placeholder.com/200x150/0071E3/FFFFFF?text=子衿食园",
+        rating: 4.8,
+        description: "环境清幽，二楼轻食轻语区适合自习简餐"
       },
       {
         id: 3,
-        name: "健康食屋",
-        queueTime: 8,
-        queueCount: 58,
-        totalSeats: 180,
-        availableSeats: 58,
-        image: "https://via.placeholder.com/200x150/34C759/FFFFFF?text=食堂3",
+        name: "沙河校区·风味餐厅",
+        queueTime: 4,
+        queueCount: 68,
+        totalSeats: 150,
+        availableSeats: 100,
+        image: "https://via.placeholder.com/200x150/34C759/FFFFFF?text=风味餐厅",
         rating: 4.9,
-        description: "专注健康营养的食堂，低油低盐"
+        description: "特色小炒与地方风味，本周上新爆炒孜然羊肉"
+      },
+      {
+        id: 4,
+        name: "南路校区·龙马一餐厅",
+        queueTime: 2,
+        queueCount: 15,
+        totalSeats: 120,
+        availableSeats: 100,
+        image: "https://via.placeholder.com/200x150/FF9500/FFFFFF?text=龙马一餐",
+        rating: 4.5,
+        description: "南路校区主力餐厅，宽敞人少"
       }
     ];
 

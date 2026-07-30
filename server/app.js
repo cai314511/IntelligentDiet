@@ -11,6 +11,7 @@ import recipeRoutes from './routes/recipes.js';
 import socialRoutes from './routes/social.js';
 import activityRoutes from './routes/activities.js';
 import aiRoutes from './routes/ai.js';
+import statsRoutes from './routes/stats.js';
 
 // 加载环境配置
 dotenv.config();
@@ -45,6 +46,7 @@ app.use('/api/recipes', recipeRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/stats', statsRoutes);
 
 // 健康检查端点
 app.get('/api/health', (req, res) => {
