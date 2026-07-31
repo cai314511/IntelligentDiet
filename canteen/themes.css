@@ -1,0 +1,157 @@
+/* ================= 智饷主题系统 ================= */
+/* CSS 变量 + body[data-theme] 对 Tailwind apple* 语义色类的全站重映射。
+   新增主题只需追加一个 [data-theme="xxx"] 变量块。 */
+
+:root,
+body[data-theme="minimal"] {
+  --zx-primary: #0071E3;
+  --zx-primary-ring: rgba(0, 113, 227, 0.5);
+  --zx-bg: #F5F5F7;
+  --zx-text: #1D1D1F;
+  --zx-text-soft: #424245;
+  --zx-muted: #86868B;
+  --zx-card: #ffffff;
+  --zx-soft-block: #F5F5F7;
+  --zx-nav-bg: rgba(255, 255, 255, 0.8);
+  --zx-nav-border: rgba(0, 0, 0, 0.05);
+  --zx-panel-bg: rgba(255, 255, 255, 0.75);
+  --zx-panel-border: rgba(255, 255, 255, 0.5);
+  --zx-bg-image: none;
+  --zx-bg-opacity: 0;
+  --zx-radius: 20px;
+}
+
+body[data-theme="anime"] {
+  --zx-primary: #FF6B9D;
+  --zx-primary-ring: rgba(255, 107, 157, 0.5);
+  --zx-bg: #FFF0F5;
+  --zx-text: #4A3040;
+  --zx-text-soft: #7A5468;
+  --zx-muted: #B893A6;
+  --zx-card: #ffffff;
+  --zx-soft-block: #FFE4EE;
+  --zx-nav-bg: rgba(255, 240, 245, 0.85);
+  --zx-nav-border: rgba(255, 107, 157, 0.15);
+  --zx-panel-bg: rgba(255, 255, 255, 0.85);
+  --zx-panel-border: rgba(255, 107, 157, 0.25);
+  --zx-bg-image: radial-gradient(#FFC2D9 2px, transparent 2px);
+  --zx-bg-size: 28px;
+  --zx-bg-opacity: 0.35;
+  --zx-radius: 24px;
+}
+
+body[data-theme="esports"] {
+  --zx-primary: #00E5FF;
+  --zx-primary-ring: rgba(0, 229, 255, 0.5);
+  --zx-bg: #0A0E17;
+  --zx-text: #E0F7FF;
+  --zx-text-soft: #9FD8E8;
+  --zx-muted: #5B7A8C;
+  --zx-card: #141B2D;
+  --zx-soft-block: #1A2438;
+  --zx-nav-bg: rgba(10, 14, 23, 0.85);
+  --zx-nav-border: rgba(0, 229, 255, 0.2);
+  --zx-panel-bg: rgba(20, 27, 45, 0.9);
+  --zx-panel-border: rgba(0, 229, 255, 0.25);
+  --zx-bg-image: linear-gradient(rgba(0,229,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.06) 1px, transparent 1px);
+  --zx-bg-size: 40px 40px;
+  --zx-bg-opacity: 1;
+  --zx-radius: 8px;
+}
+
+body[data-theme="guofeng"] {
+  --zx-primary: #C8102E;
+  --zx-primary-ring: rgba(200, 16, 46, 0.4);
+  --zx-bg: #F5F0E1;
+  --zx-text: #2B2118;
+  --zx-text-soft: #57493A;
+  --zx-muted: #9C8C77;
+  --zx-card: #FDFBF5;
+  --zx-soft-block: #EFE7D3;
+  --zx-nav-bg: rgba(245, 240, 225, 0.88);
+  --zx-nav-border: rgba(200, 16, 46, 0.15);
+  --zx-panel-bg: rgba(253, 251, 245, 0.9);
+  --zx-panel-border: rgba(200, 16, 46, 0.2);
+  --zx-bg-image: radial-gradient(rgba(200,16,46,0.08) 1.5px, transparent 1.5px);
+  --zx-bg-size: 32px;
+  --zx-bg-opacity: 0.5;
+  --zx-radius: 6px;
+}
+
+body[data-theme="music"] {
+  --zx-primary: #A78BFA;
+  --zx-primary-ring: rgba(167, 139, 250, 0.5);
+  --zx-bg: #12101F;
+  --zx-text: #EDE9FE;
+  --zx-text-soft: #B8AEE0;
+  --zx-muted: #6E6399;
+  --zx-card: #1E1B32;
+  --zx-soft-block: #272244;
+  --zx-nav-bg: rgba(18, 16, 31, 0.85);
+  --zx-nav-border: rgba(167, 139, 250, 0.2);
+  --zx-panel-bg: rgba(30, 27, 50, 0.9);
+  --zx-panel-border: rgba(167, 139, 250, 0.25);
+  --zx-bg-image: repeating-linear-gradient(90deg, rgba(167,139,250,0.05) 0 4px, transparent 4px 24px);
+  --zx-bg-size: auto;
+  --zx-bg-opacity: 1;
+  --zx-radius: 20px;
+}
+
+body[data-theme="sports"] {
+  --zx-primary: #FF6B35;
+  --zx-primary-ring: rgba(255, 107, 53, 0.5);
+  --zx-bg: #FFF7F0;
+  --zx-text: #232330;
+  --zx-text-soft: #4A4A5A;
+  --zx-muted: #9A9AA8;
+  --zx-card: #ffffff;
+  --zx-soft-block: #FFE8DC;
+  --zx-nav-bg: rgba(255, 247, 240, 0.88);
+  --zx-nav-border: rgba(255, 107, 53, 0.15);
+  --zx-panel-bg: rgba(255, 255, 255, 0.88);
+  --zx-panel-border: rgba(255, 107, 53, 0.25);
+  --zx-bg-image: repeating-linear-gradient(-45deg, rgba(255,107,53,0.04) 0 12px, transparent 12px 32px);
+  --zx-bg-size: auto;
+  --zx-bg-opacity: 1;
+  --zx-radius: 16px;
+}
+
+/* ---- 通用重映射规则（变量驱动，全站即时生效） ---- */
+body { background-color: var(--zx-bg) !important; color: var(--zx-text); }
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--zx-bg-image);
+  background-size: var(--zx-bg-size, auto);
+  opacity: var(--zx-bg-opacity, 0);
+  pointer-events: none;
+}
+
+.bg-appleBlue { background-color: var(--zx-primary) !important; }
+.text-appleBlue { color: var(--zx-primary) !important; }
+.border-appleBlue { border-color: var(--zx-primary) !important; }
+.ring-appleBlue\/50 { --tw-ring-color: var(--zx-primary-ring) !important; }
+.hover\:text-appleBlue:hover { color: var(--zx-primary) !important; }
+.bg-appleGray { background-color: var(--zx-soft-block) !important; }
+.text-appleDark { color: var(--zx-text) !important; }
+.text-appleText { color: var(--zx-text-soft) !important; }
+.text-appleLightGray { color: var(--zx-muted) !important; }
+.bg-white { background-color: var(--zx-card) !important; }
+
+.glass-nav { background: var(--zx-nav-bg) !important; border-bottom-color: var(--zx-nav-border) !important; }
+.glass-panel { background: var(--zx-panel-bg) !important; border-color: var(--zx-panel-border) !important; }
+
+.interest-tag.active,
+.option-tag.active { background-color: var(--zx-primary) !important; border-color: var(--zx-primary) !important; }
+
+.rounded-\[20px\] { border-radius: var(--zx-radius) !important; }
+.rounded-\[24px\] { border-radius: calc(var(--zx-radius) + 4px) !important; }
+.rounded-\[28px\] { border-radius: calc(var(--zx-radius) + 8px) !important; }
+
+/* 换肤过渡动画（避免生硬跳变） */
+body, .bg-white, .bg-appleBlue, .bg-appleGray, .glass-nav, .glass-panel, .text-appleBlue, .text-appleDark, .text-appleText {
+  transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease;
+}

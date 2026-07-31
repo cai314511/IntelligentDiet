@@ -1355,6 +1355,7 @@
 
         // --- 启动引导 ---
         loadCart();
+        applyTheme(currentTheme());
         renderUserEntry();
         (async () => {
             await loadRemoteData();
