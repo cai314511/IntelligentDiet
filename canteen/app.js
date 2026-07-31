@@ -218,7 +218,7 @@
                                     <span class="text-gray-500"><i class="fa-regular fa-clock mr-2"></i>预计时长</span>
                                     <span class="font-bold ${r.status === 'warning' ? 'text-red-500 pulse-red rounded-full px-2' : ''}">${r.waitTime} min</span>
                                 </div>
-                                <button class="w-full bg-gray-100 hover:bg-gray-200 text-appleDark py-2 rounded-xl transition font-medium glass-btn-active" onclick="openSeatSelectionModal('${r.name}')">查看菜单 & 选座</button>
+                                <button class="w-full bg-appleGray hover:bg-gray-200 text-appleDark py-2 rounded-xl transition font-medium glass-btn-active" onclick="openSeatSelectionModal('${r.name}')">查看菜单 & 选座</button>
                             </div>
                         `).join('')}
                     </div>
@@ -250,7 +250,7 @@
                                     <h3 class="text-lg font-bold mb-1">${item.name}</h3>
                                     <div class="flex justify-between items-center mt-4">
                                         <span class="text-appleBlue font-bold text-lg">¥${item.price.toFixed(1)}</span>
-                                        <button onclick="addToCart(${item.id})" class="bg-gray-100 text-appleDark px-4 py-1.5 rounded-full text-sm font-bold glass-btn-active">添加</button>
+                                        <button onclick="addToCart(${item.id})" class="bg-appleGray text-appleDark px-4 py-1.5 rounded-full text-sm font-bold glass-btn-active">添加</button>
                                     </div>
                                 </div>
                             </div>
@@ -314,7 +314,7 @@
                         </div>
                         <div class="mb-8">
                             <h3 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">具体说说你最近在沉迷什么？</h3>
-                            <input type="text" id="specific-interest" placeholder="例如：黑神话悟空、五月天、排球少年..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-appleBlue/50 text-sm transition-all">
+                            <input type="text" id="specific-interest" placeholder="例如：开放世界游戏、流行乐队、热血运动番..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-appleBlue/50 text-sm transition-all">
                         </div>
                         <button onclick="savePreferencesAndContinue()" class="w-full bg-appleDark text-white py-3.5 rounded-2xl font-bold hover:bg-black transition-colors shadow-lg glass-btn-active">
                             生成我的美食基因 <i class="fa-solid fa-arrow-right ml-2"></i>

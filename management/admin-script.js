@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <tr><td colspan="7" style="text-align: center; color: #86868b; padding: 40px;">暂无订单记录。前台点餐支付后，订单会实时加载在这里。</td></tr>
                                 ` : orderList.map(order => `
                                     <tr>
-                                        <td style="font-size: 13px; color: #86868b;">${order.addtime}</td>
+                                        <td style="font-size: 13px; color: #86868b;">${fmtTime(order.addtime)}</td>
                                         <td><code style="background: #f5f5f7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${order.orderid.slice(-8)}</code></td>
                                         <td>
                                             ${order.items.map(item => `
@@ -924,7 +924,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 ? `<strong>[已答复]</strong> ${item.replycontent}` 
                                                 : '<span style="color: #ff9500;">⌛ 尚未处理，等待回复...</span>'}
                                         </td>
-                                        <td style="font-size: 12px; color: #86868b;">${item.addtime}</td>
+                                        <td style="font-size: 12px; color: #86868b;">${fmtTime(item.addtime)}</td>
                                         <td>
                                             <span class="badge ${item.replycontent ? 'badge-success' : 'badge-warning'}">
                                                 ${item.replycontent ? '已处理' : '待处理'}
