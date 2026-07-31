@@ -77,7 +77,7 @@ start "ZhiXiang Canteen - Frontend Web Server" cmd /k "chcp 65001 >nul && python
 echo -- Frontend Web Server has been spawned (http://localhost:8000)
 
 :: Start Admin (B-end) Web Server on 5500
-start "ZhiXiang Canteen - Admin Web Server" cmd /k "chcp 65001 >nul && python -m http.server 5500 --directory ""%~dp0..\management"""
+start "ZhiXiang Canteen - Admin Web Server" /D "%~dp0..\management" cmd /k "chcp 65001 >nul && python -m http.server 5500"
 echo -- Admin Web Server has been spawned (http://localhost:5500)
 
 :: Delay for 2 seconds using robust ping delay
