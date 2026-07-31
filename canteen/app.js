@@ -141,12 +141,67 @@
             else if (state.currentView === 'orders') renderOrdersView();
         }
 
+        // ================= 风格宇宙：主题选择器 =================
+        function renderThemeUniverse() {
+            const cur = currentTheme();
+            return `
+                <div class="mb-10 fade-in">
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold">🌌 风格宇宙</h2>
+                        <p class="text-appleLightGray text-sm mt-1">选择你的热爱，全站即刻为你换肤</p>
+                    </div>
+                    <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2">
+                        ${THEMES.map(t => `
+                            <div onclick="selectTheme('${t.id}')"
+                                 class="shrink-0 w-44 rounded-[20px] p-4 cursor-pointer hover:-translate-y-1 transition-transform glass-btn-active ${cur === t.id ? 'ring-2 ring-appleBlue ring-offset-2' : ''}"
+                                 style="background:${t.cardBg};">
+                                <div class="text-3xl mb-2">${t.emoji}</div>
+                                <div class="font-bold text-sm" style="color:${t.cardText};">${t.name}</div>
+                                <div class="text-xs mt-1 leading-snug" style="color:${t.cardText};opacity:.75;">${t.tagline}</div>
+                                ${cur === t.id ? `<div class="text-xs font-bold mt-2" style="color:${t.cardText};">✓ 使用中</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+        }
+
+        // ================= 主题联动推荐 =================
+        function renderThemeRecommend() {
+            const t = getThemeById(currentTheme());
+            const dishes = getThemeRecommendations();
+            return `
+                <div class="mb-10 fade-in">
+                    <div class="rounded-[24px] p-6 shadow-apple border border-gray-100" style="background: var(--zx-card);">
+                        <div class="flex items-center mb-1">
+                            <span class="text-2xl mr-2">${t.emoji}</span>
+                            <h2 class="text-xl font-bold">为你推荐 · ${t.name}</h2>
+                        </div>
+                        <p class="text-appleLightGray text-sm mb-5">${t.persona}</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            ${dishes.map(d => `
+                                <div class="bg-appleGray rounded-[20px] p-3 hover:-translate-y-1 transition-transform">
+                                    <img src="${d.img}" class="w-full h-24 rounded-xl object-cover mb-3" onerror="this.src='dish-placeholder.svg'">
+                                    <p class="font-semibold text-sm truncate">${d.name}</p>
+                                    <p class="text-xs text-appleLightGray mt-1">⭐ ${d.rating} · 月售 ${d.sales}</p>
+                                    <div class="flex justify-between items-center mt-2">
+                                        <span class="text-appleBlue font-bold">¥${d.price.toFixed(1)}</span>
+                                        <button onclick="addToCart(${d.id})" class="w-7 h-7 rounded-full bg-appleBlue text-white text-sm flex items-center justify-center glass-btn-active">+</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>`;
+        }
+
         // ================= 模块1：智能点餐系统 =================
         function renderOrderView() {
             const newDishes = DB.menu.filter(m => m.isNew);
             const normalDishes = DB.menu.filter(m => !m.isNew && !m.overstocked);
 
             let html = `
+                ${renderThemeUniverse()}
+                ${renderThemeRecommend()}
                 <div class="mb-10">
                     <h1 class="text-4xl font-bold mb-2 tracking-tight">智能点餐</h1>
                     <p class="text-appleLightGray text-lg mb-8">实时避开高峰，锁定专属座位。</p>
