@@ -51,6 +51,12 @@ if not exist "node_modules" (
     call npm install
 )
 
+:: Seed database on first run
+if not exist "%BACKEND_PATH%\data\zhixiang.db" (
+    echo First run detected. Seeding database (npm run init-db)...
+    call npm run init-db
+)
+
 :: Start Backend in a new window with UTF-8 support for Node's Chinese logs
 start "ZhiXiang Canteen - Backend API Server" cmd /k "chcp 65001 >nul && npm start"
 echo -- Backend API Server has been spawned (http://localhost:5000)
@@ -70,6 +76,10 @@ cd /d "%FRONTEND_PATH%"
 start "ZhiXiang Canteen - Frontend Web Server" cmd /k "chcp 65001 >nul && python -m http.server 8000"
 echo -- Frontend Web Server has been spawned (http://localhost:8000)
 
+:: Start Admin (B-end) Web Server on 5500
+start "ZhiXiang Canteen - Admin Web Server" cmd /k "chcp 65001 >nul && python -m http.server 5500 --directory ""%~dp0..\management"""
+echo -- Admin Web Server has been spawned (http://localhost:5500)
+
 :: Delay for 2 seconds using robust ping delay
 ping 127.0.0.1 -n 3 >nul
 
@@ -79,6 +89,8 @@ echo   All startup commands executed successfully!
 echo ==================================================
 echo   Frontend URL:   http://localhost:8000
 echo   Backend Health: http://localhost:5000/api/health
+echo   Student (C-end):  http://localhost:8000
+echo   Admin (B-end):    http://localhost:5500  (admin / admin123)
 echo.
 echo NOTE: Please do NOT close the spawned server windows.
 echo.

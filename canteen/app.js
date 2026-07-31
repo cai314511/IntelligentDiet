@@ -907,6 +907,7 @@
                 appRoot.innerHTML = '<div class="text-center py-24 text-appleLightGray">订单加载失败，请稍后重试</div>';
                 return;
             }
+            if (state.currentView !== 'orders') return;
 
             // 按 orderid 分组（订单表一行一菜品）
             const groups = {};
@@ -936,7 +937,7 @@
                     <div class="bg-white rounded-[24px] p-6 shadow-apple border border-gray-100 mb-5 fade-in">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <span class="text-xs text-appleLightGray">订单号 ${o.orderid.slice(-8)} · ${o.addtime}</span>
+                                <span class="text-xs text-appleLightGray">订单号 ${o.orderid.slice(-8)} · ${fmtTime(o.addtime)}</span>
                                 <div class="mt-2 space-y-1">
                                     ${o.items.map(i => `<p class="text-sm font-medium">• ${i.name} <span class="text-appleLightGray">x${i.qty}</span></p>`).join('')}
                                 </div>
@@ -963,7 +964,10 @@
                                     </div>
                                     ${idx < ORDER_FLOW.length - 1 ? `<div class="flex-1 h-0.5 mx-2 ${idx < stepIndex(o.status) ? 'bg-appleBlue' : 'bg-gray-200'}"></div>` : ''}
                                 </div>`).join('')}
-                        </div>` : `<p class="mt-4 text-sm font-medium ${o.status === '已取消' || o.status === '已退款' ? 'text-red-500' : 'text-appleLightGray'}">当前状态：${o.status}${o.status === '未支付' ? '（可到收银台继续支付）' : ''}</p>`}
+                        </div>` : `<div class="mt-4 flex items-center justify-between">
+                            <p class="text-sm font-medium ${o.status === '已取消' || o.status === '已退款' ? 'text-red-500' : 'text-appleLightGray'}">当前状态：${o.status}</p>
+                            ${o.status === '未支付' ? `<button onclick="openCashier('${o.orderid}', ${o.total})" class="bg-appleBlue text-white text-sm px-5 py-2 rounded-full font-bold glass-btn-active">去支付</button>` : ''}
+                        </div>`}
                     </div>`).join('')}
             `;
         }
@@ -1354,7 +1358,7 @@
         renderUserEntry();
         (async () => {
             await loadRemoteData();
-            render();
+            navigate(state.currentView);
             updateCartUI();
         })();
 

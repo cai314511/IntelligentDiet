@@ -136,3 +136,11 @@ function toast(message, type = 'info') {
   document.body.appendChild(el);
   setTimeout(() => { el.style.opacity = '0'; el.style.marginTop = '-12px'; setTimeout(() => el.remove(), 300); }, 2600);
 }
+
+// 数据库存 UTC，展示统一转北京时间（UTC+8）
+function fmtTime(t) {
+  if (!t) return '';
+  const d = new Date(String(t).replace(' ', 'T') + 'Z');
+  if (isNaN(d)) return t;
+  return d.toLocaleString('zh-CN', { hour12: false, month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
