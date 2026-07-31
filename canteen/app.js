@@ -14,7 +14,7 @@
                 { id: 102, name: '豚骨拉面套餐', category: '套餐', price: 15.0, img: 'https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=400&q=80', cal: 800, protein: 25, tag: '人气爆款', sales: 980, rating: 4.9, nutritionGoal: '吃饱吃好', window: '一楼面食档口' },
                 { id: 105, name: '清炖萝卜牛腩粥', category: '汤品', price: 8.0, img: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&q=80', cal: 180, protein: 8, tag: '温补', sales: 12, rating: 4.5, overstocked: true, nutritionGoal: '性价比', window: '一楼粥粉面' },
                 { id: 109, name: '香煎秋刀鱼', category: '热菜', price: 9.0, img: 'https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=400&q=80', cal: 220, protein: 18, tag: '特价', sales: 8, rating: 4.2, overstocked: true, nutritionGoal: '性价比', window: '一楼大众自选' },
-                { id: 110, name: '慢烤低脂雪花牛排', category: '热菜', price: 22.0, img: 'https://images.unsplash.com/photo-1544025162-811114bd4b6e?w=400&q=80', cal: 300, protein: 35, tag: '优质蛋白', sales: 150, rating: 4.9, nutritionGoal: '减脂增肌', window: '二楼西式简餐' }
+                { id: 110, name: '慢烤低脂雪花牛排', category: '热菜', price: 22.0, img: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80', cal: 300, protein: 35, tag: '优质蛋白', sales: 150, rating: 4.9, nutritionGoal: '减脂增肌', window: '二楼西式简餐' }
             ],
             social: [
                 { id: 1, user: '种菜闪餐小队长', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80', rating: 5, content: '今天风味餐厅上新的爆炒羊肉绝了！排队只用了5分钟。', img: 'https://images.unsplash.com/photo-1627042633145-b780d842ba45?w=400&q=80', time: '10分钟前', likes: 45 },
@@ -22,9 +22,9 @@
                 { id: 3, user: '深夜碳水星人', avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&q=80', rating: 1, content: '避雷！一食堂那个所谓创新菜“草莓炒芹菜”，简直是反人类的设计！', img: null, time: '昨天', likes: 108 }
             ],
             culture: [
-                { id: 1, name: '校庆限定：银杏流沙包', price: 12.0, img: 'https://images.unsplash.com/photo-1512152272829-459f0f971c26?w=400&q=80', desc: '以秋季校园满地银杏为灵感。', type: 'food' },
+                { id: 1, name: '校庆限定：银杏流沙包', price: 12.0, img: 'liushabao.png', desc: '以秋季校园满地银杏为灵感。', type: 'food' },
                 { id: 2, name: '「智饷」联名帆布袋', price: 29.9, img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&q=80', desc: '采用环保有机棉，大容量，装得下MacBook和你的饭盒。', type: 'merch' },
-                { id: 3, name: '校园四季明信片套组', price: 15.0, img: 'https://images.unsplash.com/photo-1586724236151-6893692a7e78?w=400&q=80', desc: '记录中财大最美的春花与秋月。', type: 'merch' }
+                { id: 3, name: '校园四季明信片套组', price: 15.0, img: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80', desc: '记录中财大最美的春花与秋月。', type: 'merch' }
             ],
             leaderboards: {
                 top: [{name: '豚骨拉面套餐', reason: '连续三周霸榜'}, {name: '爆炒孜然羊肉', reason: '口碑爆棚'}],
