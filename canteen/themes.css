@@ -135,6 +135,7 @@ body::after {
 .border-appleBlue { border-color: var(--zx-primary) !important; }
 .ring-appleBlue\/50 { --tw-ring-color: var(--zx-primary-ring) !important; }
 .focus\:ring-appleBlue\/50:focus { --tw-ring-color: var(--zx-primary-ring) !important; }
+.ring-appleBlue { --tw-ring-color: var(--zx-primary) !important; }
 .hover\:text-appleBlue:hover { color: var(--zx-primary) !important; }
 .bg-appleGray { background-color: var(--zx-soft-block) !important; }
 .text-appleDark { color: var(--zx-text) !important; }

@@ -49,41 +49,54 @@ ai project/
 
 ### 前置要求
 
-- Node.js 16.0+ 
+- Node.js 16.0+
 - npm 7.0+
+- Python 3（用于 C/B 端静态服务）
 - 浏览器（Chrome, Firefox, Safari, Edge）
 
-### 1. 安装后端依赖
+### 1. 一键启动（推荐）
+
+双击运行 `canteen/startup.bat`，脚本会自动完成：
+
+1. 安装后端依赖（npm install）
+2. 首跑种子数据（init-db，仅在数据库不存在时执行）
+3. 启动后端 API 服务（端口 5000）
+4. 启动 C 端学生前端（端口 8000）
+5. 启动 B 端后勤管理端（端口 5500）
+
+### 2. 三端访问地址
+
+| 端 | 地址 | 说明 |
+|----|------|------|
+| C 端（学生） | http://localhost:8000 | 可注册新账号，或使用 student1 / password123 |
+| B 端（后勤） | http://localhost:5500 | 管理员账号 admin / admin123 |
+| 后端 API | http://localhost:5000/api/health | 健康检查接口 |
+
+### 3. 手动启动（备选）
 
 ```bash
-cd "c:\Users\蔡雨轩\Desktop\ai project\server"
-npm install
+# 后端 API（端口 5000）
+cd server && npm start
+
+# C 端学生前端（端口 8000）
+cd canteen && python -m http.server 8000
+
+# B 端后勤管理端（端口 5500）
+python -m http.server 5500 --directory management
 ```
 
-### 2. 启动后端服务
+### 4. 注意事项
+
+- B 端**必须**通过 http://localhost:5500 访问，**禁止 file:// 直开**（CORS 拦截）。
+- 首次启动后数据库自动生成于 `server/data/zhixiang.db`。
+
+### 5. 测试
 
 ```bash
-npm start
+cd server
+npm test        # 26 个接口用例
+npm run smoke   # 15 项冒烟断言（需后端已启动）
 ```
-
-输出应显示：
-```
-🚀 智饷食堂API服务已启动
-📍 监听地址: http://localhost:5000
-```
-
-### 3. 启动前端服务
-
-在另一个终端中：
-
-```bash
-cd "c:\Users\蔡雨轩\Desktop\ai project"
-python -m http.server 8000
-```
-
-### 4. 打开浏览器
-
-访问 **http://localhost:8000**
 
 ---
 

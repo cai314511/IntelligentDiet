@@ -20,7 +20,7 @@ before(async () => {
     .run(bcrypt.hashSync('pass123', 10));
   db.prepare("INSERT OR IGNORE INTO caipinfenlei (caipinfenlei) VALUES ('热菜')").run();
   db.prepare("INSERT INTO caipinxinxi (id, caipinmingcheng, caipinfenlei, jiage, kucun, yueshuxiao) VALUES (1, '测试菜', '热菜', 10, 40, 20)").run();
-  // 已支付订单：2 份测试菜，总额 20（orders.orderid 有 UNIQUE 约束，每订单单行）
+  // 已支付订单：2 份测试菜，总额 20（单订单单行即可覆盖退款逻辑，orderid 已不唯一，多行订单同样适用）
   db.prepare(`INSERT INTO orders (orderid, userid, caipinxinxiid, caipinmingcheng, buyshu, price, total, status)
               VALUES ('ORDER-R1', 2, 1, '测试菜', 2, 10, 20, '已支付')`).run();
   // 普通流转对照订单

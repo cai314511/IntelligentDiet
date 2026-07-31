@@ -442,7 +442,7 @@ GET /restaurants
   "data": [
     {
       "id": 1,
-      "name": "食尚苑食堂",
+      "name": "沙河校区·东区一楼餐厅",
       "queueTime": 10,
       "queueCount": 47,
       "totalSeats": 200,
