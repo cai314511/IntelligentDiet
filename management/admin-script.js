@@ -43,6 +43,14 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+// 数据库存 UTC，展示统一转北京时间（UTC+8）
+function fmtTime(t) {
+    if (!t) return '';
+    const d = new Date(String(t).replace(' ', 'T') + 'Z');
+    if (isNaN(d)) return t;
+    return d.toLocaleString('zh-CN', { hour12: false, month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
 // 统一 API 请求封装
 async function apiCall(method, endpoint, data = null) {
     const headers = { 'Content-Type': 'application/json' };
@@ -230,20 +238,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const dishesRes = await apiCall('GET', '/dishes');
         const ordersRes = await apiCall('GET', '/orders');
         const msgRes = await apiCall('GET', '/social/messages');
+        const statsRes = await apiCall('GET', '/stats/dashboard');
+        const stats = statsRes.data || {};
         
         const dishes = dishesRes.data || [];
         const orders = ordersRes.data || [];
         const feedbacks = msgRes.data || [];
 
         // 核心统计指标
-        const totalOrders = orders.length;
-        const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+        const totalOrders = stats.totalOrders ?? 0;
+        const totalRevenue = stats.totalRevenue ?? 0;
         const avgRating = dishes.length > 0 ? (dishes.reduce((sum, d) => sum + (d.pinfen || 5.0), 0) / dishes.length).toFixed(1) : 4.8;
         
         // 今日指标
-        const todayStr = new Date().toISOString().split('T')[0];
-        const todayOrders = orders.filter(o => o.addtime && o.addtime.startsWith(todayStr)).length;
-        const todayRevenue = orders.filter(o => o.addtime && o.addtime.startsWith(todayStr)).reduce((sum, o) => sum + (o.total || 0), 0);
+        const todayOrders = stats.todayOrders ?? 0;
+        const todayRevenue = stats.todayRevenue ?? 0;
 
         return `
             <div class="page-title">📊 数据统计与决策支持</div>
@@ -279,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div style="margin-top: 10px; max-height: 150px; overflow-y: auto; padding-right: 5px;">
                             ${orders.slice(0, 5).map(o => `
                                 <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f5f5f7;">
-                                    <span>${o.addtime.split(' ')[1] || o.addtime} - ${o.caipinmingcheng} x${o.buyshu}</span>
+                                    <span>${fmtTime(o.addtime)} - ${o.caipinmingcheng} x${o.buyshu}</span>
                                     <span style="color: #0066cc; font-weight: 500;">¥${o.total} (${o.status})</span>
                                 </div>
                             `).join('') || '<div style="color: #86868b; text-align: center;">暂无订单记录，等待前台用户下单</div>'}
@@ -291,19 +300,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="stats-row">
                         <div class="stat-item">
                             <div class="stat-label">注册学生总数</div>
-                            <div class="stat-value">3</div>
+                            <div class="stat-value">${stats.totalUsers ?? 0}</div>
                         </div>
                     </div>
                     <div class="stats-row">
                         <div class="stat-item">
                             <div class="stat-label">未处理学生反馈</div>
-                            <div class="stat-value">${feedbacks.filter(f => !f.replycontent).length} 件</div>
+                            <div class="stat-value">${stats.unrepliedMessages ?? 0} 件</div>
                         </div>
                     </div>
                     <div class="stats-row">
                         <div class="stat-item">
                             <div class="stat-label">菜品种类数量</div>
-                            <div class="stat-value">${dishes.length} 种</div>
+                            <div class="stat-value">${stats.totalDishes ?? dishes.length} 种</div>
                         </div>
                     </div>
                 </div>
@@ -324,32 +333,39 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody>
                             <tr>
-                                <td>商户合规率</td>
-                                <td>96%</td>
-                                <td>95%</td>
-                                <td>101%</td>
-                                <td><span class="badge badge-success">达标</span></td>
+                                <td>待接单订单</td>
+                                <td>${stats.pendingAccept ?? 0} 笔</td>
+                                <td>0 笔</td>
+                                <td>${(stats.pendingAccept ?? 0) === 0 ? '100%' : '处理中'}</td>
+                                <td><span class="badge ${(stats.pendingAccept ?? 0) === 0 ? 'badge-success' : 'badge-warning'}">${(stats.pendingAccept ?? 0) === 0 ? '正常' : '需接单'}</span></td>
                             </tr>
                             <tr>
-                                <td>投诉率</td>
-                                <td>0.2%</td>
-                                <td>&lt;0.5%</td>
-                                <td>80%</td>
-                                <td><span class="badge badge-success">达标</span></td>
+                                <td>待核销取餐</td>
+                                <td>${stats.pendingPickup ?? 0} 笔</td>
+                                <td>0 笔</td>
+                                <td>${(stats.pendingPickup ?? 0) === 0 ? '100%' : '待取餐'}</td>
+                                <td><span class="badge ${(stats.pendingPickup ?? 0) === 0 ? 'badge-success' : 'badge-warning'}">${(stats.pendingPickup ?? 0) === 0 ? '正常' : '待核销'}</span></td>
                             </tr>
                             <tr>
-                                <td>节能减排</td>
-                                <td>12%</td>
-                                <td>10%</td>
-                                <td>120%</td>
-                                <td><span class="badge badge-success">超额</span></td>
+                                <td>低库存预警菜品</td>
+                                <td>${stats.lowStockCount ?? 0} 种</td>
+                                <td>≤ 3 种</td>
+                                <td>${(stats.lowStockCount ?? 0) <= 3 ? '达标' : '超标'}</td>
+                                <td><span class="badge ${(stats.lowStockCount ?? 0) <= 3 ? 'badge-success' : 'badge-danger'}">${(stats.lowStockCount ?? 0) <= 3 ? '正常' : '需补货'}</span></td>
                             </tr>
                             <tr>
-                                <td>食材减耗</td>
-                                <td>28%</td>
-                                <td>20%</td>
-                                <td>140%</td>
-                                <td><span class="badge badge-success">超额</span></td>
+                                <td>在售菜品率</td>
+                                <td>${stats.totalDishes ? Math.round((stats.onSaleDishes / stats.totalDishes) * 100) : 100}%</td>
+                                <td>≥ 90%</td>
+                                <td>${stats.totalDishes ? Math.round((stats.onSaleDishes / stats.totalDishes) * 100) : 100}%</td>
+                                <td><span class="badge badge-success">实时</span></td>
+                            </tr>
+                            <tr>
+                                <td>平均客单价</td>
+                                <td>¥${(stats.avgOrderValue ?? 0).toFixed(2)}</td>
+                                <td>¥15.00</td>
+                                <td>${(stats.avgOrderValue ?? 0) >= 15 ? '达标' : '偏低'}</td>
+                                <td><span class="badge ${(stats.avgOrderValue ?? 0) >= 15 ? 'badge-success' : 'badge-warning'}">${(stats.avgOrderValue ?? 0) >= 15 ? '正常' : '关注'}</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -574,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==================== 3. 食品安全监管模块 (静态展示) ====================
     function renderSafetyManagement() {
         return `
-            <div class="page-title">🔒 食品安全监管</div>
+            <div class="page-title">🔒 食品安全监管 <span class="badge badge-warning" style="font-size: 12px; vertical-align: middle;">🚧 规划功能 · 演示数据</span></div>
 
             <div class="grid grid-3">
                 <div class="alert alert-danger">
@@ -722,7 +738,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==================== 4. 节约型校园管理模块 (静态与交互) ====================
     function renderConservationManagement() {
         return `
-            <div class="page-title">🌱 节约型校园管理</div>
+            <div class="page-title">🌱 节约型校园管理 <span class="badge badge-warning" style="font-size: 12px; vertical-align: middle;">🚧 规划功能 · 演示数据</span></div>
 
             <div class="grid grid-3">
                 <div class="kpi-card" style="background: linear-gradient(135deg, #34c759 0%, #30b550 100%);">
@@ -931,7 +947,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- 商户审核 -->
             <div id="merchant-review" class="tab-content">
                 <div class="card">
-                    <h3>校园后勤服务商户名录</h3>
+                    <h3>校园后勤服务商户名录 <span class="badge badge-warning" style="font-size: 12px; vertical-align: middle;">🚧 规划功能 · 演示数据</span></h3>
                     <div class="table-container">
                         <table class="table">
                             <thead>
