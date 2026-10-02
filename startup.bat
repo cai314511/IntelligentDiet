@@ -27,7 +27,7 @@ echo.
 
 :: 2. 检查后端与数据库
 echo [2/3] 正在检查后端与数据库...
-pushd "%~dp0..\server"
+pushd "%~dp0server"
 if not exist "node_modules" (
     echo 正在安装后端依赖，请稍候...
     call npm.cmd install
@@ -46,12 +46,12 @@ popd
 :: 3. 启动前端服务
 echo.
 echo [3/3] 正在启动前端静态服务...
-pushd "%~dp0"
+pushd "%~dp0canteen"
 start "智饷食堂 - 学生端网页 (Port 8000)" cmd /k "title 智饷食堂 - 学生端网页 && python -m http.server 8000"
 echo -- 学生端服务已启动: http://localhost:8000
 popd
 
-pushd "%~dp0..\management"
+pushd "%~dp0management"
 start "智饷食堂 - 管理端网页 (Port 5500)" cmd /k "title 智饷食堂 - 管理端网页 && python -m http.server 5500"
 echo -- 管理端服务已启动: http://localhost:5500
 popd

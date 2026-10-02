@@ -6,3 +6,10 @@ node_modules/
 .DS_Store
 Thumbs.db
 .superpowers/
+
+# 演示文稿大文件
+*.pptx
+*.ppt
+
+# 执行与临时探针脚本
+_run_*.py

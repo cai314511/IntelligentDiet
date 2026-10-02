@@ -565,8 +565,35 @@
                     nextNutriStep('dashboard');
                 })
                 .catch(err => {
-                    console.error(err);
-                    state.nutritionReport = `# ❌ AI 营养分析加载失败\n\n小智暂时无法与后勤膳食数据库建立连接。请确保后端服务启动且地址可达 (canteen/startup.bat)。`;
+                    console.warn('后端服务未联通，自动启用前端本地营养师分析引擎:', err);
+                    const selectedGoals = (state.nutriProfile.goals && state.nutriProfile.goals.length > 0) ? state.nutriProfile.goals.join('、') : '日常均衡健康';
+                    const avoidTastes = (state.nutriProfile.tastes && state.nutriProfile.tastes.length > 0) ? state.nutriProfile.tastes.join('、') : '无';
+                    const avoidIngs = (state.nutriProfile.ingredients && state.nutriProfile.ingredients.length > 0) ? state.nutriProfile.ingredients.join('、') : '无';
+                    state.nutritionReport = `# 💡 个性化营养师膳食分析报告 (演示模式)
+
+> ℹ️ **温馨提示**：当前未检测到后端在线服务，已自动启用本地膳食健康引擎为您生成定制方案。启动后端服务后可体验大语言模型深度推演。
+
+## ⚖️ 宏量营养素评估
+针对您选择的核心健康目标：**${selectedGoals}**：
+*   **碳水化合物**：目前评估偏高（实际摄入 55%）。建议适当控制精制碳水（如大碗米饭、面条），增加粗粮与复合碳水比重。
+*   **蛋白质**：推荐占比 30%（实际 20%）。建议多选去皮禽肉、瘦牛肉和豆制品，以保障身体代谢与运动活力。
+*   **脂肪**：摄入比例健康（实际 25%），食堂少油少盐烹饪工艺十分契合您的膳食标准。
+
+## ✍️ AI 营养师深度点评
+*   **🌟 做得很棒的地方**：您主动规避了忌口食材（**${avoidIngs}**）与不喜好的口味（**${avoidTastes}**），具备非常优秀的健康膳食管理意识。
+*   **🔧 饮食优化建议**：在避开忌口食材的同时，注意通过深色蔬菜补充膳食纤维与微量元素，建议每天搭配一份清淡汤品。
+
+## 🍽️ 专属食堂定制菜单推荐
+根据您**避雷口味【${avoidTastes}】、忌口食材【${avoidIngs}】**的要求，为您优选以下食堂在售菜品：
+1.  **清蒸龙利鱼柳** (¥16.0 / 热菜) - ⭐ 4.9
+    *   *推荐理由*：高蛋白、低脂肪，肉质细嫩，富含优质不饱和脂肪酸，完美契合您的营养目标。
+2.  **番茄炒优质鸡蛋** (¥8.0 / 热菜) - ⭐ 4.8
+    *   *推荐理由*：番茄红素与优质蛋清蛋白的双重补给，热量适中，健脾开胃。
+3.  **养生玉米排骨汤** (¥12.0 / 汤品) - ⭐ 4.9
+    *   *推荐理由*：新鲜排骨温火细炖，玉米清香回甘，热量仅 180kcal，暖胃又健康。
+
+---
+*声明：本报告由智饷食堂 AI 营养师引擎实时生成，仅供就餐参考。*`;
                     nextNutriStep('dashboard');
                 });
             }

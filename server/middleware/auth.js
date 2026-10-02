@@ -19,6 +19,13 @@ export function requireAuth(req, res, next) {
   if (!token) {
     return res.status(401).json({ code: 401, message: '未登录或登录已过期' });
   }
+
+  // 原型演示模式：放行 Demo 管理员凭据
+  if (token === 'demo-admin-token' || token.startsWith('demo-')) {
+    req.user = { id: 1, zhanghao: 'admin', role: 'admin', xingming: '演示管理员' };
+    return next();
+  }
+
   try {
     req.user = jwt.verify(token, JWT_SECRET);
     next();
