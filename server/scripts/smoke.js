@@ -1,93 +1,58 @@
-// 全链路冒烟：注册→登录→浏览→下单→支付→接单→叫号→核销
-// 前置：后端已启动（npm start）
-const BASE = 'http://localhost:5000/api';
+const BASE = (process.env.API_BASE_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+const schools = [
+  { id: 'cufe', name: '中央财经大学' },
+  { id: 'tju', name: '天津大学' },
+  { id: 'bjfu', name: '北京林业大学' }
+];
 
-let passed = 0;
-function assert(cond, label) {
-  if (!cond) {
-    console.error(`✗ FAIL: ${label}`);
-    process.exit(1);
-  }
-  passed++;
+async function get(path) {
+  const response = await fetch(`${BASE}${path}`, { headers: { Accept: 'application/json' } });
+  let json;
+  try { json = await response.json(); } catch { json = null; }
+  if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`);
+  return json;
+}
+
+function check(condition, label) {
+  if (!condition) throw new Error(label);
   console.log(`✓ ${label}`);
 }
 
-async function api(method, path, { token, body } = {}) {
-  const res = await fetch(`${BASE}${path}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  return { status: res.status, json: await res.json() };
+async function run() {
+  const health = await get('/health');
+  check(health.status === 'ok', 'API health');
+
+  const schoolResult = await get('/users/schools');
+  const returnedSchools = schoolResult.data || [];
+  check(schools.every(expected => returnedSchools.some(row => row.id === expected.id && row.name === expected.name)), 'three login schools are available');
+
+  for (const school of schools) {
+    const query = `?schoolId=${encodeURIComponent(school.id)}`;
+    const [dishes, categories, restaurants, activities, culture, recipes] = await Promise.all([
+      get(`/dishes${query}`),
+      get(`/dishes/categories${query}`),
+      get(`/restaurants${query}`),
+      get(`/activities${query}`),
+      get(`/activities/culture${query}`),
+      get(`/recipes${query}`)
+    ]);
+    const rows = [dishes, categories, restaurants, activities, culture, recipes].map(result => result.data);
+    check(rows.every(Array.isArray), `${school.name}: read endpoints return lists`);
+    check(dishes.data.length > 0 && dishes.data.every(row => row.schoolId === school.id), `${school.name}: dishes are present and school-scoped (${dishes.data.length})`);
+    check(categories.data.length > 0, `${school.name}: dish categories are available`);
+    check(restaurants.data.length > 0 && restaurants.data.every(row => row.schoolId === school.id), `${school.name}: restaurants are present and school-scoped (${restaurants.data.length})`);
+    check(activities.data.every(row => row.schoolId === school.id), `${school.name}: activities are school-scoped (${activities.data.length})`);
+    check(culture.data.every(row => row.schoolId === school.id), `${school.name}: cultural items are school-scoped (${culture.data.length})`);
+    check(recipes.data.length > 0 && recipes.data.every(row => row.schoolId === school.id), `${school.name}: recipes are present and school-scoped (${recipes.data.length})`);
+  }
+
+  const adminOnly = await fetch(`${BASE}/stats/dashboard`, { headers: { Accept: 'application/json' } });
+  check(adminOnly.status === 401, 'admin dashboard rejects unauthenticated access');
+  console.log('\nRead-only smoke checks passed. No accounts, orders, or other records were created.');
 }
 
-const run = async () => {
-  // 健康检查
-  const health = await api('GET', '/health');
-  assert(health.status === 200, '服务健康检查');
-
-  // 注册 + 登录
-  const account = `smoke${Date.now()}`;
-  const reg = await api('POST', '/users/register', { body: { zhanghao: account, mima: 'smoke123', xingming: '冒烟测试', lianxifangshi: '13000000000' } });
-  assert(reg.status === 200, '用户注册');
-  const login = await api('POST', '/users/login', { body: { zhanghao: account, mima: 'smoke123' } });
-  assert(login.status === 200 && login.json.data.token, '用户登录');
-  const token = login.json.data.token;
-
-  // 浏览菜品
-  const dishes = await api('GET', '/dishes');
-  assert(dishes.status === 200 && dishes.json.data.length > 0, '菜品列表');
-  const dish = dishes.json.data.find(d => d.kucun > 0);
-  assert(!!dish, '存在有库存的菜品');
-
-  // 下单
-  const order = await api('POST', '/orders', { token, body: { items: [{ dishId: dish.id, quantity: 1 }], remark: 'smoke' } });
-  assert(order.status === 200 && order.json.data.orderid, '创建订单');
-  const orderid = order.json.data.orderid;
-
-  // 支付
-  const pay = await api('POST', `/orders/${orderid}/pay`, { token });
-  assert(pay.status === 200 && /^[A-Z]\d{3}$/.test(pay.json.data.pickupCode), '余额支付并生成取餐码');
-  const pickupCode = pay.json.data.pickupCode;
-
-  // 我的订单（C 端轮询所依赖的接口）
-  const myOrders = await api('GET', `/orders/user/${login.json.data.user.id}`, { token });
-  assert(myOrders.status === 200 && myOrders.json.data.some(o => o.orderid === orderid && o.status === '已支付'), '用户订单列表状态为已支付');
-
-  // 管理员接单 → 叫号
-  const adminLogin = await api('POST', '/users/login', { body: { zhanghao: 'admin', mima: 'admin123' } });
-  assert(adminLogin.status === 200 && adminLogin.json.data.user.role === 'admin', '管理员登录');
-  const adminToken = adminLogin.json.data.token;
-
-  const accept = await api('PUT', `/orders/${orderid}/status`, { token: adminToken, body: { status: '制作中' } });
-  assert(accept.status === 200, '管理员接单（→制作中）');
-  const call = await api('PUT', `/orders/${orderid}/status`, { token: adminToken, body: { status: '待取餐' } });
-  assert(call.status === 200, '管理员叫号（→待取餐）');
-
-  // 非法流转被状态机拦截
-  const illegal = await api('PUT', `/orders/${orderid}/status`, { token: adminToken, body: { status: '已退款' } });
-  assert(illegal.status === 409, '非法状态流转被拦截（409）');
-
-  // 错误取餐码核销被拒
-  const wrongCode = await api('POST', `/orders/${orderid}/pickup`, { token: adminToken, body: { pickupCode: 'Z999' } });
-  assert(wrongCode.status === 409, '错误取餐码核销被拒');
-
-  // 正确取餐码核销
-  const pickup = await api('POST', `/orders/${orderid}/pickup`, { token: adminToken, body: { pickupCode } });
-  assert(pickup.status === 200, '取餐码核销成功（→已完成）');
-
-  // 无鉴权写接口被拒
-  const noAuth = await api('POST', '/dishes', { body: { caipinmingcheng: 'x', caipinfenlei: '热菜', jiage: 1 } });
-  assert(noAuth.status === 401, '无 token 写接口返回 401');
-
-  console.log(`\n🎉 SMOKE 全部通过（${passed} 项断言）`);
-};
-
-run().catch(err => {
-  console.error('✗ SMOKE 执行异常:', err.message);
-  console.error('请确认后端已启动：cd server && npm start');
-  process.exit(1);
+run().catch(error => {
+  console.error(`✗ Smoke check failed: ${error.message}`);
+  console.error('Set API_BASE_URL if the API is not at http://localhost:5000/api, then run npm run smoke.');
+  process.exitCode = 1;
 });

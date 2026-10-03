@@ -1,10 +1,13 @@
+import {targetFor} from './support/target.js';
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 
 process.env.DB_PATH = ':memory:';
+process.env.SEED_REFERENCE_DATA = 'false';
 const { db } = await import('../database.js');
 const { default: app } = await import('../app.js');
+const target=await targetFor(app);
 const bcrypt = (await import('bcryptjs')).default;
 
 let token;
@@ -16,24 +19,24 @@ before(async () => {
   db.prepare("INSERT OR IGNORE INTO caipinfenlei (caipinfenlei) VALUES ('素菜')").run();
   db.prepare("INSERT INTO caipinxinxi (id, caipinmingcheng, caipinfenlei, jiage, kucun) VALUES (1, '红烧肉', '热菜', 15, 2)").run();
   db.prepare("INSERT INTO caipinxinxi (id, caipinmingcheng, caipinfenlei, jiage, kucun) VALUES (2, '青菜', '素菜', 5, 100)").run();
-  const login = await request(app).post('/api/users/login').send({ zhanghao: 'u1', mima: 'pw123456' });
+  const login = await request(target).post('/api/users/login').send({ zhanghao: 'u1', mima: 'pw123456', schoolId: 'cufe' });
   token = login.body.data.token;
 });
 
 test('正常下单成功并返回总价', async () => {
-  const res = await request(app).post('/api/orders')
+  const res = await request(target).post('/api/orders')
     .set('Authorization', `Bearer ${token}`)
     .send({ items: [{ dishId: 2, quantity: 2 }], remark: '少辣' });
-  assert.equal(res.status, 200);
+  assert.equal(res.status, 201);
   assert.ok(res.body.data.orderid);
   assert.equal(res.body.data.totalPrice, 10);
 });
 
 test('多菜品下单：同一 orderid 多行共存', async () => {
-  const res = await request(app).post('/api/orders')
+  const res = await request(target).post('/api/orders')
     .set('Authorization', `Bearer ${token}`)
     .send({ items: [{ dishId: 1, quantity: 1 }, { dishId: 2, quantity: 1 }] });
-  assert.equal(res.status, 200);
+  assert.equal(res.status, 201);
   const orderid = res.body.data.orderid;
   const rows = db.prepare('SELECT orderid, caipinxinxiid, total FROM orders WHERE orderid = ?').all(orderid);
   assert.equal(rows.length, 2);
@@ -44,7 +47,7 @@ test('多菜品下单：同一 orderid 多行共存', async () => {
 });
 
 test('库存不足返回 409 且不产生任何订单行', async () => {
-  const res = await request(app).post('/api/orders')
+  const res = await request(target).post('/api/orders')
     .set('Authorization', `Bearer ${token}`)
     .send({ items: [{ dishId: 1, quantity: 5 }, { dishId: 2, quantity: 1 }] });
   assert.equal(res.status, 409);

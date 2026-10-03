@@ -3,10 +3,12 @@ import bcrypt from 'bcryptjs';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { config } from './config.js';
+import { seedReferenceData } from './seed.js';
+import { initWorkspace } from './services/workspaceSchema.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbDir = path.join(__dirname, 'data');
-const dbPath = process.env.DB_PATH || path.join(dbDir, 'zhixiang.db');
+const dbPath = config.dbPath;
 
 // 确保数据库目录存在
 const dbParentDir = path.dirname(dbPath);
@@ -57,6 +59,7 @@ export function initDatabase() {
       xingbie TEXT,
       lianxifangshi TEXT,
       jine DECIMAL(12, 2) DEFAULT 0,
+      school_id TEXT NOT NULL DEFAULT 'cufe',
       addtime DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -159,8 +162,31 @@ export function initDatabase() {
     if (!cols.includes(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
   };
   addColumn('orders', 'pickup_code', 'pickup_code TEXT');
+  addColumn('orders', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
   addColumn('yonghu', 'role', "role TEXT DEFAULT 'user'");
+  addColumn('yonghu', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
+  addColumn('caipinxinxi', 'source_key', 'source_key TEXT');
   addColumn('caipinxinxi', 'shangjia', "shangjia TEXT DEFAULT '是'");
+  addColumn('caipinxinxi', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
+  addColumn('caipinxinxi', 'ingredients_json', "ingredients_json TEXT NOT NULL DEFAULT '[]'");
+  addColumn('caipinxinxi', 'allergens_json', "allergens_json TEXT NOT NULL DEFAULT '[]'");
+  addColumn('caipinxinxi', 'nutrition_json', "nutrition_json TEXT NOT NULL DEFAULT '{}'");
+  addColumn('caipinxinxi', 'portion_g', 'portion_g INTEGER NOT NULL DEFAULT 300');
+  addColumn('caipinxinxi', 'data_source', "data_source TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'source_url', "source_url TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'campus', "campus TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'restaurant_name', "restaurant_name TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'price_unit', "price_unit TEXT NOT NULL DEFAULT '元/份'");
+  addColumn('caipinxinxi', 'taste_tags_json', "taste_tags_json TEXT NOT NULL DEFAULT '[]'");
+  addColumn('caipinxinxi', 'dietary_tags_json', "dietary_tags_json TEXT NOT NULL DEFAULT '[]'");
+  addColumn('caipinxinxi', 'spice_level', "spice_level TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'source_date', "source_date TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'source_kind', "source_kind TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'price_basis', "price_basis TEXT NOT NULL DEFAULT ''");
+  addColumn('caipinxinxi', 'nutrition_basis', "nutrition_basis TEXT NOT NULL DEFAULT ''");
+  addColumn('discusscaipinxinxi', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
+  addColumn('discusscaipinxinxi', 'rating', 'rating INTEGER NOT NULL DEFAULT 5');
+  addColumn('messages', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
 
   // ---- orders.orderid 唯一约束移除（一行一菜品共用 orderid，幂等重建）----
   // 必须放在 addColumn('orders', 'pickup_code', ...) 之后，保证旧表已有 pickup_code 列可复制
@@ -189,12 +215,13 @@ export function initDatabase() {
         phone TEXT,
         remark TEXT,
         pickup_code TEXT,
+        school_id TEXT NOT NULL DEFAULT 'cufe',
         addtime DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(userid) REFERENCES yonghu(id),
         FOREIGN KEY(caipinxinxiid) REFERENCES caipinxinxi(id)
       );
-      INSERT INTO orders_new (id, orderid, userid, caipinxinxiid, caipinmingcheng, tupian, buyshu, price, total, discountprice, status, address, phone, remark, pickup_code, addtime)
-        SELECT id, orderid, userid, caipinxinxiid, caipinmingcheng, tupian, buyshu, price, total, discountprice, status, address, phone, remark, pickup_code, addtime FROM orders;
+      INSERT INTO orders_new (id, orderid, userid, caipinxinxiid, caipinmingcheng, tupian, buyshu, price, total, discountprice, status, address, phone, remark, pickup_code, school_id, addtime)
+        SELECT id, orderid, userid, caipinxinxiid, caipinmingcheng, tupian, buyshu, price, total, discountprice, status, address, phone, remark, pickup_code, school_id, addtime FROM orders;
       DROP TABLE orders;
       ALTER TABLE orders_new RENAME TO orders;
       CREATE INDEX IF NOT EXISTS idx_orders_userid ON orders(userid);
@@ -204,15 +231,156 @@ export function initDatabase() {
     console.log('✓ orders 表已重建：移除 orderid 唯一约束');
   }
 
-  // admin 账号角色修正
-  db.prepare("UPDATE yonghu SET role = 'admin' WHERE zhanghao = 'admin'").run();
-
   // ---- 明文密码迁移为 bcrypt（幂等：已哈希的以 $2 开头，跳过）----
   const plaintextUsers = db.prepare("SELECT id, mima FROM yonghu WHERE mima NOT LIKE '$2%'").all();
   const updatePwd = db.prepare('UPDATE yonghu SET mima = ? WHERE id = ?');
   for (const u of plaintextUsers) {
     updatePwd.run(bcrypt.hashSync(u.mima, 10), u.id);
   }
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS universities (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL UNIQUE,
+      short_name TEXT NOT NULL,
+      accent TEXT NOT NULL DEFAULT '#2357d8',
+      logo TEXT NOT NULL DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS restaurants (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      school_id TEXT NOT NULL,
+      campus TEXT NOT NULL,
+      name TEXT NOT NULL,
+      category TEXT NOT NULL DEFAULT '学生餐厅',
+      description TEXT NOT NULL DEFAULT '',
+      opening_hours TEXT NOT NULL DEFAULT '06:30-21:00',
+      queue_minutes INTEGER NOT NULL DEFAULT 8,
+      queue_count INTEGER NOT NULL DEFAULT 18,
+      total_seats INTEGER NOT NULL DEFAULT 160,
+      available_seats INTEGER NOT NULL DEFAULT 56,
+      image TEXT NOT NULL DEFAULT '',
+      UNIQUE(school_id, campus, name)
+    );
+    CREATE TABLE IF NOT EXISTS restaurant_seats (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      restaurant_id INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+      seat_label TEXT NOT NULL,
+      seat_type TEXT NOT NULL DEFAULT '2人座',
+      status TEXT NOT NULL DEFAULT 'available',
+      UNIQUE(restaurant_id, seat_label)
+    );
+    CREATE TABLE IF NOT EXISTS seat_reservations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      reservation_id TEXT NOT NULL UNIQUE,
+      user_id INTEGER NOT NULL REFERENCES yonghu(id),
+      restaurant_id INTEGER NOT NULL REFERENCES restaurants(id),
+      seat_id INTEGER NOT NULL REFERENCES restaurant_seats(id),
+      starts_at TEXT NOT NULL,
+      ends_at TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'confirmed',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(seat_id, starts_at)
+    );
+    CREATE TABLE IF NOT EXISTS activities (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      school_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      category TEXT NOT NULL DEFAULT '校园活动',
+      campus TEXT NOT NULL DEFAULT '',
+      starts_at TEXT NOT NULL,
+      ends_at TEXT NOT NULL,
+      location TEXT NOT NULL DEFAULT '',
+      image TEXT NOT NULL DEFAULT '',
+      source_name TEXT NOT NULL DEFAULT '',
+      source_url TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'published',
+      capacity INTEGER NOT NULL DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS activity_signups (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      activity_id INTEGER NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
+      user_id INTEGER NOT NULL REFERENCES yonghu(id),
+      status TEXT NOT NULL DEFAULT 'registered',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(activity_id, user_id)
+    );
+    CREATE TABLE IF NOT EXISTS recipes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      school_id TEXT NOT NULL DEFAULT 'all',
+      title TEXT NOT NULL,
+      goal TEXT NOT NULL,
+      description TEXT NOT NULL,
+      dish_ids_json TEXT NOT NULL DEFAULT '[]',
+      tips_json TEXT NOT NULL DEFAULT '[]',
+      UNIQUE(school_id, title)
+    );
+    CREATE TABLE IF NOT EXISTS cultural_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      school_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL DEFAULT '校园文创',
+      description TEXT NOT NULL DEFAULT '',
+      price DECIMAL(10,2) NOT NULL DEFAULT 0,
+      image TEXT NOT NULL DEFAULT '',
+      campus TEXT NOT NULL DEFAULT '',
+      source_name TEXT NOT NULL DEFAULT '',
+      source_url TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'published',
+      UNIQUE(school_id, title)
+    );
+    CREATE TABLE IF NOT EXISTS cultural_orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id TEXT NOT NULL UNIQUE,
+      user_id INTEGER NOT NULL REFERENCES yonghu(id),
+      school_id TEXT NOT NULL,
+      item_id INTEGER NOT NULL REFERENCES cultural_items(id),
+      title TEXT NOT NULL,
+      quantity INTEGER NOT NULL,
+      unit_price DECIMAL(10,2) NOT NULL,
+      total DECIMAL(10,2) NOT NULL,
+      status TEXT NOT NULL DEFAULT '已支付',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS operations_records (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      school_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      payload_json TEXT NOT NULL DEFAULT '{}',
+      status TEXT NOT NULL DEFAULT '正常',
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(school_id,type,title)
+    );
+    CREATE TABLE IF NOT EXISTS payment_ledger (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      transaction_id TEXT NOT NULL UNIQUE,
+      orderid TEXT NOT NULL,
+      user_id INTEGER NOT NULL REFERENCES yonghu(id),
+      kind TEXT NOT NULL CHECK(kind IN ('payment','refund')),
+      amount_cents INTEGER NOT NULL CHECK(amount_cents > 0),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_payment_one_refund ON payment_ledger(orderid, kind);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_activity_school_title ON activities(school_id,title);
+    CREATE INDEX IF NOT EXISTS idx_dish_school ON caipinxinxi(school_id, shangjia, caipinfenlei);
+    CREATE INDEX IF NOT EXISTS idx_activity_school ON activities(school_id, starts_at);
+    CREATE INDEX IF NOT EXISTS idx_reviews_school_dish ON discusscaipinxinxi(school_id,caipinxinxiid);
+    CREATE INDEX IF NOT EXISTS idx_messages_school ON messages(school_id,addtime);
+  `);
+
+  const cultureColumns = db.prepare('PRAGMA table_info(cultural_items)').all().map(column => column.name);
+  if (!cultureColumns.includes('status')) db.exec("ALTER TABLE cultural_items ADD COLUMN status TEXT NOT NULL DEFAULT 'published'");
+
+  const seedSchools = db.prepare(`INSERT INTO universities(id,name,short_name,accent) VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,short_name=excluded.short_name,accent=excluded.accent`);
+  for (const school of JSON.parse(fs.readFileSync(path.join(config.userDataDir, 'schools.json'), 'utf8'))) {
+    seedSchools.run(school.id, school.name, school.shortName, school.accent);
+  }
+
+  if (config.seedReferenceData) seedReferenceData(db);
+  initWorkspace(db);
 
   console.log('✓ 数据库表创建成功');
 }

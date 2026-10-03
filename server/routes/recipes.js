@@ -1,90 +1,43 @@
 import express from 'express';
+import { db } from '../database.js';
+import { requireAdmin } from '../middleware/auth.js';
 
-const router = express.Router();
+const router=express.Router();
+const parse=text=>{try{return JSON.parse(text||'[]')}catch{return []}};
+function recipesFor(schoolId) {
+  return db.prepare(`SELECT id,school_id AS schoolId,title,goal,description,dish_ids_json AS rawDishIds,tips_json AS rawTips
+    FROM recipes WHERE school_id IN ('all',?) ORDER BY id`).all(schoolId).map(row=>{
+      const ids=parse(row.rawDishIds);
+      const meals=ids.map(id=>db.prepare(`SELECT id,caipinmingcheng AS name,jiage AS price,ingredients_json AS rawIngredients,nutrition_json AS rawNutrition
+        FROM caipinxinxi WHERE id=? AND school_id IN ('all',?)`).get(id,schoolId)).filter(Boolean).map(d=>({...d,price:Number(d.price),ingredients:parse(d.rawIngredients),nutrition:parse(d.rawNutrition)}));
+      return {id:row.id,schoolId:row.schoolId,title:row.title,goal:row.goal,description:row.description,dishIds:ids,tips:parse(row.rawTips),meals};
+    });
+}
+function validSchool(id){return Boolean(db.prepare('SELECT 1 FROM universities WHERE id=?').get(id));}
 
-// 获取所有健康食谱
-router.get('/', (req, res) => {
-  try {
-    const recipes = [
-      {
-        id: 1,
-        goal: "减肥瘦身",
-        dailyCalories: 1800,
-        description: "低热量营养套餐，帮助健康减重",
-        meals: ["蔬菜炒米饭", "清汤鱼丸", "水果沙拉"],
-        nutrition: { protein: 85, carbs: 180, fat: 45 }
-      },
-      {
-        id: 2,
-        goal: "增肌健身",
-        dailyCalories: 2800,
-        description: "高蛋白营养套餐，适合健身人群",
-        meals: ["牛肉饭", "蛋白粉", "坚果"],
-        nutrition: { protein: 140, carbs: 280, fat: 70 }
-      },
-      {
-        id: 3,
-        goal: "血糖控制",
-        dailyCalories: 1600,
-        description: "低GI食物组合，适合血糖偏高人群",
-        meals: ["糙米饭", "清蒸鸡胸", "绿菜"],
-        nutrition: { protein: 75, carbs: 140, fat: 35 }
-      },
-      {
-        id: 4,
-        goal: "日常均衡",
-        dailyCalories: 2000,
-        description: "营养均衡组合，适合大多数人群",
-        meals: ["米饭", "红烧肉", "蔬菜汤"],
-        nutrition: { protein: 85, carbs: 200, fat: 60 }
-      },
-      {
-        id: 5,
-        goal: "学生定制",
-        dailyCalories: 2200,
-        description: "专为学生设计，经济又营养",
-        meals: ["拌面", "卤蛋", "白菜汤"],
-        nutrition: { protein: 75, carbs: 220, fat: 50 }
-      }
-    ];
-
-    res.json({ code: 200, data: recipes });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
-  }
+router.get('/',(req,res)=>{
+  const schoolId=String(req.query.schoolId||'cufe');
+  if(!validSchool(schoolId)) return res.status(400).json({code:400,message:'请选择有效学校'});
+  res.json({code:200,data:recipesFor(schoolId)});
 });
 
-// 获取某个食谱详情
-router.get('/:id', (req, res) => {
-  try {
-    const recipes = [
-      {
-        id: 1,
-        goal: "减肥瘦身",
-        dailyCalories: 1800,
-        description: "低热量营养套餐，帮助健康减重",
-        meals: [
-          { name: "蔬菜炒米饭", calories: 600, nutrition: { protein: 15, carbs: 80, fat: 15 } },
-          { name: "清汤鱼丸", calories: 400, nutrition: { protein: 35, carbs: 20, fat: 10 } },
-          { name: "水果沙拉", calories: 400, nutrition: { protein: 10, carbs: 60, fat: 5 } }
-        ],
-        tips: [
-          "每天坚持运动30分钟以上",
-          "多喝水，少喝饮料",
-          "晚上8点后不进食"
-        ]
-      }
-    ];
+router.get('/:id',(req,res)=>{
+  const schoolId=String(req.query.schoolId||'cufe');
+  if(!validSchool(schoolId)) return res.status(400).json({code:400,message:'请选择有效学校'});
+  const recipe=recipesFor(schoolId).find(row=>row.id===Number(req.params.id));
+  if(!recipe) return res.status(404).json({code:404,message:'食谱不存在'});
+  res.json({code:200,data:recipe});
+});
 
-    const recipe = recipes.find(r => r.id === parseInt(req.params.id));
-    if (!recipe) {
-      return res.status(404).json({ code: 404, message: '食谱不存在' });
-    }
-
-    res.json({ code: 200, data: recipe });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
-  }
+router.post('/',requireAdmin,(req,res)=>{
+  const {title,goal,description,dishIds=[],tips=[]}=req.body||{};
+  if(typeof title!=='string'||!title.trim()||title.length>100||typeof goal!=='string'||!goal.trim()||typeof description!=='string'||!description.trim()||description.length>2000||!Array.isArray(dishIds)||dishIds.length>20||!Array.isArray(tips)||tips.length>20) return res.status(400).json({code:400,message:'食谱信息格式无效'});
+  const ids=dishIds.map(Number);
+  if(ids.some(id=>!Number.isSafeInteger(id)||id<1)) return res.status(400).json({code:400,message:'食谱菜品编号无效'});
+  const count=ids.length?db.prepare(`SELECT COUNT(*) AS count FROM caipinxinxi WHERE school_id=? AND shangjia='是' AND id IN (${ids.map(()=>'?').join(',')})`).get(req.user.schoolId,...ids).count:0;
+  if(count!==ids.length) return res.status(400).json({code:400,message:'食谱包含当前学校未上架的菜品'});
+  const result=db.prepare(`INSERT INTO recipes(school_id,title,goal,description,dish_ids_json,tips_json) VALUES(?,?,?,?,?,?)`).run(req.user.schoolId,title.trim(),goal.trim(),description.trim(),JSON.stringify(ids),JSON.stringify(tips));
+  res.status(201).json({code:200,message:'食谱已创建',data:{id:result.lastInsertRowid}});
 });
 
 export default router;

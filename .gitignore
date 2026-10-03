@@ -1,5 +1,6 @@
 node_modules/
 .env
+!server/.env.example
 *.db
 *.db-journal
 *.log
@@ -13,3 +14,5 @@ Thumbs.db
 
 # 执行与临时探针脚本
 _run_*.py
+
+userdata/.jwt-secret

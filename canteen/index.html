@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <script src="/shared/session-bridge.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>「智饷」高校智慧食堂 - 体验全新的校园就餐生活</title>
@@ -33,6 +34,8 @@
     
     <link rel="stylesheet" href="app.css">
     <link rel="stylesheet" href="themes.css">
+    <link rel="icon" href="/assets/brand/zhixiang-app-icon.png">
+    <link rel="stylesheet" href="/shared/pet.css">
 </head>
 <body class="font-sans antialiased">
 
@@ -49,14 +52,11 @@
                 <a href="#" class="nav-link hover:text-appleBlue transition-colors" data-target="orders">我的订单</a>
             </div>
             <div class="flex items-center space-x-4">
-                <div id="user-entry" class="flex items-center"></div>
-                <button onclick="toggleCart()" class="relative text-appleText hover:text-appleBlue transition">
+                <button onclick="toggleCart()" aria-label="我的餐盘" class="relative text-appleText hover:text-appleBlue transition">
                     <i class="fa-solid fa-bag-shopping text-xl"></i>
                     <span id="cart-badge" class="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
                 </button>
-                <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden cursor-pointer border border-gray-300">
-                    <img src="https://ui-avatars.com/api/?name=User&background=0066CC&color=fff" alt="User">
-                </div>
+                <div id="user-entry" class="flex items-center space-x-4"></div>
             </div>
         </div>
     </nav>
@@ -80,11 +80,11 @@
         </div>
     </div>
 
-    <div class="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
+    <div id="ai-chat-anchor" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
         <div id="ai-panel" class="mb-4 w-80 sm:w-96 glass-panel rounded-[24px] overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-300 origin-bottom-right shadow-2xl flex flex-col relative" style="height: 500px;">
             <div class="bg-gradient-to-r from-appleBlue to-blue-500 text-white p-4 flex justify-between items-center z-10">
                 <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><i class="fa-solid fa-robot"></i></div>
+                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><img src="/assets/brand/xiaozhi-body.png" alt="小智" class="xiaozhi-chat-avatar"></div>
                     <span class="font-semibold tracking-wide">小智 AI 助理</span>
                 </div>
                 <button onclick="toggleAI()" class="text-white/80 hover:text-white"><i class="fa-solid fa-chevron-down"></i></button>
@@ -92,7 +92,7 @@
             
             <div id="ai-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50/50 text-sm z-10">
                 <div class="flex items-start space-x-2">
-                    <div class="w-8 h-8 rounded-full bg-appleBlue text-white flex shrink-0 items-center justify-center"><i class="fa-solid fa-robot text-xs"></i></div>
+                    <div class="w-8 h-8 rounded-full bg-appleBlue text-white flex shrink-0 items-center justify-center"><img src="/assets/brand/xiaozhi-body.png" alt="小智" class="xiaozhi-chat-avatar"></div>
                     <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-appleText">
                         同学你好！我是小智。试试顶部的【塔罗牌测运势】，或者直接问我排队情况、帮你搭配减脂餐哦！
                     </div>
@@ -121,8 +121,8 @@
             </div>
         </div>
 
-        <button onclick="toggleAI()" class="w-16 h-16 rounded-full bg-appleBlue text-white shadow-[0_10px_25px_rgba(0,113,227,0.4)] flex items-center justify-center text-2xl hover:scale-105 transition-transform duration-300 relative glass-btn-active">
-            <i class="fa-solid fa-robot"></i>
+        <button id="original-ai-trigger" onclick="toggleAI()" class="w-16 h-16 rounded-full bg-appleBlue text-white shadow-[0_10px_25px_rgba(0,113,227,0.4)] flex items-center justify-center text-2xl hover:scale-105 transition-transform duration-300 relative glass-btn-active">
+            <img src="/assets/brand/xiaozhi-body.png" alt="小智" class="xiaozhi-chat-avatar">
             <span class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
         </button>
     </div>
@@ -132,5 +132,6 @@
     <script src="themes.js"></script>
     <script src="api.js"></script>
     <script src="app.js"></script>
+    <script type="module" src="/shared/pet.js"></script>
 </body>
 </html>

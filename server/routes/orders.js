@@ -1,262 +1,119 @@
 import express from 'express';
+import { randomUUID } from 'crypto';
 import { db } from '../database.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { ORDER_STATUS, canTransition, generatePickupCode } from '../utils/orderState.js';
 
+import { createOrder } from '../services/createOrder.js';
 const router = express.Router();
+const fail = (res, status, message) => res.status(status).json({ code: status, message });
+function releaseTaskSeats(order){const task=db.prepare('SELECT * FROM agent_tasks WHERE order_id=? AND user_id=? AND school_id=?').get(order.orderid,order.userid,order.school_id);if(task){for(const id of JSON.parse(task.reservation_ids_json))db.prepare("UPDATE seat_reservations SET status='cancelled' WHERE reservation_id=? AND user_id=?").run(id,order.userid);db.prepare("UPDATE agent_tasks SET status='cancelled',updated_at=CURRENT_TIMESTAMP WHERE id=?").run(task.id);}}
+const scopedOrder = (orderid, schoolId) => db.prepare('SELECT DISTINCT orderid, userid, school_id, status, pickup_code FROM orders WHERE orderid=? AND school_id=?').get(orderid, schoolId);
 
-// 获取所有订单列表
 router.get('/', requireAdmin, (req, res) => {
-  try {
-    const orders = db.prepare(`
-      SELECT id, orderid, userid, caipinmingcheng, tupian, buyshu, price, total, status, address, phone, remark, pickup_code, addtime
-      FROM orders 
-      ORDER BY addtime DESC
-    `).all();
-
-    res.json({ code: 200, data: orders });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
-  }
+  const rows = db.prepare(`SELECT id,orderid,userid,caipinxinxiid,caipinmingcheng,tupian,buyshu,price,total,status,address,phone,remark,pickup_code,addtime
+    FROM orders WHERE school_id=? ORDER BY addtime DESC LIMIT 1000`).all(req.user.schoolId);
+  res.json({ code: 200, data: rows });
 });
 
-// 创建订单（事务 + 库存校验）
-router.post('/', requireAuth, (req, res) => {
-  try {
-    const { items, address, phone, remark } = req.body;
-    const userid = req.user.id;
-
-    if (!items || items.length === 0) {
-      return res.status(400).json({ code: 400, message: '缺少必要参数' });
-    }
-
-    // 前置校验：菜品存在性与库存（在事务外快速失败）
-    const getDish = db.prepare('SELECT id, caipinmingcheng, jiage, kucun, tupian FROM caipinxinxi WHERE id = ?');
-    const checked = [];
-    for (const item of items) {
-      const dish = getDish.get(item.dishId);
-      if (!dish) {
-        return res.status(404).json({ code: 404, message: `菜品 ${item.dishId} 不存在` });
-      }
-      if (!item.quantity || item.quantity < 1) {
-        return res.status(400).json({ code: 400, message: '购买数量非法' });
-      }
-      if (dish.kucun < item.quantity) {
-        return res.status(409).json({ code: 409, message: `「${dish.caipinmingcheng}」库存不足（剩 ${dish.kucun} 份）` });
-      }
-      checked.push({ dish, quantity: item.quantity });
-    }
-
-    const orderid = `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    let totalPrice = 0;
-
-    const createOrder = db.transaction(() => {
-      const insert = db.prepare(`
-        INSERT INTO orders 
-        (orderid, userid, caipinxinxiid, caipinmingcheng, tupian, buyshu, price, total, address, phone, remark)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-      for (const { dish, quantity } of checked) {
-        const itemTotal = dish.jiage * quantity;
-        totalPrice += itemTotal;
-        insert.run(orderid, userid, dish.id, dish.caipinmingcheng, dish.tupian,
-          quantity, dish.jiage, itemTotal, address || '学校食堂', phone || '', remark || '');
-      }
-      // 清空购物车
-      db.prepare('DELETE FROM cart WHERE userid = ?').run(userid);
-    });
-    createOrder();
-
-    res.json({
-      code: 200,
-      message: '订单创建成功',
-      data: { orderid, totalPrice }
-    });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
-  }
+router.post('/', requireAuth, (req,res)=>{
+  try { const result=createOrder(req.user,req.body);res.status(201).json({code:200,message:'订单创建成功',data:result}); }
+  catch(error){res.status(error.status||500).json({code:error.status||500,message:error.status?error.message:'订单暂时无法创建'});}
 });
 
-// 获取用户订单列表（本人或管理员）
 router.get('/user/:userid', requireAuth, (req, res) => {
-  try {
-    if (req.user.id !== Number(req.params.userid) && req.user.role !== 'admin') {
-      return res.status(403).json({ code: 403, message: '无权查看他人订单' });
-    }
-    const orders = db.prepare(`
-      SELECT id, orderid, caipinmingcheng, tupian, buyshu, total, status, pickup_code, addtime
-      FROM orders 
-      WHERE userid = ?
-      ORDER BY addtime DESC
-    `).all(req.params.userid);
-
-    res.json({ code: 200, data: orders });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
-  }
+  const targetId = Number(req.params.userid);
+  if (targetId !== req.user.id && req.user.role !== 'admin') return fail(res, 403, '无权查看他人订单');
+  const rows = db.prepare(`SELECT id,orderid,caipinxinxiid,caipinmingcheng,tupian,buyshu,price,total,status,pickup_code,addtime
+    FROM orders WHERE userid=? AND school_id=? ORDER BY addtime DESC LIMIT 500`).all(targetId, req.user.schoolId);
+  res.json({ code: 200, data: rows });
 });
 
-// 获取订单详情
 router.get('/:orderid', requireAuth, (req, res) => {
-  try {
-    const orders = db.prepare(`
-      SELECT id, orderid, caipinmingcheng, tupian, buyshu, price, total, status, address, phone, addtime
-      FROM orders 
-      WHERE orderid = ?
-    `).all(req.params.orderid);
-
-    if (orders.length === 0) {
-      return res.status(404).json({ code: 404, message: '订单不存在' });
-    }
-
-    res.json({ code: 200, data: orders });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
-  }
+  const order = scopedOrder(req.params.orderid, req.user.schoolId);
+  if (!order) return fail(res, 404, '订单不存在');
+  if (order.userid !== req.user.id && req.user.role !== 'admin') return fail(res, 403, '无权查看该订单');
+  const rows = db.prepare(`SELECT id,orderid,caipinxinxiid,caipinmingcheng,tupian,buyshu,price,total,status,address,phone,remark,pickup_code,addtime
+    FROM orders WHERE orderid=? AND school_id=? ORDER BY id`).all(req.params.orderid, req.user.schoolId);
+  res.json({ code: 200, data: rows });
 });
 
-// 更新订单状态（管理员，状态机校验）
 router.put('/:orderid/status', requireAdmin, (req, res) => {
+  const { status } = req.body || {};
+  if (!ORDER_STATUS.includes(status)) return fail(res, 400, '非法的订单状态');
+  const order = scopedOrder(req.params.orderid, req.user.schoolId);
+  if (!order) return fail(res, 404, '订单不存在');
+  if (status==='已支付'||status==='已完成') return fail(res,409,'支付与核销需使用各自业务操作');
+  if (!canTransition(order.status, status)) return fail(res, 409, `订单不能从「${order.status}」变更为「${status}」`);
   try {
-    const { status } = req.body;
-
-    if (!status || !ORDER_STATUS.includes(status)) {
-      return res.status(400).json({ code: 400, message: '非法的订单状态' });
-    }
-
-    const rows = db.prepare('SELECT DISTINCT status FROM orders WHERE orderid = ?').all(req.params.orderid);
-    if (rows.length === 0) {
-      return res.status(404).json({ code: 404, message: '订单不存在' });
-    }
-
-    const current = rows[0].status;
-    if (!canTransition(current, status)) {
-      return res.status(409).json({ code: 409, message: `订单不能从「${current}」变更为「${status}」` });
-    }
-
-    if (status === '已退款') {
-      // 退款：事务内回退资金 + 库存 + 月售，再改状态
-      const refund = db.transaction(() => {
-        const items = db.prepare(
-          'SELECT caipinxinxiid, buyshu, total, userid FROM orders WHERE orderid = ?'
-        ).all(req.params.orderid);
-        const totalRefund = items.reduce((sum, r) => sum + r.total, 0);
-        db.prepare('UPDATE yonghu SET jine = jine + ? WHERE id = ?').run(totalRefund, items[0].userid);
-        const restock = db.prepare(
-          'UPDATE caipinxinxi SET kucun = kucun + ?, yueshuxiao = MAX(yueshuxiao - ?, 0) WHERE id = ?'
-        );
-        for (const r of items) restock.run(r.buyshu, r.buyshu, r.caipinxinxiid);
-        db.prepare("UPDATE orders SET status = '已退款' WHERE orderid = ?").run(req.params.orderid);
-      });
-      refund();
-    } else {
-      db.prepare('UPDATE orders SET status = ? WHERE orderid = ?').run(status, req.params.orderid);
-    }
-
-    res.json({ code: 200, message: '订单状态更新成功', data: { orderid: req.params.orderid, status } });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
-  }
-});
-
-// 余额支付（本人，事务：扣库存 + 扣余额 + 取餐码 + 状态流转）
-router.post('/:orderid/pay', requireAuth, (req, res) => {
-  try {
-    const rows = db.prepare(`
-      SELECT id, userid, caipinxinxiid, caipinmingcheng, buyshu, total, status
-      FROM orders WHERE orderid = ?
-    `).all(req.params.orderid);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ code: 404, message: '订单不存在' });
-    }
-    if (rows[0].userid !== req.user.id) {
-      return res.status(403).json({ code: 403, message: '无权支付他人订单' });
-    }
-    if (rows[0].status !== '未支付') {
-      return res.status(409).json({ code: 409, message: `订单当前状态为「${rows[0].status}」，无法支付` });
-    }
-
-    const totalPrice = rows.reduce((sum, r) => sum + r.total, 0);
-    const user = db.prepare('SELECT jine FROM yonghu WHERE id = ?').get(req.user.id);
-    if (user.jine < totalPrice) {
-      return res.status(409).json({ code: 409, message: `余额不足，当前余额 ¥${user.jine.toFixed(2)}` });
-    }
-
-    // 取餐码与活跃订单查重，撞码重试（最多 5 次）
-    let pickupCode = generatePickupCode();
-    const codeClash = db.prepare(`
-      SELECT COUNT(*) AS c FROM orders
-      WHERE pickup_code = ? AND status NOT IN ('已完成', '已取消', '已退款')
-    `);
-    for (let i = 0; i < 5 && codeClash.get(pickupCode).c > 0; i++) {
-      pickupCode = generatePickupCode();
-    }
-
-    const pay = db.transaction(() => {
-      // 扣库存（二次校验，防并发超卖）
-      const deduct = db.prepare('UPDATE caipinxinxi SET kucun = kucun - ? WHERE id = ? AND kucun >= ?');
-      for (const r of rows) {
-        const result = deduct.run(r.buyshu, r.caipinxinxiid, r.buyshu);
-        if (result.changes === 0) {
-          throw new Error(`「${r.caipinmingcheng}」库存不足`);
-        }
+    const transition = db.transaction(() => {
+      if (status === '已退款') {
+        const payment=db.prepare("SELECT amount_cents FROM payment_ledger WHERE orderid=? AND user_id=? AND kind='payment'").get(order.orderid,order.userid);
+        if(!payment) throw Object.assign(new Error('没有可退款的支付流水'),{status:409});
+        const lines = db.prepare('SELECT caipinxinxiid,buyshu,total,userid FROM orders WHERE orderid=? AND school_id=?').all(order.orderid, req.user.schoolId);
+        const refundCents = Math.round(lines.reduce((sum, line) => sum + Number(line.total), 0) * 100);
+        if(payment.amount_cents!==refundCents) throw Object.assign(new Error('支付流水金额与订单不一致'),{status:409});
+        db.prepare(`INSERT INTO payment_ledger(transaction_id,orderid,user_id,kind,amount_cents) VALUES(?,?,?,'refund',?)`)
+          .run(randomUUID(), order.orderid, order.userid, refundCents);
+        db.prepare('UPDATE yonghu SET jine=jine+? WHERE id=? AND school_id=?').run(refundCents / 100, order.userid, req.user.schoolId);
+        const restock = db.prepare('UPDATE caipinxinxi SET kucun=kucun+?,yueshuxiao=MAX(yueshuxiao-?,0) WHERE id=? AND school_id=?');
+        for (const line of lines) restock.run(line.buyshu, line.buyshu, line.caipinxinxiid, req.user.schoolId);
       }
-      // 扣余额 + 月售统计
-      db.prepare('UPDATE yonghu SET jine = jine - ? WHERE id = ?').run(totalPrice, req.user.id);
-      const addSales = db.prepare('UPDATE caipinxinxi SET yueshuxiao = yueshuxiao + ? WHERE id = ?');
-      for (const r of rows) addSales.run(r.buyshu, r.caipinxinxiid);
-      // 状态 + 取餐码
-      db.prepare("UPDATE orders SET status = '已支付', pickup_code = ? WHERE orderid = ?")
-        .run(pickupCode, req.params.orderid);
+      const update = db.prepare('UPDATE orders SET status=? WHERE orderid=? AND school_id=? AND status=?');
+      const changed = update.run(status, order.orderid, req.user.schoolId, order.status).changes;
+      if(['已退款','已取消'].includes(status))releaseTaskSeats(order);
+      if (!changed) throw Object.assign(new Error('订单状态已更新，请刷新后重试'), { status: 409 });
     });
-
-    try {
-      pay();
-    } catch (e) {
-      return res.status(409).json({ code: 409, message: e.message });
-    }
-
-    const balance = db.prepare('SELECT jine FROM yonghu WHERE id = ?').get(req.user.id).jine;
-
-    res.json({
-      code: 200,
-      message: '支付成功',
-      data: { orderid: req.params.orderid, pickupCode, totalPrice, balance }
-    });
+    transition();
+    res.json({ code: 200, message: '订单状态更新成功', data: { orderid: order.orderid, status } });
   } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
+    res.status(error.status || 409).json({ code: error.status || 409, message: error.message });
   }
 });
 
-// 取餐核销（管理员，取餐码核验）
-router.post('/:orderid/pickup', requireAdmin, (req, res) => {
+router.post('/:orderid/pay', requireAuth, (req, res) => {
+  const order = scopedOrder(req.params.orderid, req.user.schoolId);
+  if (!order) return fail(res, 404, '订单不存在');
+  if (order.userid !== req.user.id) return fail(res, 403, '无权支付他人订单');
+  let pickupCode;
   try {
-    const { pickupCode } = req.body;
-    if (!pickupCode) {
-      return res.status(400).json({ code: 400, message: '请提供取餐码' });
-    }
-
-    const row = db.prepare(`
-      SELECT DISTINCT status, pickup_code FROM orders WHERE orderid = ?
-    `).get(req.params.orderid);
-
-    if (!row) {
-      return res.status(404).json({ code: 404, message: '订单不存在' });
-    }
-    if (row.status !== '待取餐') {
-      return res.status(409).json({ code: 409, message: `订单当前状态为「${row.status}」，不能核销` });
-    }
-    if (row.pickup_code !== pickupCode.trim().toUpperCase()) {
-      return res.status(409).json({ code: 409, message: '取餐码不正确' });
-    }
-
-    db.prepare("UPDATE orders SET status = '已完成' WHERE orderid = ?").run(req.params.orderid);
-
-    res.json({ code: 200, message: '核销成功，订单已完成', data: { orderid: req.params.orderid, status: '已完成' } });
+    const pay = db.transaction(() => {
+      const current = scopedOrder(req.params.orderid, req.user.schoolId);
+      if (!current || current.status !== '未支付') throw Object.assign(new Error('订单当前状态无法支付'), { status: 409 });
+      for(let i=0;i<100;i++){const code=generatePickupCode();if(!db.prepare("SELECT 1 FROM orders WHERE pickup_code=? AND school_id=? AND status IN ('已支付','制作中','待取餐')").get(code,req.user.schoolId)){pickupCode=code;break;}}if(!pickupCode)throw Object.assign(new Error('取餐码暂不可生成，请稍后重试'),{status:409});
+      const lines = db.prepare(`SELECT caipinxinxiid,caipinmingcheng,buyshu,total FROM orders WHERE orderid=? AND school_id=?`).all(order.orderid, req.user.schoolId);
+      const cents = Math.round(lines.reduce((sum, row) => sum + Number(row.total), 0) * 100);
+      const debit = db.prepare('UPDATE yonghu SET jine=jine-? WHERE id=? AND school_id=? AND jine>=?').run(cents / 100, req.user.id, req.user.schoolId, cents / 100);
+      if (!debit.changes) throw Object.assign(new Error('账户余额不足'), { status: 409 });
+      const deduct = db.prepare('UPDATE caipinxinxi SET kucun=kucun-?,yueshuxiao=yueshuxiao+? WHERE id=? AND school_id=? AND shangjia=\'是\' AND kucun>=?');
+      for (const line of lines) {
+        const result = deduct.run(line.buyshu, line.buyshu, line.caipinxinxiid, req.user.schoolId, line.buyshu);
+        if (!result.changes) throw Object.assign(new Error(`「${line.caipinmingcheng}」库存不足`), { status: 409 });
+      }
+      db.prepare(`INSERT INTO payment_ledger(transaction_id,orderid,user_id,kind,amount_cents) VALUES(?,?,?,'payment',?)`).run(randomUUID(), order.orderid, req.user.id, cents);
+      db.prepare(`UPDATE orders SET status='已支付',pickup_code=? WHERE orderid=? AND school_id=? AND status='未支付'`).run(pickupCode, order.orderid, req.user.schoolId);
+      return cents / 100;
+    });
+    const totalPrice = pay();
+    const balance = db.prepare('SELECT jine FROM yonghu WHERE id=? AND school_id=?').get(req.user.id, req.user.schoolId).jine;
+    res.json({ code: 200, message: '支付成功', data: { orderid: order.orderid, pickupCode, totalPrice, balance } });
   } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
+    res.status(error.status || 409).json({ code: error.status || 409, message: error.message });
   }
 });
 
+router.post('/:orderid/pickup', requireAdmin, (req, res) => {
+  const order = scopedOrder(req.params.orderid, req.user.schoolId);
+  const pickupCode = String(req.body?.pickupCode || '').trim().toUpperCase();
+  if (!order) return fail(res, 404, '订单不存在');
+  if (order.status !== '待取餐') return fail(res, 409, `订单当前状态为「${order.status}」，不能核销`);
+  if (!pickupCode || order.pickup_code !== pickupCode) return fail(res, 409, '取餐码不正确');
+  const updated = db.prepare(`UPDATE orders SET status='已完成' WHERE orderid=? AND school_id=? AND status='待取餐'`).run(order.orderid, req.user.schoolId);
+  if (!updated.changes) return fail(res, 409, '订单状态已更新，请刷新后重试');
+  res.json({ code: 200, message: '核销成功，订单已完成', data: { orderid: order.orderid, status: '已完成' } });
+});
+
+router.post('/:orderid/cancel',requireAuth,(req,res)=>{
+  try{db.transaction(()=>{const order=scopedOrder(req.params.orderid,req.user.schoolId);if(!order||order.userid!==req.user.id)throw Object.assign(new Error('订单不存在'),{status:404});if(order.status!=='未支付')throw Object.assign(new Error('当前订单不可取消'),{status:409});db.prepare("UPDATE orders SET status='已取消' WHERE orderid=? AND school_id=?").run(order.orderid,req.user.schoolId);releaseTaskSeats(order);})();res.json({code:200,message:'订单已取消'});}catch(e){res.status(e.status||500).json({message:e.message});}
+});
 export default router;

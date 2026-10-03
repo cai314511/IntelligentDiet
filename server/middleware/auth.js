@@ -1,14 +1,10 @@
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'zhixiang-dev-secret';
-if (!process.env.JWT_SECRET) {
-  console.warn('⚠️ 未配置 JWT_SECRET，使用开发默认密钥（生产环境请务必配置）');
-}
+import { config } from '../config.js';
 
 export function signToken(user) {
   return jwt.sign(
-    { id: user.id, zhanghao: user.zhanghao, role: user.role || 'user' },
-    JWT_SECRET,
+    { id: user.id, zhanghao: user.zhanghao, role: user.role || 'user', schoolId: user.school_id || user.schoolId, development: Boolean(user.development) },
+    config.jwtSecret,
     { expiresIn: '7d' }
   );
 }
@@ -20,18 +16,22 @@ export function requireAuth(req, res, next) {
     return res.status(401).json({ code: 401, message: '未登录或登录已过期' });
   }
 
-  // 原型演示模式：放行 Demo 管理员凭据
-  if (token === 'demo-admin-token' || token.startsWith('demo-')) {
-    req.user = { id: 1, zhanghao: 'admin', role: 'admin', xingming: '演示管理员' };
-    return next();
-  }
-
   try {
-    req.user = jwt.verify(token, JWT_SECRET);
+    req.user = jwt.verify(token, config.jwtSecret);
+    if (req.user.development && config.nodeEnv !== 'development') throw new Error('Development session disabled');
     next();
   } catch {
     return res.status(401).json({ code: 401, message: '未登录或登录已过期' });
   }
+}
+
+export function optionalAuth(req, _res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (token) {
+    try { const user=jwt.verify(token, config.jwtSecret);if(!user.development||config.nodeEnv==='development')req.user=user; } catch { /* public endpoints remain usable with expired sessions */ }
+  }
+  next();
 }
 
 export function requireAdmin(req, res, next) {

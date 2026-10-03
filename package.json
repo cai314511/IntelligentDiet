@@ -1,0 +1,1 @@
+{"name":"zhixiang-campus-workspace","private":true,"type":"module","scripts":{"frontend":"node scripts/serve-frontend.mjs","api":"npm --prefix server start","init-db":"npm --prefix server run init-db","test":"npm --prefix server test"}}

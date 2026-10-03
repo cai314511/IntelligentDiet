@@ -1,0 +1,209 @@
+.xiaozhi-pet {
+  position: fixed;
+  width: 108px;
+  height: 148px;
+  z-index: 110;
+  user-select: none;
+  isolation: isolate;
+}
+.pet-body {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  touch-action: none;
+  cursor: grab;
+  position: relative;
+  filter: drop-shadow(0 7px 8px #17477b25);
+}
+.pet-body:active {
+  cursor: grabbing;
+}
+.pet-sprite {
+  display: block;
+  width: 108px;
+  height: 122px;
+  background-image: url("/assets/brand/xiaozhi-body.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 0;
+  image-rendering: pixelated;
+  animation: pet-breathe 3s ease-in-out infinite;
+}
+.pet-avatar {
+  display: none;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid white;
+  pointer-events: none;
+}
+.pet-name {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #d9e9f5;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 10px;
+  color: #225c9e;
+  position: absolute;
+  bottom: 0;
+  left: 28px;
+}
+.avatar-look .pet-avatar {
+  display: block;
+}
+.avatar-look .pet-sprite {
+  display: none;
+}
+.avatar-look {
+  height: 108px;
+  width: 94px;
+}
+.avatar-look .pet-name {
+  left: 18px;
+}
+.pet-tools {
+  position: absolute;
+  right: 0;
+  bottom: 155px;
+  width: 150px;
+  background: #fff;
+  border: 1px solid #d9e9f5;
+  padding: 8px;
+  border-radius: 16px;
+  box-shadow: 0 12px 35px #123e5920;
+  display: grid;
+  gap: 3px;
+}
+.pet-tools button {
+  border: 0;
+  border-radius: 9px;
+  padding: 8px;
+  background: #f2f8fd;
+  color: #234d71;
+  text-align: left;
+  font-size: 12px;
+}
+.pet-tools button:hover {
+  background: #dcefff;
+}
+.pet-bubble {
+  position: absolute;
+  right: 110px;
+  bottom: 40px;
+  width: 165px;
+  border: 1px solid #d9e9f5;
+  background: white;
+  border-radius: 16px 16px 4px 16px;
+  padding: 12px;
+  font-size: 12px;
+  color: #235270;
+  box-shadow: 0 5px 20px #123e5910;
+  pointer-events: none;
+}
+.pet-left .pet-bubble {
+  right: auto;
+  left: 110px;
+  border-radius: 16px 16px 16px 4px;
+}
+.pet-left .pet-tools {
+  right: auto;
+  left: 0;
+}
+.pet-happy .pet-body {
+  animation: pet-hop 0.5s ease 2;
+}
+.pet-chat-log {
+  height: 330px;
+  overflow: auto;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pet-chat-greeting {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+.pet-chat-greeting img {
+  width: 55px;
+  border-radius: 50%;
+}
+.pet-message {
+  padding: 12px 15px;
+  background: #edf6fc;
+  border-radius: 14px;
+  font-size: 13px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.pet-message.user {
+  background: var(--school);
+  color: white;
+  align-self: end;
+  max-width: 85%;
+}
+.pet-chat-form {
+  display: flex;
+  gap: 9px;
+  margin-top: 18px;
+}
+.pet-chat-form input {
+  min-width: 0;
+}
+@keyframes pet-breathe {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes pet-hop {
+  50% {
+    transform: translateY(-12px) rotate(-5deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pet-sprite,
+  .pet-happy .pet-body {
+    animation: none;
+  }
+}
+@media (max-width: 680px) {
+  .xiaozhi-pet {
+    transform: scale(0.82);
+    transform-origin: top left;
+  }
+  .pet-chat-log {
+    height: 280px;
+  }
+}
+
+.xiaozhi-pet.pet-top .pet-tools {
+  top: 150px;
+  bottom: auto;
+}
+
+#original-ai-trigger { display: none; }
+.xiaozhi-pet [hidden] { display: none !important; }
+.pet-avatar { object-fit: contain; border: 0; border-radius: 0; }
+dialog:has(.pet-chat-log) { padding: 24px; border: 1px solid #d9e9f5; border-radius: 18px; width: min(520px, 90vw); }
+dialog:has(.pet-chat-log) .modal-head { display: flex; justify-content: space-between; margin-bottom: 16px; }
+.pet-chat-form input { flex: 1; padding: 10px; border: 1px solid #d9e9f5; border-radius: 8px; }
+.pet-chat-form button { background: #0071e3; color: white; border: 0; padding: 10px; border-radius: 8px; }
+
+/* 小智聊天卡片 */
+#ai-panel { width: min(480px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 100px)) !important; }
+#ai-panel > div:first-child { min-height: 76px; padding-left: 106px; }
+#ai-panel > div:first-child .xiaozhi-chat-avatar { display: none; }
+#ai-panel > div:first-child .backdrop-blur-sm { display: none; }
+.xiaozhi-chat-avatar { width: 100%; height: 100%; object-fit: contain; }
+#ai-messages .rounded-full:has(.xiaozhi-chat-avatar) { background: transparent !important; width: 38px; height: 42px; }
+.xiaozhi-pet.pet-chat-docked { width: 84px; height: 94px; transform: none; }
+.pet-chat-docked .pet-sprite { display: block; width: 84px; height: 94px; animation: none; }
+.pet-chat-docked .pet-avatar, .pet-chat-docked .pet-name, .pet-chat-docked .pet-bubble, .pet-chat-docked .pet-tools { display: none !important; }
+.pet-chat-docked .pet-body { cursor: pointer; }
+@media (max-width: 680px) { #ai-chat-anchor { right: 16px; bottom: 16px; } }

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>智饷 · 校园餐饮共用入口</title>
+    <link rel="icon" href="/assets/brand/zhixiang-app-icon.png" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+  </head>
+  <body>
+    <main class="portal">
+      <section class="portal-story">
+        <a class="brand" href="/"
+          ><span class="app-brand-icon"
+            ><img src="/assets/brand/zhixiang-app-icon.png" alt="智饷" /></span
+          >智饷</a
+        >
+        <div class="lead">
+          <span class="eyebrow">CAMPUS DINING, REIMAGINED</span>
+          <h1>好好吃饭，<br />校园生活更从容。</h1>
+          <p class="muted" style="margin-top: 18px">
+            学生的一餐，食堂的一天。<br />从点餐到供需，让每一个决定更轻松。
+          </p>
+        </div>
+        <img
+          class="mascot"
+          src="/assets/brand/xiaozhi-body.png"
+          alt="小智校园餐饮精灵"
+        />
+        <footer>校园餐饮服务 · 学生与校方共用入口</footer>
+      </section>
+      <section class="portal-login">
+        <div class="portal-form">
+          <span class="eyebrow">WELCOME TO ZHIXIANG</span>
+          <h2 style="margin-top: 8px">欢迎来到智饷</h2>
+          <p class="muted" style="margin-top: 8px">
+            选择身份，进入你的校园工作台。
+          </p>
+          <div class="role-choices">
+            <button class="role-choice" data-role="student">
+              <b>◉</b><strong>我是学生</strong
+              ><span>智能点餐 · 营养记录 · 校园生活</span></button
+            ><button class="role-choice" data-role="admin">
+              <b>▦</b><strong>我是校方</strong
+              ><span>食堂运营 · 订单处理 · 供需预测</span>
+            </button>
+          </div>
+          <form id="auth-form">
+            <div class="form-grid">
+              <div>
+                <label for="school">学校</label
+                ><select id="school" required>
+                  <option value="">正在加载学校…</option>
+                </select>
+              </div>
+              <div>
+                <label for="campus">校区</label
+                ><select id="campus">
+                  <option value="">全校</option>
+                </select>
+              </div>
+            </div>
+            <label for="account">账号</label
+            ><input
+              id="account"
+              autocomplete="username"
+              minlength="3"
+              maxlength="32"
+              required
+              placeholder="请输入账号"
+            /><label for="password">密码</label
+            ><input
+              id="password"
+              type="password"
+              autocomplete="current-password"
+              minlength="8"
+              maxlength="128"
+              required
+              placeholder="请输入密码"
+            />
+            <div id="register-fields" hidden>
+              <label for="name">姓名</label
+              ><input id="name" maxlength="40" placeholder="请输入姓名" /><label
+                for="phone"
+                >联系方式</label
+              ><input
+                id="phone"
+                type="tel"
+                maxlength="30"
+                placeholder="手机号"
+              />
+            </div>
+            <p
+              class="muted"
+              id="auth-context"
+              style="font-size: 11px; margin-top: 12px"
+            >
+              请选择身份和学校
+            </p>
+            <button class="btn primary" id="submit" type="submit">
+              登录并进入</button
+            ><button
+              class="btn ghost"
+              type="button"
+              id="switch-register"
+              hidden
+            >
+              还没有账号？注册学生账号</button
+            ><button class="btn ghost" type="button" id="retry-schools" hidden>
+              重新加载学校
+            </button>
+            <p id="auth-status" class="status" role="alert"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+    <script src="/config.js"></script>
+    <script type="module" src="/portal.js"></script>
+  </body>
+</html>

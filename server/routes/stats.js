@@ -1,51 +1,33 @@
 import express from 'express';
-import { db } from '../database.js';
 import { requireAdmin } from '../middleware/auth.js';
+import { db } from '../database.js';
+import { config } from '../config.js';
 
-const router = express.Router();
+const router=express.Router();
 
-// 数据大屏聚合统计（管理员）。今日按北京时间（UTC+8）边界计算。
-router.get('/dashboard', requireAdmin, (req, res) => {
+router.get('/dashboard',requireAdmin,(req,res)=>{
   try {
-    const PAID_STATUS = "('已支付','制作中','待取餐','已完成')";
-
-    const totalUsers = db.prepare("SELECT COUNT(*) AS c FROM yonghu WHERE role = 'user'").get().c;
-    const totalOrders = db.prepare('SELECT COUNT(DISTINCT orderid) AS c FROM orders').get().c;
-    const revenue = db.prepare(`
-      SELECT COALESCE(SUM(total), 0) AS s FROM orders WHERE status IN ${PAID_STATUS}
-    `).get().s;
-    const today = db.prepare(`
-      SELECT COUNT(DISTINCT orderid) AS c, COALESCE(SUM(total), 0) AS s
-      FROM orders
-      WHERE status IN ${PAID_STATUS}
-        AND date(addtime, '+8 hours') = date('now', '+8 hours')
-    `).get();
-    const totalDishes = db.prepare('SELECT COUNT(*) AS c FROM caipinxinxi').get().c;
-    const onSaleDishes = db.prepare("SELECT COUNT(*) AS c FROM caipinxinxi WHERE shangjia = '是'").get().c;
-    const lowStockCount = db.prepare('SELECT COUNT(*) AS c FROM caipinxinxi WHERE kucun < 20').get().c;
-    const pendingAccept = db.prepare("SELECT COUNT(DISTINCT orderid) AS c FROM orders WHERE status = '已支付'").get().c;
-    const pendingPickup = db.prepare("SELECT COUNT(DISTINCT orderid) AS c FROM orders WHERE status = '待取餐'").get().c;
-    const unrepliedMessages = db.prepare('SELECT COUNT(*) AS c FROM messages WHERE replycontent IS NULL').get().c;
-
-    res.json({
-      code: 200,
-      data: {
-        totalUsers,
-        totalOrders,
-        totalRevenue: revenue,
-        todayOrders: today.c,
-        todayRevenue: today.s,
-        avgOrderValue: totalOrders > 0 ? Math.round((revenue / totalOrders) * 100) / 100 : 0,
-        onSaleDishes,
-        totalDishes,
-        lowStockCount,
-        pendingAccept,
-        pendingPickup,
-        unrepliedMessages
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ code: 500, message: error.message });
+    const schoolId=req.user.schoolId;
+    const totalUsers=db.prepare("SELECT COUNT(*) AS c FROM yonghu WHERE role='user' AND school_id=?").get(schoolId).c;
+    const totalOrders=db.prepare('SELECT COUNT(DISTINCT orderid) AS c FROM orders WHERE school_id=?').get(schoolId).c;
+    const paidStatus="('已支付','制作中','待取餐','已完成')";
+    const revenue=db.prepare(`SELECT COALESCE(SUM(total),0) AS amount FROM orders WHERE school_id=? AND status IN ${paidStatus}`).get(schoolId).amount;
+    const today=db.prepare(`SELECT COUNT(DISTINCT orderid) AS c,COALESCE(SUM(total),0) AS amount FROM orders
+      WHERE school_id=? AND status IN ${paidStatus} AND date(addtime,'+8 hours')=date('now','+8 hours')`).get(schoolId);
+    const totalDishes=db.prepare('SELECT COUNT(*) AS c FROM caipinxinxi WHERE school_id=?').get(schoolId).c;
+    const onSaleDishes=db.prepare("SELECT COUNT(*) AS c FROM caipinxinxi WHERE school_id=? AND shangjia='是'").get(schoolId).c;
+    const lowStockCount=db.prepare("SELECT COUNT(*) AS c FROM caipinxinxi WHERE school_id=? AND shangjia='是' AND kucun<?").get(schoolId,config.lowStockThreshold).c;
+    const paidOrderSummary=db.prepare(`SELECT COUNT(*) AS count,COALESCE(AVG(order_total),0) AS average FROM
+      (SELECT orderid,SUM(total) AS order_total FROM orders WHERE school_id=? AND status IN ${paidStatus} GROUP BY orderid)`).get(schoolId);
+    const ratings=db.prepare(`SELECT COALESCE(ROUND(AVG(rating),1),0) AS average,COUNT(*) AS count FROM discusscaipinxinxi WHERE school_id=?`).get(schoolId);
+    const pendingAccept=db.prepare("SELECT COUNT(DISTINCT orderid) AS c FROM orders WHERE school_id=? AND status='已支付'").get(schoolId).c;
+    const pendingPickup=db.prepare("SELECT COUNT(DISTINCT orderid) AS c FROM orders WHERE school_id=? AND status='待取餐'").get(schoolId).c;
+    const unrepliedMessages=db.prepare('SELECT COUNT(*) AS c FROM messages WHERE school_id=? AND replycontent IS NULL').get(schoolId).c;
+    res.json({code:200,data:{totalUsers,totalOrders,totalRevenue:revenue,todayOrders:today.c,todayRevenue:today.amount,
+      avgOrderValue:Math.round(paidOrderSummary.average*100)/100,paidOrderCount:paidOrderSummary.count,averageRating:ratings.average,ratingCount:ratings.count,
+      onSaleDishes,totalDishes,lowStockCount,lowStockThreshold:config.lowStockThreshold,pendingAccept,pendingPickup,unrepliedMessages}});
+  } catch {
+    res.status(500).json({code:500,message:'运营数据暂时无法读取'});
   }
 });
 

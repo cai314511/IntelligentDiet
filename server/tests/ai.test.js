@@ -1,25 +1,42 @@
-import { test, before } from 'node:test';
+import {targetFor} from './support/target.js';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 
 process.env.DB_PATH = ':memory:';
-delete process.env.GEMINI_API_KEY; // 强制走 mock 降级
-const { db } = await import('../database.js');
+process.env.AI_BASE_URL = '';
+process.env.AI_API_KEY = '';
+process.env.AI_MODEL = '';
 const { default: app } = await import('../app.js');
+const target=await targetFor(app);
 
-before(() => {
-  // dotenv 可能从 server/.env 重新载入 key，强制清空确保走 mock 降级分支
-  process.env.GEMINI_API_KEY = '';
-  // caipinxinxi.caipinfenlei 有外键，先补分类
-  db.prepare("INSERT OR IGNORE INTO caipinfenlei (caipinfenlei) VALUES ('面食')").run();
-  db.prepare("INSERT OR IGNORE INTO caipinfenlei (caipinfenlei) VALUES ('素菜')").run();
-  db.prepare("INSERT INTO caipinxinxi (caipinmingcheng, caipinfenlei, jiage, kucun, yueshuxiao, cailiao) VALUES ('番茄鸡蛋面', '面食', 9, 50, 300, '番茄，鸡蛋')").run();
-  db.prepare("INSERT INTO caipinxinxi (caipinmingcheng, caipinfenlei, jiage, kucun, yueshuxiao, cailiao) VALUES ('白灼菜心', '素菜', 5, 50, 200, '菜心')").run();
+test('学校列表返回三校且菜单按学校隔离', async () => {
+  const schools = await request(target).get('/api/users/schools');
+  assert.equal(schools.status, 200);
+  assert.deepEqual(schools.body.data.map(school => school.id).sort(), ['bjfu', 'cufe', 'tju']);
+  const tjuMenu = await request(target).get('/api/dishes?schoolId=tju');
+  const cufeMenu = await request(target).get('/api/dishes?schoolId=cufe');
+  assert.equal(tjuMenu.status, 200);
+  assert.equal(cufeMenu.status, 200);
+  assert.ok(tjuMenu.body.data.length > 0);
+  assert.ok(tjuMenu.body.data.every(dish => dish.schoolId === 'tju'));
+  assert.ok(cufeMenu.body.data.every(dish => dish.schoolId === 'cufe'));
+  const soup = cufeMenu.body.data.find(dish => dish.name === '麻辣烫');
+  assert.ok(soup.ingredients.includes('豆腐'));
+  assert.ok(soup.allergens.includes('小麦'));
+  assert.ok(soup.tasteTags.length > 0 && soup.dietaryTags.length > 0);
+  assert.equal(soup.campus, '沙河校区');
+  assert.ok(soup.restaurant);
+  assert.equal(soup.priceUnit, '元/份');
+  assert.ok(soup.sourceDate && soup.sourceKind && soup.priceBasis && soup.nutritionBasis);
 });
 
-test('推荐类提问的 mock 回复包含真实菜名', async () => {
-  const res = await request(app).post('/api/ai/chat').send({ message: '有什么好吃的推荐？' });
-  assert.equal(res.status, 200);
-  const reply = res.body.reply || res.body.data?.reply || '';
-  assert.ok(reply.includes('番茄鸡蛋面') || reply.includes('白灼菜心'), `回复应包含真实菜名，实际: ${reply}`);
+test('未配置模型时 AI 助理根据所选学校查询餐厅数据', async () => {
+  const response = await request(target).post('/api/ai/chat').send({
+    schoolId: 'tju',
+    message: '天津大学有哪些餐厅和排队信息？'
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.mode, 'database');
+  assert.match(response.body.reply, /卫津路校区|北洋园校区/);
 });

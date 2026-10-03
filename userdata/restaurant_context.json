@@ -1,0 +1,114 @@
+[
+  {
+    "schoolId": "cufe",
+    "campus": "学院南路校区",
+    "name": "地下民族食堂",
+    "distanceM": 480,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "cufe",
+    "campus": "沙河校区",
+    "name": "东区三层食堂",
+    "distanceM": 220,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "cufe",
+    "campus": "沙河校区",
+    "name": "东区食堂",
+    "distanceM": 180,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "cufe",
+    "campus": "沙河校区",
+    "name": "西区食堂",
+    "distanceM": 620,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "tju",
+    "campus": "卫津路校区",
+    "name": "梅园餐厅",
+    "distanceM": 380,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "tju",
+    "campus": "北洋园校区",
+    "name": "棠园餐厅",
+    "distanceM": 280,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "tju",
+    "campus": "北洋园校区",
+    "name": "菊园餐厅",
+    "distanceM": 640,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "tju",
+    "campus": "卫津路校区",
+    "name": "学一食堂",
+    "distanceM": 200,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "tju",
+    "campus": "北洋园校区",
+    "name": "梅园餐厅",
+    "distanceM": 420,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "tju",
+    "campus": "卫津路校区",
+    "name": "食堂西饼屋",
+    "distanceM": 150,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "tju",
+    "campus": "卫津路校区",
+    "name": "菊园餐厅",
+    "distanceM": 530,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "bjfu",
+    "campus": "东区",
+    "name": "学一食堂",
+    "distanceM": 190,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "bjfu",
+    "campus": "东区",
+    "name": "学二食堂",
+    "distanceM": 430,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "bjfu",
+    "campus": "东区",
+    "name": "清真食堂",
+    "distanceM": 510,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "bjfu",
+    "campus": "东区",
+    "name": "禾园餐厅",
+    "distanceM": 680,
+    "sourceName": "餐厅运营台账"
+  },
+  {
+    "schoolId": "bjfu",
+    "campus": "东区",
+    "name": "烘焙坊",
+    "distanceM": 340,
+    "sourceName": "餐厅运营台账"
+  }
+]

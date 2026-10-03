@@ -1,0 +1,5 @@
+[
+  {"id":"cufe","name":"中央财经大学","shortName":"中财","accent":"#1648a0","campuses":["学院南路校区","沙河校区"]},
+  {"id":"tju","name":"天津大学","shortName":"天大","accent":"#8d2536","campuses":["卫津路校区","北洋园校区"]},
+  {"id":"bjfu","name":"北京林业大学","shortName":"北林","accent":"#32734a","campuses":["东区"]}
+]

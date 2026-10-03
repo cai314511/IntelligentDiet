@@ -1,10 +1,13 @@
+import {targetFor} from './support/target.js';
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 
 process.env.DB_PATH = ':memory:';
+process.env.SEED_REFERENCE_DATA = 'false';
 const { db } = await import('../database.js');
 const { default: app } = await import('../app.js');
+const target=await targetFor(app);
 const { canTransition } = await import('../utils/orderState.js');
 const bcrypt = (await import('bcryptjs')).default;
 
@@ -17,7 +20,7 @@ before(async () => {
   db.prepare("INSERT INTO caipinxinxi (id, caipinmingcheng, caipinfenlei, jiage, kucun) VALUES (1, '测试菜', '热菜', 10, 50)").run();
   db.prepare(`INSERT INTO orders (orderid, userid, caipinxinxiid, caipinmingcheng, buyshu, price, total, status)
               VALUES ('ORDER-T1', 1, 1, '测试菜', 1, 10, 10, '已支付')`).run();
-  const login = await request(app).post('/api/users/login').send({ zhanghao: 'boss', mima: 'boss123' });
+  const login = await request(target).post('/api/users/login').send({ zhanghao: 'boss', mima: 'boss123', schoolId: 'cufe' });
   adminToken = login.body.data.token;
 });
 
@@ -32,26 +35,26 @@ test('canTransition 状态机规则', () => {
 });
 
 test('非法状态流转返回 409', async () => {
-  const res = await request(app).put('/api/orders/ORDER-T1/status')
+  const res = await request(target).put('/api/orders/ORDER-T1/status')
     .set('Authorization', `Bearer ${adminToken}`)
     .send({ status: '已完成' }); // 已支付 不能直接到 已完成
   assert.equal(res.status, 409);
 });
 
 test('合法流转成功，不存在的订单返回 404', async () => {
-  const ok = await request(app).put('/api/orders/ORDER-T1/status')
+  const ok = await request(target).put('/api/orders/ORDER-T1/status')
     .set('Authorization', `Bearer ${adminToken}`)
     .send({ status: '制作中' });
   assert.equal(ok.status, 200);
 
-  const notFound = await request(app).put('/api/orders/ORDER-NOPE/status')
+  const notFound = await request(target).put('/api/orders/ORDER-NOPE/status')
     .set('Authorization', `Bearer ${adminToken}`)
     .send({ status: '制作中' });
   assert.equal(notFound.status, 404);
 });
 
 test('GET /:orderid 查不到返回 404', async () => {
-  const res = await request(app).get('/api/orders/ORDER-NOPE')
+  const res = await request(target).get('/api/orders/ORDER-NOPE')
     .set('Authorization', `Bearer ${adminToken}`);
   assert.equal(res.status, 404);
 });

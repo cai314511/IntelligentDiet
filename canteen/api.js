@@ -1,5 +1,5 @@
 // 智饷 C 端 API 层：统一请求、登录态、登录/注册模态框
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = '/api';
 
 function getToken() { return localStorage.getItem('zx_token') || ''; }
 function currentUser() {
@@ -12,6 +12,9 @@ function setSession(token, user) {
 function clearSession() {
   localStorage.removeItem('zx_token');
   localStorage.removeItem('zx_user');
+  localStorage.removeItem('zx_session');
+  localStorage.removeItem('zx_admin_token');
+  localStorage.removeItem('zx_admin_name');
 }
 
 async function api(method, path, body) {
@@ -39,68 +42,12 @@ async function api(method, path, body) {
 
 // ---- 登录 / 注册模态框 ----
 function openLoginModal() {
-  modalRoot.innerHTML = `
-    <div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal" onclick="if(event.target===this)closeModal()">
-      <div class="bg-white rounded-[28px] p-8 w-[92%] max-w-[400px] shadow-appleHover slide-up">
-        <div class="text-center mb-6">
-          <img src="xiaozhi-logo.svg" class="w-14 h-14 mx-auto mb-3" onerror="this.style.display='none'">
-          <h2 id="auth-title" class="text-2xl font-bold">登录智饷</h2>
-          <p class="text-appleLightGray text-sm mt-1">校园卡账号一键登录，开启智慧就餐</p>
-        </div>
-        <input id="auth-account" placeholder="账号" class="w-full bg-appleGray rounded-xl px-4 py-3 mb-3 outline-none focus:ring-2 ring-appleBlue/50 text-sm">
-        <input id="auth-password" type="password" placeholder="密码" class="w-full bg-appleGray rounded-xl px-4 py-3 mb-3 outline-none focus:ring-2 ring-appleBlue/50 text-sm">
-        <div id="auth-extra" class="hidden">
-          <input id="auth-name" placeholder="姓名" class="w-full bg-appleGray rounded-xl px-4 py-3 mb-3 outline-none focus:ring-2 ring-appleBlue/50 text-sm">
-          <input id="auth-phone" placeholder="手机号" class="w-full bg-appleGray rounded-xl px-4 py-3 mb-3 outline-none focus:ring-2 ring-appleBlue/50 text-sm">
-        </div>
-        <button onclick="submitAuth()" id="auth-submit" class="w-full bg-appleBlue text-white py-3 rounded-full font-bold hover:opacity-90 transition glass-btn-active">登 录</button>
-        <p class="text-center text-sm text-appleLightGray mt-4">
-          <span id="auth-switch-text">还没有账号？</span>
-          <a href="javascript:void(0)" class="text-appleBlue font-medium" onclick="toggleAuthMode()" id="auth-switch">立即注册</a>
-        </p>
-      </div>
-    </div>`;
-}
-
-let authMode = 'login';
-function toggleAuthMode() {
-  authMode = authMode === 'login' ? 'register' : 'login';
-  const isLogin = authMode === 'login';
-  document.getElementById('auth-title').innerText = isLogin ? '登录智饷' : '注册智饷';
-  document.getElementById('auth-extra').classList.toggle('hidden', isLogin);
-  document.getElementById('auth-submit').innerText = isLogin ? '登 录' : '注 册';
-  document.getElementById('auth-switch-text').innerText = isLogin ? '还没有账号？' : '已有账号？';
-  document.getElementById('auth-switch').innerText = isLogin ? '立即注册' : '去登录';
-}
-
-async function submitAuth() {
-  const zhanghao = document.getElementById('auth-account').value.trim();
-  const mima = document.getElementById('auth-password').value;
-  if (!zhanghao || !mima) return toast('请输入账号和密码', 'warning');
-
-  if (authMode === 'register') {
-    const xingming = document.getElementById('auth-name').value.trim();
-    const lianxifangshi = document.getElementById('auth-phone').value.trim();
-    if (!xingming) return toast('请输入姓名', 'warning');
-    const { status, json } = await api('POST', '/users/register', { zhanghao, mima, xingming, lianxifangshi });
-    if (status !== 200) return toast(json.message || '注册失败', 'error');
-    toast('注册成功，已赠送 ¥10000 体验金', 'success');
-  }
-
-  const { status, json } = await api('POST', '/users/login', { zhanghao, mima });
-  if (status !== 200) return toast(json.message || '登录失败', 'error');
-  setSession(json.data.token, json.data.user);
-  closeModal();
-  renderUserEntry();
-  toast(`欢迎回来，${json.data.user.xingming}`, 'success');
-  render();
+  location.href = '/?identity=student';
 }
 
 function logout() {
-  clearSession();
-  renderUserEntry();
-  toast('已退出登录', 'success');
-  render();
+  ['zx_session', 'zx_token', 'zx_user', 'zx_admin_token', 'zx_admin_name'].forEach(key => localStorage.removeItem(key));
+  location.href = '/?identity=student';
 }
 
 function requireLogin() {
@@ -114,8 +61,9 @@ function renderUserEntry() {
   const slot = document.getElementById('user-entry');
   if (!slot) return;
   const user = currentUser();
+  const safeName = String(user?.xingming || user?.zhanghao || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[c]));
   slot.innerHTML = user
-    ? `<a href="javascript:void(0)" onclick="openProfileModal()" class="text-sm font-medium mr-3 hover:opacity-80 transition" title="编辑资料">👋 ${user.xingming} <span class="text-appleBlue font-bold">¥${Number(user.jine).toFixed(2)}</span></a>
+    ? `<button id="account-home" onclick="openProfileModal()" class="flex items-center space-x-4 text-sm font-medium hover:opacity-80 transition" title="个人主页" aria-label="个人主页：${safeName}"><span>👋 ${safeName} <span class="text-appleBlue font-bold">¥${Number(user.jine).toFixed(2)}</span></span><span class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300 flex items-center justify-center text-appleBlue font-semibold shrink-0" aria-hidden="true">${safeName.slice(0, 1)}</span></button>
        <button onclick="logout()" class="text-sm text-appleLightGray hover:text-appleDark transition">退出</button>`
     : `<button onclick="openLoginModal()" class="bg-appleBlue text-white text-sm px-5 py-2 rounded-full font-medium hover:opacity-90 transition glass-btn-active">登录 / 注册</button>`;
 }

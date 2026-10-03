@@ -1,0 +1,14 @@
+[
+  {"schoolId":"cufe","type":"safety","title":"沙河校区周度食品安全巡检","status":"已完成","payload":{"campus":"沙河校区","category":"食品安全巡检","owner":"饮食服务中心","inspectionDate":"2026-10-01","checkpoints":18,"passed":17,"followUp":"冷藏区温度记录复核","severity":"一般"}},
+  {"schoolId":"cufe","type":"safety","title":"学院南路食材验收记录","status":"进行中","payload":{"campus":"学院南路校区","category":"食材验收","owner":"民族食堂","inspectionDate":"2026-10-02","checkpoints":12,"passed":12,"followUp":"批次单据归档","severity":"正常"}},
+  {"schoolId":"cufe","type":"conservation","title":"沙河校区餐厨垃圾周报","status":"运行中","payload":{"campus":"沙河校区","category":"餐厨垃圾","metric":"日均回收量","value":186,"unit":"kg","period":"2026-09-26 至 2026-10-02","owner":"后勤服务中心"}},
+  {"schoolId":"cufe","type":"service","title":"东区食堂午间出餐协同","status":"处理中","payload":{"campus":"沙河校区","category":"服务工单","contact":"饮食服务中心","priority":"普通","description":"核对午间各窗口出餐节奏与备餐衔接。","createdAt":"2026-10-02 10:20"}},
+  {"schoolId":"tju","type":"safety","title":"北洋园校区后厨卫生检查","status":"已完成","payload":{"campus":"北洋园校区","category":"卫生检查","owner":"餐饮服务中心","inspectionDate":"2026-10-01","checkpoints":20,"passed":20,"followUp":"月度台账复核","severity":"正常"}},
+  {"schoolId":"tju","type":"safety","title":"卫津路校区冷链温度抽查","status":"待处理","payload":{"campus":"卫津路校区","category":"设备巡检","owner":"梅园餐厅","inspectionDate":"2026-10-02","checkpoints":9,"passed":8,"followUp":"复测冷藏柜温度","severity":"一般"}},
+  {"schoolId":"tju","type":"conservation","title":"北洋园校区光盘行动统计","status":"运行中","payload":{"campus":"北洋园校区","category":"节约用餐","metric":"本周参与桌次","value":1280,"unit":"桌次","period":"2026-09-26 至 2026-10-02","owner":"膳食管理科"}},
+  {"schoolId":"tju","type":"service","title":"棠园餐厅窗口设施维护","status":"处理中","payload":{"campus":"北洋园校区","category":"设施维护","contact":"餐饮服务中心","priority":"普通","description":"安排窗口保温设备例行检查与维护。","createdAt":"2026-10-02 09:40"}},
+  {"schoolId":"bjfu","type":"safety","title":"学一食堂日常留样检查","status":"已完成","payload":{"campus":"东区","category":"食品留样","owner":"学一食堂","inspectionDate":"2026-10-02","checkpoints":14,"passed":14,"followUp":"按计划完成记录归档","severity":"正常"}},
+  {"schoolId":"bjfu","type":"safety","title":"烘焙坊设备清洁复核","status":"进行中","payload":{"campus":"东区","category":"卫生检查","owner":"烘焙坊","inspectionDate":"2026-10-02","checkpoints":10,"passed":9,"followUp":"复核烤箱清洁记录","severity":"一般"}},
+  {"schoolId":"bjfu","type":"conservation","title":"东区食堂可回收餐具周报","status":"运行中","payload":{"campus":"东区","category":"绿色运营","metric":"循环餐具使用次数","value":3460,"unit":"次","period":"2026-09-26 至 2026-10-02","owner":"后勤服务中心"}},
+  {"schoolId":"bjfu","type":"service","title":"学二食堂午餐备餐计划","status":"处理中","payload":{"campus":"西区","category":"服务协同","contact":"膳食管理部门","priority":"普通","description":"优化午餐时段备餐与窗口补餐协同。","createdAt":"2026-10-02 10:05"}}
+]

@@ -1,6 +1,6 @@
 // 智饷 - 高校后勤管理系统主脚本文件 (前后端分离 API 交互版)
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = '/api';
 
 // 全局 Toast 提示函数 (Apple 风格)
 function showToast(message, type = 'info') {
@@ -167,8 +167,8 @@ async function apiCall(method, endpoint, data = null) {
                 return mockApiHandler(method, endpoint, data);
             }
             localStorage.removeItem('zx_admin_token');
-            const overlay = document.getElementById('login-overlay');
-            if (overlay) overlay.style.display = 'flex';
+            ['zx_session', 'zx_token', 'zx_user', 'zx_admin_name'].forEach(key => localStorage.removeItem(key));
+            location.replace('/?identity=admin');
             throw new Error('登录已过期，请重新登录');
         }
         const json = await response.json();
@@ -207,57 +207,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showLoginOverlay() {
-        document.getElementById('login-overlay').style.display = 'flex';
+        location.replace('/?identity=admin');
     }
 
     function enterDashboard() {
-        document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('admin-name').innerText =
             localStorage.getItem('zx_admin_name') || '管理员';
         loadModule('dashboard');
     }
-
-    // 原型演示快捷登录（免密）
-    window.demoAdminLogin = function() {
-        localStorage.setItem('zx_admin_token', 'demo-admin-token');
-        localStorage.setItem('zx_admin_name', '演示管理员 (Demo)');
-        showToast('✨ 已使用原型演示管理员身份进入系统', 'success');
-        enterDashboard();
-    };
-
-    // 快捷填充默认管理员账号与密码
-    window.fillDemoAccount = function() {
-        const acc = document.getElementById('login-account');
-        const pwd = document.getElementById('login-password');
-        if (acc) acc.value = 'admin';
-        if (pwd) pwd.value = 'admin123';
-        showToast('已填入内置管理员账号 (admin / admin123)', 'info');
-    };
-
-    // 管理员真实登录（保留认证功能，并提供友好容错）
-    window.submitAdminLogin = async function() {
-        const zhanghao = document.getElementById('login-account').value.trim();
-        const mima = document.getElementById('login-password').value;
-        if (!zhanghao || !mima) return showToast('请输入账号和密码，或直接点击下方原型演示登录', 'warning');
-        try {
-            const res = await apiCall('POST', '/users/login', { zhanghao, mima });
-            if (res.data?.user?.role !== 'admin') {
-                return showToast('该账号不是管理员，无权进入后勤系统', 'error');
-            }
-            localStorage.setItem('zx_admin_token', res.data.token);
-            localStorage.setItem('zx_admin_name', res.data.user.xingming);
-            showToast(`欢迎，${res.data.user.xingming}`, 'success');
-            enterDashboard();
-        } catch (e) {
-            // 如果输入的是 admin 账号但后端报错或不通，自动协助切换至演示模式
-            if (zhanghao === 'admin') {
-                showToast('后端验证未通过，已自动切换至原型演示通道登录', 'info');
-                demoAdminLogin();
-            } else {
-                showToast(e.message || '登录失败，您可点击下方「原型演示」直接体验', 'error');
-            }
-        }
-    };
 
     // 导航设置
     function setupNavigation() {
@@ -286,10 +243,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 退出按钮
         document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('zx_admin_token');
-            localStorage.removeItem('zx_admin_name');
-            showToast('已安全退出登录', 'success');
-            setTimeout(() => showLoginOverlay(), 600);
+            ['zx_session', 'zx_token', 'zx_user', 'zx_admin_token', 'zx_admin_name'].forEach(key => localStorage.removeItem(key));
+            location.href = '/?identity=admin';
         });
     }
 

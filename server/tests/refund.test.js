@@ -1,10 +1,13 @@
+import {targetFor} from './support/target.js';
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 
 process.env.DB_PATH = ':memory:';
+process.env.SEED_REFERENCE_DATA = 'false';
 const { db } = await import('../database.js');
 const { default: app } = await import('../app.js');
+const target=await targetFor(app);
 const bcrypt = (await import('bcryptjs')).default;
 
 let adminToken;
@@ -23,6 +26,7 @@ before(async () => {
   // 已支付订单：2 份测试菜，总额 20（单订单单行即可覆盖退款逻辑，orderid 已不唯一，多行订单同样适用）
   db.prepare(`INSERT INTO orders (orderid, userid, caipinxinxiid, caipinmingcheng, buyshu, price, total, status)
               VALUES ('ORDER-R1', 2, 1, '测试菜', 2, 10, 20, '已支付')`).run();
+  db.prepare("INSERT INTO payment_ledger(transaction_id,orderid,user_id,kind,amount_cents) VALUES('fixture-paid-R1','ORDER-R1',2,'payment',2000)").run();
   // 普通流转对照订单
   db.prepare(`INSERT INTO orders (orderid, userid, caipinxinxiid, caipinmingcheng, buyshu, price, total, status)
               VALUES ('ORDER-R2', 2, 1, '测试菜', 1, 10, 10, '已支付')`).run();
@@ -30,16 +34,16 @@ before(async () => {
   db.prepare(`INSERT INTO orders (orderid, userid, caipinxinxiid, caipinmingcheng, buyshu, price, total, status)
               VALUES ('ORDER-U2', 3, 1, '测试菜', 1, 10, 10, '未支付')`).run();
 
-  const loginAdmin = await request(app).post('/api/users/login').send({ zhanghao: 'boss', mima: 'boss123' });
+  const loginAdmin = await request(target).post('/api/users/login').send({ zhanghao: 'boss', mima: 'boss123', schoolId: 'cufe' });
   adminToken = loginAdmin.body.data.token;
-  const login1 = await request(app).post('/api/users/login').send({ zhanghao: 'user1', mima: 'pass123' });
+  const login1 = await request(target).post('/api/users/login').send({ zhanghao: 'user1', mima: 'pass123', schoolId: 'cufe' });
   user1Token = login1.body.data.token;
-  const login2 = await request(app).post('/api/users/login').send({ zhanghao: 'user2', mima: 'pass123' });
+  const login2 = await request(target).post('/api/users/login').send({ zhanghao: 'user2', mima: 'pass123', schoolId: 'cufe' });
   user2Token = login2.body.data.token;
 });
 
 test('已支付订单退款：余额回增、库存/月售回退、状态变已退款', async () => {
-  const res = await request(app).put('/api/orders/ORDER-R1/status')
+  const res = await request(target).put('/api/orders/ORDER-R1/status')
     .set('Authorization', `Bearer ${adminToken}`)
     .send({ status: '已退款' });
   assert.equal(res.status, 200);
@@ -59,7 +63,7 @@ test('已支付订单退款：余额回增、库存/月售回退、状态变已�
 });
 
 test('非退款状态流转不回退资金库存', async () => {
-  const res = await request(app).put('/api/orders/ORDER-R2/status')
+  const res = await request(target).put('/api/orders/ORDER-R2/status')
     .set('Authorization', `Bearer ${adminToken}`)
     .send({ status: '制作中' });
   assert.equal(res.status, 200);
@@ -72,15 +76,15 @@ test('非退款状态流转不回退资金库存', async () => {
 });
 
 test('GET /orders/user/:userid 本人 200，他人 403，admin 200', async () => {
-  const self = await request(app).get('/api/orders/user/3')
+  const self = await request(target).get('/api/orders/user/3')
     .set('Authorization', `Bearer ${user2Token}`);
   assert.equal(self.status, 200);
 
-  const other = await request(app).get('/api/orders/user/3')
+  const other = await request(target).get('/api/orders/user/3')
     .set('Authorization', `Bearer ${user1Token}`);
   assert.equal(other.status, 403);
 
-  const admin = await request(app).get('/api/orders/user/3')
+  const admin = await request(target).get('/api/orders/user/3')
     .set('Authorization', `Bearer ${adminToken}`);
   assert.equal(admin.status, 200);
 });

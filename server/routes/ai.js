@@ -1,195 +1,128 @@
 import express from 'express';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { db } from '../database.js';
+import { config } from '../config.js';
+import { optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
+const getSchool = req => req.user?.schoolId || String(req.body?.schoolId || req.query.schoolId || 'cufe');
+const validSchool = id => Boolean(db.prepare('SELECT 1 FROM universities WHERE id=?').get(id));
+const json = (value, fallback = []) => { try { return JSON.parse(value || ''); } catch { return fallback; } };
 
-// 获取 API KEY
-const getApiKey = () => {
-  return process.env.GEMINI_API_KEY || '';
-};
+const tools = [
+  { type: 'function', function: { name: 'search_menu', description: '按学校查询在售菜品、参考价格、食材、过敏原和营养估算。', parameters: { type: 'object', properties: { query: { type: 'string' }, category: { type: 'string' }, maxPrice: { type: 'number' }, excludeIngredients: { type: 'array', items: { type: 'string' } }, limit: { type: 'integer', minimum: 1, maximum: 12 } }, required: [] } } },
+  { type: 'function', function: { name: 'list_restaurants', description: '查询学校餐厅、当前排队记录、营业时间和可用座位统计。', parameters: { type: 'object', properties: {}, required: [] } } },
+  { type: 'function', function: { name: 'list_activities_and_culture', description: '查询学校已发布的活动和文创商品。', parameters: { type: 'object', properties: { kind: { type: 'string', enum: ['activities', 'culture', 'all'] } }, required: [] } } },
+  { type: 'function', function: { name: 'list_my_orders', description: '查询当前登录学生在本校的近期订单；仅可用于当前用户本人。', parameters: { type: 'object', properties: { limit: { type: 'integer', minimum: 1, maximum: 20 } }, required: [] } } }
+];
 
-// 1. 小智助理智能对话接口
-router.post('/chat', async (req, res) => {
-  try {
-    const { message } = req.body;
-
-    if (!message) {
-      return res.status(400).json({ code: 400, message: '消息内容不能为空' });
-    }
-
-    const apiKey = getApiKey();
-
-    // 如果未配置 API Key，触发高拟真 Mock 降级
-    if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-      const responses = {
-        '排队': '💡 报告同学！当前一食堂人比较多，预计需要排队 15 分钟，子衿食园和风味餐厅比较空闲哦，只要排 5 分钟，建议您错峰前往～😊',
-        '食谱': '💪 收到！我已经通知我们的【AI 营养师】了。您可以在上方点击“AI 营养师”选项卡，花 1 分钟定制您专属的减脂或增肌食谱，我会根据您填写的忌口规则过滤掉雷区菜品哦！',
-        '活动': '🎉 哇！我们春季寻味嘉年华正在火热进行中！有“光盘打卡挑战”和“新品试吃会”可以参加。完成打卡还可以累积后勤积分，去兑换免费饮品券呢，快去文创活动页面看看吧！🎨',
-        '订单': '📋 正在帮您向后勤数据库查询订单...咦，您刚下过的一笔订单已经在后勤系统登记啦！后勤处的叔叔阿姨们正干劲满满地为您制作，一会儿生成取餐码后记得及时去窗口凭码取餐哦～',
-        '座位': '🪑 根据座位传感器反馈：目前二楼轻食轻语区还有 8 个靠窗空余雅座，风味餐厅剩余座位很多，您可以点击“智能点餐”边下单边在线预订专属餐桌！'
-      };
-
-      let reply = '';
-
-      // 推荐类提问：基于真实在售菜品库动态生成（数据驱动 mock）
-      const RECOMMEND_KEYS = ['推荐', '好吃', '吃什么', '便宜', '特色', '美食'];
-      if (RECOMMEND_KEYS.some(k => message.includes(k))) {
-        const topDishes = db.prepare(`
-          SELECT caipinmingcheng, jiage, caipinfenlei, yueshuxiao
-          FROM caipinxinxi
-          WHERE kucun > 0 AND shangjia = '是'
-          ORDER BY yueshuxiao DESC
-          LIMIT 3
-        `).all();
-        if (topDishes.length > 0) {
-          const lines = topDishes.map((d, i) =>
-            `${i + 1}. 「${d.caipinmingcheng}」¥${d.jiage}（${d.caipinfenlei}，月售 ${d.yueshuxiao}）`
-          ).join('\n');
-          reply = `🍽️ 收到！小智刚查了今日真实在售菜单，为你推荐：\n${lines}\n\n都是现做热乎菜，要尝尝吗？😋`;
-        }
-      }
-
-      if (!reply) {
-        for (const [key, value] of Object.entries(responses)) {
-          if (message.includes(key)) {
-            reply = value;
-            break;
-          }
-        }
-      }
-
-      if (!reply) {
-        reply = `同学你好！我是智饷食堂的 AI 助理小智。🤖\n\n【本地模拟提示：后端未检测到有效的 GEMINI_API_KEY。若要启用真实的谷歌 Gemini 智能大脑，请在 server/.env 中配置您的 API 密钥。】\n\n我可以帮您实时查询食堂排队、推荐菜品、搭配减脂餐、查看校园文创活动哦！您可以问我“一食堂排队吗”或者“最近有什么美食活动”试试看～`;
-      }
-
-      return res.json({ code: 200, reply });
-    }
-
-    // 启用真实 Gemini API
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-    const systemInstruction = `
-你是一个运行在高校智慧食堂系统（名叫“智饷”，位于中央财经大学沙河校区）中的智能AI助理，名字叫“小智”。
-你的职责是解答学生关于食堂的排队情况、推荐菜品、健康饮食配比、校园文创活动等各种咨询。
-你的对话风格应该：
-1. 热情、有礼貌、幽默风趣，称呼对方为“同学”。
-2. 回复简明扼要，控制在 150 字以内，避免过于冗长，尽量多使用 emoji（如 🍽️, 💡, 🪑, 💪, 🎉）增加亲切感。
-3. 结合“智饷”食堂特色（比如：东区一楼餐厅、子衿食园、风味餐厅、龙马一餐厅、二楼轻食轻语等）。
-4. 提示同学可以使用顶部的【AI 营养师】进行专业膳食评估，或者抽取高能美食盲盒。
-5. 同学提问如果包含排队，告诉他一食堂拥堵（排队20分钟以上），子衿食园和风味餐厅很空（5分钟内），推荐错峰就餐。
-`;
-
-    const prompt = `${systemInstruction}\n\n当前同学的提问："${message}"\n请给出符合你人设的回复：`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const replyText = response.text();
-
-    res.json({ code: 200, reply: replyText.trim() });
-
-  } catch (error) {
-    res.status(500).json({ code: 500, message: 'AI 服务暂时开小差了: ' + error.message });
+function runTool(name, args, schoolId, userId) {
+  if (name === 'search_menu') {
+    const clauses = ["school_id=?", "shangjia='是'"]; const values = [schoolId];
+    if (args.query) { clauses.push('(caipinmingcheng LIKE ? OR cailiao LIKE ?)'); const q = `%${String(args.query).slice(0, 60)}%`; values.push(q, q); }
+    if (args.category) { clauses.push('caipinfenlei=?'); values.push(String(args.category).slice(0, 40)); }
+    if (Number.isFinite(Number(args.maxPrice))) { clauses.push('jiage<=?'); values.push(Number(args.maxPrice)); }
+    const rows = db.prepare(`SELECT id,caipinmingcheng AS name,caipinfenlei AS category,jiage AS referencePrice,cailiao AS ingredientsText,
+      ingredients_json AS ingredientsJson,allergens_json AS allergensJson,nutrition_json AS nutritionJson,portion_g AS portionG,data_source AS sourceName,source_url AS sourceUrl,
+      campus,restaurant_name AS restaurant,price_unit AS priceUnit,taste_tags_json AS tasteTagsJson,dietary_tags_json AS dietaryTagsJson,spice_level AS spiceLevel,
+      source_date AS sourceDate,source_kind AS sourceKind,price_basis AS priceBasis,nutrition_basis AS nutritionBasis
+      FROM caipinxinxi WHERE ${clauses.join(' AND ')} ORDER BY jiage ASC LIMIT ?`).all(...values, Math.max(1, Math.min(12, Number(args.limit) || 8)));
+    const excluded = (Array.isArray(args.excludeIngredients) ? args.excludeIngredients : []).map(String);
+    return rows.map(row => ({ ...row, referencePrice: Number(row.referencePrice), ingredients: json(row.ingredientsJson), allergens: json(row.allergensJson),
+      nutritionEstimate: json(row.nutritionJson, {}), tasteTags: json(row.tasteTagsJson), dietaryTags: json(row.dietaryTagsJson),
+      excludeMatch: excluded.filter(term => `${row.name} ${row.ingredientsText}`.includes(term)) }))
+      .filter(row => !row.excludeMatch.length)
+      .map(({ ingredientsJson, allergensJson, nutritionJson, tasteTagsJson, dietaryTagsJson, ingredientsText, ...row }) => ({ ...row, ingredientsText }));
   }
+  if (name === 'list_restaurants') {
+    return db.prepare(`SELECT r.campus,r.name,r.category,r.description,r.opening_hours AS openingHours,r.queue_count AS queueCount,
+      r.queue_minutes AS queueMinutes, SUM(CASE WHEN rs.status='available' AND sr.id IS NULL THEN 1 ELSE 0 END) AS availableSeats
+      FROM restaurants r LEFT JOIN restaurant_seats rs ON rs.restaurant_id=r.id
+      LEFT JOIN seat_reservations sr ON sr.seat_id=rs.id AND sr.status='confirmed' AND sr.ends_at>datetime('now')
+      WHERE r.school_id=? GROUP BY r.id ORDER BY r.campus,r.name`).all(schoolId);
+  }
+  if (name === 'list_activities_and_culture') {
+    const kind = args.kind || 'all'; const result = {};
+    if (kind === 'all' || kind === 'activities') result.activities = db.prepare(`SELECT title,description,category,campus,starts_at AS startsAt,ends_at AS endsAt,location,source_name AS sourceName,source_url AS sourceUrl
+      FROM activities WHERE school_id=? AND status='published' ORDER BY starts_at DESC LIMIT 20`).all(schoolId);
+    if (kind === 'all' || kind === 'culture') result.culture = db.prepare(`SELECT title,category,description,price,campus,source_name AS sourceName,source_url AS sourceUrl
+      FROM cultural_items WHERE school_id=? AND status='published' ORDER BY id DESC LIMIT 20`).all(schoolId);
+    return result;
+  }
+  if (name === 'list_my_orders') {
+    if (!userId) return { error: '需要先登录才能查询个人订单。' };
+    return db.prepare(`SELECT orderid,caipinmingcheng AS dish,status,buyshu AS quantity,total,addtime AS createdAt
+      FROM orders WHERE userid=? AND school_id=? ORDER BY addtime DESC LIMIT ?`).all(userId, schoolId, Math.max(1, Math.min(20, Number(args.limit) || 10)));
+  }
+  return { error: '未知查询工具' };
+}
+
+function localAnswer(message, schoolId, userId) {
+  const school = db.prepare('SELECT name FROM universities WHERE id=?').get(schoolId)?.name || '本校';
+  if (/订单/.test(message)) { const result=runTool('list_my_orders',{},schoolId,userId);return Array.isArray(result)?(result.length?result.map(o=>`${o.orderid} · ${o.dish} × ${o.quantity} · ${o.status}`).join('\n'):'暂无个人订单'):result.error; }
+  if (/排队|餐厅|食堂|座位/.test(message)) {
+    const rows = runTool('list_restaurants', {}, schoolId);
+    return rows.length ? `${school}餐厅信息：\n${rows.map(r => `• ${r.campus}·${r.name}：排队约 ${r.queueMinutes} 分钟（${r.queueCount} 人），当前可用座位 ${r.availableSeats} 个；营业时间 ${r.openingHours}`).join('\n')}` : '当前没有可查询的餐厅记录。';
+  }
+  if (/活动|文创|周边/.test(message)) {
+    const result = runTool('list_activities_and_culture', { kind: 'all' }, schoolId);
+    const lines = [...(result.activities || []).map(x => `活动：${x.title}（${x.campus}，${x.startsAt}）`), ...(result.culture || []).map(x => `文创：${x.title}，参考价 ¥${x.price}`)];
+    return lines.length ? lines.join('\n') : '当前没有可查询的活动或文创记录。';
+  }
+  const candidates = runTool('search_menu', { query: /便宜|实惠|价格/.test(message) ? '' : message.replace(/推荐|好吃|吃什么|菜品|菜|来点|帮我|一下/g, '').trim(), limit: 6 }, schoolId);
+  const rows = candidates.length ? candidates : runTool('search_menu', { limit: 6 }, schoolId);
+  if (/推荐|吃什么|好吃|菜|吃/.test(message) && rows.length) return `根据${school}当前菜单，以下是可选菜品（价格和营养值按目录参考）：\n${rows.map(x => `• ${x.name}（${x.category}）¥${x.referencePrice} / ${x.portionG}g，营养估算 ${x.nutritionEstimate.calories || '—'} kcal`).join('\n')}`;
+  return `我是校园餐饮助手，可帮你查 ${school} 的在售菜品、餐厅排队、活动、文创商品${userId ? '和个人订单' : ''}。你可以直接告诉我想查询的内容。`;
+}
+
+async function callModel(messages, schoolId, userId) {
+  const school = db.prepare('SELECT name FROM universities WHERE id=?').get(schoolId)?.name;
+  const request = { model: config.aiModel, temperature: 0.2, messages: [{ role: 'system', content: `你是校园餐饮服务助手。当前学校是${school}。涉及菜单、价格、餐厅、排队、活动、文创和订单的信息必须使用查询工具；只依据工具结果回答，不得编造。不得声称已下单、付款或预约；本接口只提供查询与建议。营养信息是估算值，不做诊断或治疗建议。用简洁中文回答。` }, ...messages], tools, tool_choice: 'auto' };
+  for (let turn = 0; turn < 4; turn++) {
+    const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), config.aiTimeoutMs);
+    let response;
+    try {
+      response = await fetch(`${config.aiBaseUrl}/chat/completions`, { method: 'POST', signal: controller.signal, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.aiApiKey}` }, body: JSON.stringify(request) });
+    } finally { clearTimeout(timeout); }
+    if (!response.ok) throw new Error(`AI provider returned ${response.status}`);
+    const payload = await response.json(); const choice = payload.choices?.[0];
+    if (!choice) throw new Error('AI provider returned an empty response');
+    request.messages.push(choice.message);
+    const calls = choice.message.tool_calls || [];
+    if (!calls.length) return String(choice.message.content || '').trim();
+    for (const call of calls) {
+      let args = {}; try { args = JSON.parse(call.function.arguments || '{}'); } catch { /* malformed provider arguments */ }
+      const result = runTool(call.function.name, args, schoolId, userId);
+      request.messages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(result) });
+    }
+  }
+  return '已根据当前查询结果整理信息，请缩小问题范围后再试。';
+}
+
+router.post('/chat', optionalAuth, (req, res) => {
+  const message = String(req.body?.message || '').trim(); const schoolId = getSchool(req);
+  if (!message || message.length > 2000) return res.status(400).json({ code: 400, message: '消息长度应为 1 至 2000 字' });
+  if (!validSchool(schoolId)) return res.status(400).json({ code: 400, message: '请选择有效学校' });
+  if (!(config.aiBaseUrl && config.aiApiKey && config.aiModel)) return res.json({ code: 200, reply: localAnswer(message, schoolId, req.user?.id), mode: 'database' });
+  callModel([...(Array.isArray(req.body.history)?req.body.history:[]).filter(m=>['user','assistant'].includes(m.role)&&typeof m.content==='string').slice(-8).map(m=>({role:m.role,content:m.content.slice(0,2000)})),{ role: 'user', content: message }], schoolId, req.user?.id).then(reply => res.json({ code: 200, reply, mode: 'agent' })).catch(error => {
+    console.error('AI provider error:', error.message);
+    res.status(502).json({ code: 502, message: '智能服务暂时不可用，请稍后重试' });
+  });
 });
 
-// 2. AI 营养师报告生成接口
-router.post('/analyze-nutrition', async (req, res) => {
-  try {
-    const { goals = [], tastes = [], ingredients = [] } = req.body;
-
-    // 从数据库中拉取真实的在售菜品列表，让大模型做出“有据可查”的精准推荐！
-    const dishes = db.prepare(`
-      SELECT id, caipinmingcheng, caipinfenlei, jiage, pinfen, yingyang, cailiao
-      FROM caipinxinxi
-      LIMIT 30
-    `).all();
-
-    const apiKey = getApiKey();
-
-    // 如果未配置 API Key，触发 Mock 数据降级（返回高精度的 Markdown 点评）
-    if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-      const mockReport = `# 💡 个性化营养师膳食分析报告 (模拟模式)
-
-> ⚠️ **本地模拟提示**：由于后端未配置 \`GEMINI_API_KEY\`，本报告由本地专家模板引擎实时渲染生成。配置后可体验大语言模型深度个性化定制报告。
-
-## ⚖️ 宏量营养素评估
-针对您选择的目标：**${goals.join('、') || '日常均衡'}**：
-*   **碳水化合物**：目前评估偏高（实际摄入 55%）。建议削减精制碳水（如大碗米饭、面条），增加粗粮比重（如燕麦、黑米）。
-*   **蛋白质**：目前摄入不足（实际 20%，推荐 30%）。急需增加去皮禽肉、瘦牛肉和豆制品的摄入以维持肌肉代谢。
-*   **脂肪**：摄入比例极佳（实际 25%），食堂的低盐低油工艺非常符合您的脂肪控制需求。
-
-## ✍️ AI 深度点评
-*   **🌟 做得很棒的地方**：您主动规避了忌口食材（**${ingredients.join('、') || '无'}**）以及不喜好的口味（**${tastes.join('、') || '无'}**），这表明您具备非常清晰的膳食控制意识。
-*   **🔧 饮食优化建议**：在规避这些雷区的同时，建议重点补充**维生素 D 和优质脂肪酸**。建议尝试食堂的蒸鱼或高蛋白沙拉。
-
-## 🍽️ 专属食堂定制菜单推荐
-根据您**拒绝口味【${tastes.join('，') || '无'}】、忌口食材【${ingredients.join('，') || '无'}】**的规则，小智从我们学校今日菜谱中为您精选了以下菜品：
-
-1.  **减脂鸡肉沙拉** (¥6.5 / 热菜) - ⭐ 4.8
-    *   *推荐理由*：高蛋白、低热量！精选去皮鸡胸肉，富含 25g 优质蛋白质，完美契合您的【${goals.join('、') || '健康就餐'}】目标。
-2.  **慢烤低脂牛排** (¥22.0 / 热菜) - ⭐ 4.9
-    *   *推荐理由*：含有 35g 极佳的动物蛋白与丰富血红素铁，不含任何忌口配料，烹饪过程控油极严，口感扎实，是增力增肌的绝对王者！
-3.  **清炖萝卜牛腩粥** (¥8.0 / 汤品) - ⭐ 4.5
-    *   *推荐理由*：如果您今天想要清淡一下，这是极好的温补选择。萝卜通气消食，牛腩软烂易吸收，热量仅 180kcal，暖胃又健康。
-
----
-*声明：本报告由智饷食堂 AI 营养师引擎实时生成，仅供就餐参考。*`;
-
-      return res.json({ code: 200, report: mockReport });
-    }
-
-    // 启用真实 Gemini API 进行高度个性化报告生成
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' }); // 营养分析使用推理能力更强的 pro 模型
-
-    // 格式化今日食堂菜谱
-    const dishesListStr = dishes.map(d => `- [${d.caipinfenlei}] ${d.caipinmingcheng} (ID: ${d.id}, 单价: ¥${d.jiage}, 配料: ${d.cailiao || '无'}, 营养参数: ${d.yingyang || '标准'}, 评分: ${d.pinfen}⭐)`).join('\n');
-
-    const prompt = `
-你是一位顶级的后勤营养膳食学与临床健康管理专家。
-现在，有一位中央财经大学的学生向你寻求个性化的膳食评估报告。
-
-这位学生的健康画像与忌口规则如下：
-- **健康核心目标**：${goals.join('，') || '日常均衡'}
-- **避雷的口味**：拒绝 ${tastes.join('，') || '无'}
-- **不要的食材（绝对忌口）**：不要 ${ingredients.join('，') || '无'}
-
-我们高校食堂今日提供的真实在售菜谱如下：
-${dishesListStr}
-
-请根据该学生的健康目标、口味喜好和【严格的忌口食材规则】，为他生成一份专业、辞藻优美、极具人文关怀的「个性化营养分析报告」。
-请**严格按照以下 Markdown 格式**进行输出（你可以加入适当的 Emoji，让报告显得更有温度）：
-
-# 💡 个性化营养师膳食分析报告
-
-## ⚖️ 宏量营养素评估
-[分析他的目标，提出合理的碳水、蛋白质、脂肪摄入比例建议。指出为什么他可能失衡，或者给出科学的就餐比例指引]
-
-## ✍️ AI 深度点评
-*   **🌟 做得很棒的地方**：[给予积极的鼓励，肯定他的健康饮食理念]
-*   **🔧 饮食优化建议**：[针对他排除忌口了某些食材（比如不要${ingredients.join('，')}），指导他应该如何在食堂挑选其他安全替代品来补足微量元素。]
-
-## 🍽️ 专属食堂定制菜单推荐
-[请从上面的“我们高校食堂今日提供的真实在售菜谱”中，挑选 3 款【完全不包含他任何忌口食材】、【符合他口味】且【对实现他健康目标非常有用】的真实菜品，列成一个清单，并给出详细的推荐理由。推荐格式如下：]
-1.  **[菜品名称]** (¥[价格] / [分类]) - ⭐ [评分]分
-    *   *推荐理由*：[用极具感染力且专业严谨的辞藻说明为什么这款菜适合他，并注明它的卡路里/蛋白质优势]
-2.  ...
-
----
-*声明：本报告由智饷食堂 AI 营养师引擎实时生成，仅供就餐参考。*
-`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const reportText = response.text();
-
-    res.json({ code: 200, report: reportText });
-
-  } catch (error) {
-    res.status(500).json({ code: 500, message: 'AI 营养师服务暂时故障: ' + error.message });
-  }
+router.post('/analyze-nutrition', optionalAuth, (req, res) => {
+  const schoolId = getSchool(req);
+  if (!validSchool(schoolId)) return res.status(400).json({ code: 400, message: '请选择有效学校' });
+  const goals = Array.isArray(req.body?.goals) ? req.body.goals.map(String).slice(0, 10) : [];
+  const tastes = Array.isArray(req.body?.tastes) ? req.body.tastes.map(String).slice(0, 20) : [];
+  const ingredients = Array.isArray(req.body?.ingredients) ? req.body.ingredients.map(String).slice(0, 30) : [];
+  const dishes = runTool('search_menu', { excludeIngredients: ingredients, limit: 8 }, schoolId);
+  if (!dishes.length) return res.json({ code: 200, report: '当前菜单中没有符合所选忌口条件的菜品。可调整筛选条件后再次生成。' });
+  const data = dishes.map(d => `- ${d.name}｜${d.category}｜参考价 ¥${d.referencePrice}｜份量 ${d.portionG}g｜营养估算 ${d.nutritionEstimate.calories || '—'} kcal，蛋白质 ${d.nutritionEstimate.protein || '—'}g｜食材 ${d.ingredients.join('、')}｜过敏原 ${d.allergens.join('、') || '未标注'}`).join('\n');
+  const report = `# 个性化膳食参考\n\n目标：${goals.join('、') || '日常均衡'}  \n口味偏好：${tastes.join('、') || '未设置'}  \n忌口：${ingredients.join('、') || '未设置'}\n\n## 菜品选择\n${data}\n\n以上营养数值为每份估算值，具体摄入请结合实际份量及个人情况判断。`;
+  if (!(config.aiBaseUrl && config.aiApiKey && config.aiModel)) return res.json({ code: 200, report, mode: 'database' });
+  callModel([{ role: 'user', content: `请只基于这些学校菜单记录，为学生给出简短、审慎的膳食搭配建议。目标=${goals.join('、')}；口味=${tastes.join('、')}；忌口=${ingredients.join('、')}。菜单数据：\n${data}\n明确说明营养值为估算，不能做医疗诊断。` }], schoolId, req.user?.id)
+    .then(text => res.json({ code: 200, report: text, mode: 'agent' }))
+    .catch(error => { console.error('Nutrition agent error:', error.message); res.status(502).json({ code: 502, message: '营养分析暂时不可用，请稍后重试' }); });
 });
 
 export default router;

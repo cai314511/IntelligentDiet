@@ -1060,6 +1060,7 @@
             state.aiOpen = !state.aiOpen;
             if (state.aiOpen) panel.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
             else panel.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            window.dispatchEvent(new CustomEvent('xiaozhi-chat-toggle', { detail: { open: state.aiOpen } }));
         }
 
         function handleAiInput() {
@@ -1297,7 +1298,7 @@
             const messagesDiv = document.getElementById('ai-messages');
             messagesDiv.innerHTML += `
                 <div class="flex items-start space-x-2 mt-4 slide-up">
-                    <div class="w-8 h-8 rounded-full bg-appleBlue text-white flex shrink-0 items-center justify-center shadow-md"><i class="fa-solid fa-robot text-xs"></i></div>
+                    <div class="w-8 h-8 rounded-full bg-appleBlue text-white flex shrink-0 items-center justify-center shadow-md"><img src="/assets/brand/xiaozhi-body.png" alt="小智" class="xiaozhi-chat-avatar"></div>
                     <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-appleText text-sm leading-relaxed">
                         ${htmlContent}
                     </div>
