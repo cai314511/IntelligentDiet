@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import request from "supertest";
 process.env.DB_PATH = ":memory:";
 process.env.AI_BASE_URL = "";
-process.env.AI_API_KEY = "";
+process.env.AZURE_OPENAI_API_KEY = "";
 process.env.AI_MODEL = "";
 const { default: app } = await import("../app.js");
 const target = await targetFor(app);
@@ -25,34 +25,28 @@ before(async () => {
   assert.equal(a.status, 200);
   admin = a.body.data.token;
   for (const name of ["workspace_test", "workspace_other"]) {
-    await client
-      .post("/api/users/register")
-      .send({
-        zhanghao: name,
-        mima: "testpass123",
-        xingming: name,
-        schoolId: "cufe",
-      });
+    await client.post("/api/users/register").send({
+      zhanghao: name,
+      mima: "testpass123",
+      xingming: name,
+      schoolId: "cufe",
+    });
   }
   user = (
-    await client
-      .post("/api/users/login")
-      .send({
-        zhanghao: "workspace_test",
-        mima: "testpass123",
-        schoolId: "cufe",
-        identity: "student",
-      })
+    await client.post("/api/users/login").send({
+      zhanghao: "workspace_test",
+      mima: "testpass123",
+      schoolId: "cufe",
+      identity: "student",
+    })
   ).body.data.token;
   other = (
-    await client
-      .post("/api/users/login")
-      .send({
-        zhanghao: "workspace_other",
-        mima: "testpass123",
-        schoolId: "cufe",
-        identity: "student",
-      })
+    await client.post("/api/users/login").send({
+      zhanghao: "workspace_other",
+      mima: "testpass123",
+      schoolId: "cufe",
+      identity: "student",
+    })
   ).body.data.token;
   dish = (
     await client.get("/api/workspace/catalog").set(auth(user))
@@ -61,14 +55,12 @@ before(async () => {
 test("登录身份由服务端核验，营养高级权限按角色隔离", async () => {
   assert.equal(
     (
-      await client
-        .post("/api/users/login")
-        .send({
-          zhanghao: "workspace_test",
-          mima: "testpass123",
-          schoolId: "cufe",
-          identity: "admin",
-        })
+      await client.post("/api/users/login").send({
+        zhanghao: "workspace_test",
+        mima: "testpass123",
+        schoolId: "cufe",
+        identity: "admin",
+      })
     ).status,
     403,
   );
@@ -159,8 +151,16 @@ test("就餐方案需确认，价格变化回滚，重复确认不重复下单�
   const ok = await client
     .post(`/api/tasks/${plan.id}/confirm`)
     .set(auth(user))
-    .send({ expectedTotal: plan.total });
+    .send({ expectedTotal: plan.total, remark: "少辣，不要香菜" });
   assert.equal(ok.status, 200);
+  const listing = await client.get("/api/orders").set(auth(admin));
+  const listed = listing.body.data.find(
+    (row) => row.orderid === ok.body.data.orderid,
+  );
+  assert.equal(listed.campus, plan.items[0].campus);
+  assert.equal(listed.restaurant_id, plan.restaurant.id);
+  assert.equal(listed.window_name, plan.items[0].window);
+  assert.equal(listed.remark, "少辣，不要香菜");
   const twice = await client
     .post(`/api/tasks/${plan.id}/confirm`)
     .set(auth(user))
@@ -380,4 +380,255 @@ test("预测留出回测根据实际历史计算准确度并按食堂隔离", as
   assert.equal(r.body.data.accuracy, 100);
   assert.equal(r.body.data.items.find((x) => x.id === d.id).demand, 10);
   assert.equal(r.body.data.hourly.find((x) => x.label === "12时").visits, 1);
+});
+
+test("运营台账拒绝负成本和跨学校菜品关联", async () => {
+  const body = {
+    type: "inventory",
+    title: "库存校验",
+    status: "运行中",
+    payload: { unitCost: -1 },
+  };
+  assert.equal(
+    (await client.post("/api/operations").set(auth(admin)).send(body)).status,
+    400,
+  );
+  const foreign = db
+    .prepare("SELECT id FROM caipinxinxi WHERE school_id='tju' LIMIT 1")
+    .get();
+  assert.equal(
+    (
+      await client
+        .post("/api/operations")
+        .set(auth(admin))
+        .send({ ...body, payload: { dishId: foreign.id, unitCost: 3 } })
+    ).status,
+    400,
+  );
+});
+
+test("多轮对话只解析需求，不创建任务订单，后续回答补全人数与座位", async () => {
+  dish = (
+    await client.get("/api/workspace/catalog").set(auth(user))
+  ).body.data.dishes.find((d) => d.forSale && d.stock > 0 && d.restaurantId);
+  const before = db.prepare("SELECT count(*) n FROM orders").get().n;
+  const first = await client
+    .post("/api/tasks/interpret")
+    .set(auth(user))
+    .send({ message: `想吃${dish.name}，30元` });
+  assert.equal(first.status, 200);
+  assert.equal(first.body.data.constraints.dishId, dish.id);
+  assert.equal(first.body.data.constraints.people, undefined);
+  const next = await client
+    .post("/api/tasks/interpret")
+    .set(auth(user))
+    .send({
+      message: "一个人，现在吃",
+      history: [{ role: "user", content: `想吃${dish.name}，30元` }],
+    });
+  assert.equal(next.body.data.constraints.people, 1);
+  assert.ok(next.body.data.constraints.startsAt);
+  const seat = await client
+    .post("/api/tasks/interpret")
+    .set(auth(user))
+    .send({
+      message: "需要",
+      history: [{ role: "assistant", content: "需要帮你预约座位吗？" }],
+    });
+  assert.equal(seat.body.data.constraints.reserve, true);
+  assert.equal(db.prepare("SELECT count(*) n FROM orders").get().n, before);
+});
+test("规划进度来自实际服务阶段，长于30天的时间可规划且失败不伪报完成", async () => {
+  const r = await client
+    .post("/api/tasks")
+    .set(auth(user))
+    .send({
+      stream: true,
+      message: "想吃午餐",
+      constraints: {
+        dishId: dish.id,
+        budget: 100,
+        startsAt: new Date(Date.now() + 40 * 86400000).toISOString(),
+      },
+    });
+  assert.equal(r.status, 200);
+  const events = r.text.trim().split("\n").map(JSON.parse);
+  assert.deepEqual(
+    events.filter((e) => e.type === "progress").map((e) => e.data),
+    [0, 1, 2, 3, 4, 5, 6],
+  );
+  assert.equal(events.at(-1).type, "plan");
+  const fail = await client
+    .post("/api/tasks")
+    .set(auth(user))
+    .send({ stream: true, message: "午餐", constraints: { budget: 0 } });
+  const failedEvents = fail.text.trim().split("\n").map(JSON.parse);
+  assert.equal(failedEvents.at(-1).type, "error");
+  assert.ok(!failedEvents.some((e) => e.type === "plan"));
+});
+test("直接点餐与座位同事务创建，冲突回滚，取消订单释放预约", async () => {
+  const time = new Date(Date.now() + 5 * 86400000).toISOString();
+  const seats = (
+    await client
+      .get(
+        `/api/restaurants/${dish.restaurantId}/seats?startsAt=${encodeURIComponent(time)}`,
+      )
+      .set(auth(user))
+  ).body.data.seats;
+  const payload = {
+    items: [{ dishId: dish.id, quantity: 1 }],
+    expectedTotal: dish.price,
+    dining: {
+      restaurantId: dish.restaurantId,
+      startsAt: time,
+      seatIds: [seats.find((s) => s.available).id],
+    },
+  };
+  const r = await client.post("/api/orders").set(auth(user)).send(payload);
+  assert.equal(r.status, 201);
+  assert.equal(r.body.data.reservationIds.length, 1);
+  const count = db.prepare("SELECT count(*) n FROM orders").get().n;
+  const conflict = await client
+    .post("/api/orders")
+    .set(auth(other))
+    .send(payload);
+  assert.equal(conflict.status, 409);
+  assert.equal(db.prepare("SELECT count(*) n FROM orders").get().n, count);
+  const cancel = await client
+    .post(`/api/orders/${r.body.data.orderid}/cancel`)
+    .set(auth(user));
+  assert.equal(cancel.status, 200);
+  assert.equal(
+    db
+      .prepare("SELECT status FROM seat_reservations WHERE reservation_id=?")
+      .get(r.body.data.reservationIds[0]).status,
+    "cancelled",
+  );
+});
+
+test("自然表达人数预算和明日时间可解析，后续修改不覆盖旧选择", async () => {
+  const r = await client
+    .post("/api/tasks/interpret")
+    .set(auth(user))
+    .send({ message: "我自己，三十元，明天中午十二点，不需要座位" });
+  assert.equal(r.status, 200);
+  assert.equal(r.body.data.constraints.people, 1);
+  assert.equal(r.body.data.constraints.budget, 30);
+  assert.equal(r.body.data.constraints.reserve, false);
+  const tomorrow = new Date(Date.now() + 86400000).toLocaleDateString("sv-SE", {
+    timeZone: "Asia/Shanghai",
+  });
+  assert.equal(
+    r.body.data.constraints.startsAt,
+    new Date(`${tomorrow}T12:00:00+08:00`).toISOString(),
+  );
+  const updated = await client
+    .post("/api/tasks/interpret")
+    .set(auth(user))
+    .send({
+      message: "换成两个人",
+      history: [
+        { role: "user", content: "我自己，三十元，明天中午十二点，不需要座位" },
+      ],
+    });
+  assert.equal(updated.body.data.constraints.people, 2);
+  assert.equal(updated.body.data.constraints.startsAt, undefined);
+  assert.equal(updated.body.data.constraints.budget, undefined);
+  assert.equal(updated.body.data.constraints.reserve, undefined);
+  assert.equal(
+    (
+      await client
+        .post("/api/tasks/interpret")
+        .set(auth(user))
+        .send({ message: "7个人" })
+    ).status,
+    400,
+  );
+});
+test("方案从不预约改为指定座位和人数，确认前不创建预约或订单", async () => {
+  const d = (
+    await client.get("/api/workspace/catalog").set(auth(user))
+  ).body.data.dishes.find((d) => d.forSale && d.stock > 3 && d.restaurantId);
+  const created = await client
+    .post("/api/tasks")
+    .set(auth(user))
+    .send({
+      message: "午餐",
+      constraints: {
+        dishId: d.id,
+        budget: 100,
+        people: 1,
+        reserve: false,
+        startsAt: new Date(Date.now() + 6 * 86400000).toISOString(),
+      },
+    });
+  assert.equal(created.status, 201);
+  const p = created.body.data;
+  const seats = (
+    await client
+      .get(
+        `/api/restaurants/${d.restaurantId}/seats?startsAt=${encodeURIComponent(p.startsAt)}`,
+      )
+      .set(auth(user))
+  ).body.data.seats;
+  const seat = seats.find((s) => s.available && s.type === "4人座");
+  const before = db.prepare("SELECT count(*) n FROM orders").get().n;
+  const updated = await client
+    .put(`/api/tasks/${p.id}`)
+    .set(auth(user))
+    .send({ people: 2, reserve: true, seatIds: [seat.id] });
+  assert.equal(updated.status, 200);
+  assert.equal(updated.body.data.items[0].quantity, 2);
+  assert.deepEqual(
+    updated.body.data.seats.map((s) => s.id),
+    [seat.id],
+  );
+  assert.equal(db.prepare("SELECT count(*) n FROM orders").get().n, before);
+  assert.equal(
+    db
+      .prepare(
+        "SELECT count(*) n FROM seat_reservations WHERE seat_id=? AND starts_at=?",
+      )
+      .get(seat.id, p.startsAt).n,
+    0,
+  );
+});
+
+test("同一时段座位取消后可以再次预约，保留旧预约记录", async () => {
+  const d = (
+    await client.get("/api/workspace/catalog").set(auth(user))
+  ).body.data.dishes.find((d) => d.forSale && d.stock > 0 && d.restaurantId);
+  const startsAt = new Date(Date.now() + 8 * 86400000).toISOString();
+  const seats = (
+    await client
+      .get(
+        `/api/restaurants/${d.restaurantId}/seats?startsAt=${encodeURIComponent(startsAt)}`,
+      )
+      .set(auth(user))
+  ).body.data.seats;
+  const payload = {
+    items: [{ dishId: d.id, quantity: 1 }],
+    dining: {
+      restaurantId: d.restaurantId,
+      startsAt,
+      seatIds: [seats.find((s) => s.available).id],
+    },
+  };
+  const first = await client.post("/api/orders").set(auth(user)).send(payload);
+  assert.equal(first.status, 201);
+  await client
+    .post(`/api/orders/${first.body.data.orderid}/cancel`)
+    .set(auth(user));
+  const second = await client.post("/api/orders").set(auth(user)).send(payload);
+  assert.equal(second.status, 201);
+  assert.notEqual(
+    first.body.data.reservationIds[0],
+    second.body.data.reservationIds[0],
+  );
+  assert.equal(
+    db
+      .prepare("SELECT status FROM seat_reservations WHERE reservation_id=?")
+      .get(first.body.data.reservationIds[0]).status,
+    "cancelled",
+  );
 });

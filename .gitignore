@@ -16,3 +16,5 @@ Thumbs.db
 _run_*.py
 
 userdata/.jwt-secret
+
+userdata/backups/

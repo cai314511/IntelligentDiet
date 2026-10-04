@@ -47,7 +47,11 @@ async function load() {
     schools = (await api("/users/schools")).data;
     $("school").innerHTML = options(
       schools.map((s) => ({ value: s.id, label: s.name })),
-      session()?.user?.school_id || schools[0]?.id,
+      session()?.user?.school_id ||
+        schools.find(
+          (s) => s.id === new URLSearchParams(location.search).get("schoolId"),
+        )?.id ||
+        schools[0]?.id,
     );
     $("retry-schools").hidden = true;
     campuses();
@@ -119,7 +123,8 @@ api("/users/development-entry")
       try {
         const schoolId = $("school").value;
         if (!schoolId) throw new Error("请先选择学校");
-        const data = (await post("/users/development-account", { schoolId })).data;
+        const data = (await post("/users/development-account", { schoolId }))
+          .data;
         register = false;
         update();
         $("account").value = data.account;

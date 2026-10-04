@@ -31,7 +31,7 @@ const audit = (user, id, action, before, after) =>
       before ? JSON.stringify(before) : null,
       after ? JSON.stringify(after) : null,
     );
-const valid = (b) =>
+const valid = (b, user) =>
   types.has(b.type) &&
   typeof b.title === "string" &&
   b.title.trim() &&
@@ -42,7 +42,33 @@ const valid = (b) =>
   JSON.stringify(b.payload).length < 8000 &&
   typeof b.status === "string" &&
   b.status.length > 0 &&
-  b.status.length <= 30;
+  b.status.length <= 30 &&
+  [
+    "quantity",
+    "unitCost",
+    "prepared",
+    "checkpoints",
+    "passed",
+    "revenue",
+  ].every(
+    (k) =>
+      b.payload[k] === undefined ||
+      (Number.isFinite(Number(b.payload[k])) &&
+        Number(b.payload[k]) >= 0 &&
+        Number(b.payload[k]) <= 1e8),
+  ) &&
+  (!b.payload.restaurantId ||
+    Boolean(
+      db
+        .prepare("SELECT 1 FROM restaurants WHERE id=? AND school_id=?")
+        .get(Number(b.payload.restaurantId), user.schoolId),
+    )) &&
+  (!b.payload.dishId ||
+    Boolean(
+      db
+        .prepare("SELECT 1 FROM caipinxinxi WHERE id=? AND school_id=?")
+        .get(Number(b.payload.dishId), user.schoolId),
+    ));
 const handle = (res, fn) => {
   try {
     fn();
@@ -146,7 +172,8 @@ router.post("/audit/:id/undo", (req, res) =>
 router.post("/", (req, res) =>
   handle(res, () => {
     const b = { payload: {}, status: "运行中", ...req.body };
-    if (!valid(b)) return res.status(400).json({ message: "运营记录格式无效" });
+    if (!valid(b, req.user))
+      return res.status(400).json({ message: "运营记录格式无效" });
     const id = db.transaction(() => {
       const r = db
         .prepare(
@@ -176,7 +203,8 @@ router.put("/:id", (req, res) =>
     const before = row(req.params.id, req.user);
     if (!before) return res.status(404).json({ message: "运营记录不存在" });
     const b = { ...req.body, type: before.type };
-    if (!valid(b)) return res.status(400).json({ message: "运营记录格式无效" });
+    if (!valid(b, req.user))
+      return res.status(400).json({ message: "运营记录格式无效" });
     db.transaction(() => {
       db.prepare(
         "UPDATE operations_records SET title=?,payload_json=?,status=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND school_id=?",

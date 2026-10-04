@@ -1,3 +1,4 @@
+import { modelRequest } from "../services/modelClient.js";
 import express from "express";
 import { db } from "../database.js";
 import { requireAuth } from "../middleware/auth.js";
@@ -210,7 +211,7 @@ router.post("/recognize", async (req, res) => {
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), config.aiTimeoutMs);
   try {
-    const r = await fetch(`${config.aiBaseUrl}/chat/completions`, {
+    const r = await requestModel({
       method: "POST",
       signal: controller.signal,
       headers: {
@@ -339,7 +340,7 @@ router.post("/deep-report", async (req, res) => {
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), config.aiTimeoutMs);
   try {
-    const r = await fetch(`${config.aiBaseUrl}/chat/completions`, {
+    const r = await requestModel({
       method: "POST",
       signal: controller.signal,
       headers: {
@@ -374,3 +375,5 @@ router.post("/deep-report", async (req, res) => {
   }
 });
 export default router;
+
+function requestModel(options) { return modelRequest(JSON.parse(options.body), { signal: options.signal }); }

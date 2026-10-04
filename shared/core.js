@@ -43,7 +43,13 @@ export function saveSession(value) {
   }
 }
 export function logout() {
-  ["zx_session", "zx_token", "zx_user", "zx_admin_token", "zx_admin_name"].forEach(key => localStorage.removeItem(key));
+  [
+    "zx_session",
+    "zx_token",
+    "zx_user",
+    "zx_admin_token",
+    "zx_admin_name",
+  ].forEach((key) => localStorage.removeItem(key));
   location.href = "/";
 }
 export function guard(identity) {
@@ -81,7 +87,11 @@ export async function api(path, { method = "GET", body, retry = true } = {}) {
   const controller = new AbortController(),
     timeout = setTimeout(
       () => controller.abort(),
-      window.ZX_CONFIG?.requestTimeout || 15000,
+      path.startsWith("/tasks") ||
+        path.startsWith("/nutrition/recognize") ||
+        path.startsWith("/nutrition/deep-report")
+        ? Math.max(window.ZX_CONFIG?.requestTimeout || 15000, 45000)
+        : window.ZX_CONFIG?.requestTimeout || 15000,
     );
   try {
     const r = await fetch(url, {
@@ -93,7 +103,13 @@ export async function api(path, { method = "GET", body, retry = true } = {}) {
     const data = await r.json().catch(() => ({}));
     if (!r.ok) {
       if (r.status === 401 && !path.includes("/login")) {
-        localStorage.removeItem("zx_session");
+        [
+          "zx_session",
+          "zx_token",
+          "zx_user",
+          "zx_admin_token",
+          "zx_admin_name",
+        ].forEach((k) => localStorage.removeItem(k));
         location.replace("/");
       }
       throw new ApiError(data.message || `请求失败（${r.status}）`, r.status);
@@ -196,6 +212,63 @@ export function download(name, rows) {
   URL.revokeObjectURL(a.href);
 }
 export function applySchool(school) {
+  if (school?.id) document.body.dataset.school = school.id;
+  document.documentElement.style.removeProperty("--school-background");
+  if (school?.background) {
+    try {
+      const u = new URL(school.background, location.origin);
+      if (["http:", "https:"].includes(u.protocol))
+        document.documentElement.style.setProperty(
+          "--school-background",
+          `url(${JSON.stringify(u.href)})`,
+        );
+    } catch {}
+  }
   if (/^#[0-9a-f]{6}$/i.test(school?.accent))
     document.documentElement.style.setProperty("--school", school.accent);
+}
+
+export async function streamTask(body, onProgress) {
+  const controller = new AbortController(),
+    timer = setTimeout(() => controller.abort(), 45000);
+  try {
+    const response = await fetch(
+      (window.ZX_CONFIG?.apiBase || "/api") + "/tasks",
+      {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session()?.token || ""}`,
+        },
+        body: JSON.stringify({ ...body, stream: true }),
+      },
+    );
+    if (!response.ok)
+      throw new Error((await response.json()).message || "无法生成方案");
+    const reader = response.body.getReader(),
+      decoder = new TextDecoder();
+    let buffer = "",
+      plan;
+    const consume = (line) => {
+      if (!line.trim()) return;
+      const event = JSON.parse(line);
+      if (event.type === "progress") onProgress(event.data);
+      if (event.type === "plan") plan = event.data;
+      if (event.type === "error") throw new Error(event.data);
+    };
+    while (true) {
+      const { value, done } = await reader.read();
+      buffer += decoder.decode(value, { stream: !done });
+      const lines = buffer.split("\n");
+      buffer = lines.pop();
+      for (const line of lines) consume(line);
+      if (done) break;
+    }
+    consume(buffer);
+    if (!plan) throw new Error("方案未完成，请重试");
+    return plan;
+  } finally {
+    clearTimeout(timer);
+  }
 }

@@ -1,11 +1,11 @@
-import Database from 'better-sqlite3';
-import bcrypt from 'bcryptjs';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { config } from './config.js';
-import { seedReferenceData } from './seed.js';
-import { initWorkspace } from './services/workspaceSchema.js';
+import Database from "better-sqlite3";
+import bcrypt from "bcryptjs";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { config } from "./config.js";
+import { seedReferenceData } from "./seed.js";
+import { initWorkspace } from "./services/workspaceSchema.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = config.dbPath;
@@ -20,7 +20,7 @@ if (!fs.existsSync(dbParentDir)) {
 export const db = new Database(dbPath);
 
 // 启用外键约束
-db.pragma('foreign_keys = ON');
+db.pragma("foreign_keys = ON");
 
 export function initDatabase() {
   // 使用表
@@ -158,45 +158,120 @@ export function initDatabase() {
 
   // ---- 幂等列迁移（重复执行安全）----
   const addColumn = (table, column, ddl) => {
-    const cols = db.prepare(`PRAGMA table_info(${table})`).all().map(c => c.name);
-    if (!cols.includes(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+    const cols = db
+      .prepare(`PRAGMA table_info(${table})`)
+      .all()
+      .map((c) => c.name);
+    if (!cols.includes(column))
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
   };
-  addColumn('orders', 'pickup_code', 'pickup_code TEXT');
-  addColumn('orders', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
-  addColumn('yonghu', 'role', "role TEXT DEFAULT 'user'");
-  addColumn('yonghu', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
-  addColumn('caipinxinxi', 'source_key', 'source_key TEXT');
-  addColumn('caipinxinxi', 'shangjia', "shangjia TEXT DEFAULT '是'");
-  addColumn('caipinxinxi', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
-  addColumn('caipinxinxi', 'ingredients_json', "ingredients_json TEXT NOT NULL DEFAULT '[]'");
-  addColumn('caipinxinxi', 'allergens_json', "allergens_json TEXT NOT NULL DEFAULT '[]'");
-  addColumn('caipinxinxi', 'nutrition_json', "nutrition_json TEXT NOT NULL DEFAULT '{}'");
-  addColumn('caipinxinxi', 'portion_g', 'portion_g INTEGER NOT NULL DEFAULT 300');
-  addColumn('caipinxinxi', 'data_source', "data_source TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'source_url', "source_url TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'campus', "campus TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'restaurant_name', "restaurant_name TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'price_unit', "price_unit TEXT NOT NULL DEFAULT '元/份'");
-  addColumn('caipinxinxi', 'taste_tags_json', "taste_tags_json TEXT NOT NULL DEFAULT '[]'");
-  addColumn('caipinxinxi', 'dietary_tags_json', "dietary_tags_json TEXT NOT NULL DEFAULT '[]'");
-  addColumn('caipinxinxi', 'spice_level', "spice_level TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'source_date', "source_date TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'source_kind', "source_kind TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'price_basis', "price_basis TEXT NOT NULL DEFAULT ''");
-  addColumn('caipinxinxi', 'nutrition_basis', "nutrition_basis TEXT NOT NULL DEFAULT ''");
-  addColumn('discusscaipinxinxi', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
-  addColumn('discusscaipinxinxi', 'rating', 'rating INTEGER NOT NULL DEFAULT 5');
-  addColumn('messages', 'school_id', "school_id TEXT NOT NULL DEFAULT 'cufe'");
+  addColumn("orders", "pickup_code", "pickup_code TEXT");
+  addColumn("orders", "school_id", "school_id TEXT NOT NULL DEFAULT 'cufe'");
+  addColumn("yonghu", "role", "role TEXT DEFAULT 'user'");
+  addColumn("yonghu", "school_id", "school_id TEXT NOT NULL DEFAULT 'cufe'");
+  addColumn("caipinxinxi", "source_key", "source_key TEXT");
+  addColumn("caipinxinxi", "shangjia", "shangjia TEXT DEFAULT '是'");
+  addColumn(
+    "caipinxinxi",
+    "school_id",
+    "school_id TEXT NOT NULL DEFAULT 'cufe'",
+  );
+  addColumn(
+    "caipinxinxi",
+    "ingredients_json",
+    "ingredients_json TEXT NOT NULL DEFAULT '[]'",
+  );
+  addColumn(
+    "caipinxinxi",
+    "allergens_json",
+    "allergens_json TEXT NOT NULL DEFAULT '[]'",
+  );
+  addColumn(
+    "caipinxinxi",
+    "nutrition_json",
+    "nutrition_json TEXT NOT NULL DEFAULT '{}'",
+  );
+  addColumn(
+    "caipinxinxi",
+    "portion_g",
+    "portion_g INTEGER NOT NULL DEFAULT 300",
+  );
+  addColumn(
+    "caipinxinxi",
+    "data_source",
+    "data_source TEXT NOT NULL DEFAULT ''",
+  );
+  addColumn("caipinxinxi", "source_url", "source_url TEXT NOT NULL DEFAULT ''");
+  addColumn("caipinxinxi", "campus", "campus TEXT NOT NULL DEFAULT ''");
+  addColumn(
+    "caipinxinxi",
+    "restaurant_name",
+    "restaurant_name TEXT NOT NULL DEFAULT ''",
+  );
+  addColumn(
+    "caipinxinxi",
+    "price_unit",
+    "price_unit TEXT NOT NULL DEFAULT '元/份'",
+  );
+  addColumn(
+    "caipinxinxi",
+    "taste_tags_json",
+    "taste_tags_json TEXT NOT NULL DEFAULT '[]'",
+  );
+  addColumn(
+    "caipinxinxi",
+    "dietary_tags_json",
+    "dietary_tags_json TEXT NOT NULL DEFAULT '[]'",
+  );
+  addColumn(
+    "caipinxinxi",
+    "spice_level",
+    "spice_level TEXT NOT NULL DEFAULT ''",
+  );
+  addColumn(
+    "caipinxinxi",
+    "source_date",
+    "source_date TEXT NOT NULL DEFAULT ''",
+  );
+  addColumn(
+    "caipinxinxi",
+    "source_kind",
+    "source_kind TEXT NOT NULL DEFAULT ''",
+  );
+  addColumn(
+    "caipinxinxi",
+    "price_basis",
+    "price_basis TEXT NOT NULL DEFAULT ''",
+  );
+  addColumn(
+    "caipinxinxi",
+    "nutrition_basis",
+    "nutrition_basis TEXT NOT NULL DEFAULT ''",
+  );
+  addColumn(
+    "discusscaipinxinxi",
+    "school_id",
+    "school_id TEXT NOT NULL DEFAULT 'cufe'",
+  );
+  addColumn(
+    "discusscaipinxinxi",
+    "rating",
+    "rating INTEGER NOT NULL DEFAULT 5",
+  );
+  addColumn("messages", "school_id", "school_id TEXT NOT NULL DEFAULT 'cufe'");
 
   // ---- orders.orderid 唯一约束移除（一行一菜品共用 orderid，幂等重建）----
   // 必须放在 addColumn('orders', 'pickup_code', ...) 之后，保证旧表已有 pickup_code 列可复制
-  const hasUniqueOrderid = db.prepare("PRAGMA index_list(orders)").all().some(idx => {
-    if (!idx.unique) return false;
-    const cols = db.prepare(`PRAGMA index_info("${idx.name}")`).all();
-    return cols.length === 1 && cols[0].name === 'orderid';
-  });
+  const hasUniqueOrderid = db
+    .prepare("PRAGMA index_list(orders)")
+    .all()
+    .some((idx) => {
+      if (!idx.unique) return false;
+      const cols = db.prepare(`PRAGMA index_info("${idx.name}")`).all();
+      return cols.length === 1 && cols[0].name === "orderid";
+    });
   if (hasUniqueOrderid) {
-    db.pragma('foreign_keys = OFF');
+    db.pragma("foreign_keys = OFF");
     db.exec(`
       BEGIN;
       CREATE TABLE orders_new (
@@ -227,13 +302,15 @@ export function initDatabase() {
       CREATE INDEX IF NOT EXISTS idx_orders_userid ON orders(userid);
       COMMIT;
     `);
-    db.pragma('foreign_keys = ON');
-    console.log('✓ orders 表已重建：移除 orderid 唯一约束');
+    db.pragma("foreign_keys = ON");
+    console.log("✓ orders 表已重建：移除 orderid 唯一约束");
   }
 
   // ---- 明文密码迁移为 bcrypt（幂等：已哈希的以 $2 开头，跳过）----
-  const plaintextUsers = db.prepare("SELECT id, mima FROM yonghu WHERE mima NOT LIKE '$2%'").all();
-  const updatePwd = db.prepare('UPDATE yonghu SET mima = ? WHERE id = ?');
+  const plaintextUsers = db
+    .prepare("SELECT id, mima FROM yonghu WHERE mima NOT LIKE '$2%'")
+    .all();
+  const updatePwd = db.prepare("UPDATE yonghu SET mima = ? WHERE id = ?");
   for (const u of plaintextUsers) {
     updatePwd.run(bcrypt.hashSync(u.mima, 10), u.id);
   }
@@ -280,7 +357,10 @@ export function initDatabase() {
       ends_at TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'confirmed',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(seat_id, starts_at)
+      CHECK(ends_at > starts_at)
+    );
+    CREATE TABLE IF NOT EXISTS order_dining (
+      order_id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, restaurant_id INTEGER NOT NULL, starts_at TEXT NOT NULL, reservation_ids_json TEXT NOT NULL DEFAULT '[]'
     );
     CREATE TABLE IF NOT EXISTS activities (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -371,18 +451,78 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_messages_school ON messages(school_id,addtime);
   `);
 
-  const cultureColumns = db.prepare('PRAGMA table_info(cultural_items)').all().map(column => column.name);
-  if (!cultureColumns.includes('status')) db.exec("ALTER TABLE cultural_items ADD COLUMN status TEXT NOT NULL DEFAULT 'published'");
+  const reservationSchema =
+    db
+      .prepare(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='seat_reservations'",
+      )
+      .get()?.sql || "";
+  if (/UNIQUE\s*\(seat_id,\s*starts_at\)/i.test(reservationSchema)) {
+    if (dbPath !== ":memory:") {
+      const backupDir = path.join(path.dirname(dbPath), "backups");
+      fs.mkdirSync(backupDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(backupDir, `before-seat-index-${Date.now()}.sqlite`),
+        db.serialize(),
+      );
+    }
+    db.transaction(() => {
+      db.exec(`CREATE TABLE seat_reservations_migrated (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, reservation_id TEXT NOT NULL UNIQUE,
+        user_id INTEGER NOT NULL REFERENCES yonghu(id), restaurant_id INTEGER NOT NULL REFERENCES restaurants(id),
+        seat_id INTEGER NOT NULL REFERENCES restaurant_seats(id), starts_at TEXT NOT NULL, ends_at TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'confirmed', created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+      INSERT INTO seat_reservations_migrated SELECT * FROM seat_reservations;
+      DROP TABLE seat_reservations;
+      ALTER TABLE seat_reservations_migrated RENAME TO seat_reservations;`);
+    })();
+  }
+  db.exec(
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_active_seat_start ON seat_reservations(seat_id,starts_at) WHERE status='confirmed'",
+  );
 
-  const seedSchools = db.prepare(`INSERT INTO universities(id,name,short_name,accent) VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,short_name=excluded.short_name,accent=excluded.accent`);
-  for (const school of JSON.parse(fs.readFileSync(path.join(config.userDataDir, 'schools.json'), 'utf8'))) {
+  const cultureColumns = db
+    .prepare("PRAGMA table_info(cultural_items)")
+    .all()
+    .map((column) => column.name);
+  if (!cultureColumns.includes("status"))
+    db.exec(
+      "ALTER TABLE cultural_items ADD COLUMN status TEXT NOT NULL DEFAULT 'published'",
+    );
+
+  if (
+    !db
+      .prepare("PRAGMA table_info(universities)")
+      .all()
+      .some((c) => c.name === "background")
+  )
+    db.exec(
+      "ALTER TABLE universities ADD COLUMN background TEXT NOT NULL DEFAULT ''",
+    );
+  const seedSchools = db.prepare(
+    `INSERT INTO universities(id,name,short_name,accent) VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,short_name=excluded.short_name,accent=excluded.accent`,
+  );
+  for (const school of JSON.parse(
+    fs.readFileSync(path.join(config.userDataDir, "schools.json"), "utf8"),
+  )) {
     seedSchools.run(school.id, school.name, school.shortName, school.accent);
+    if (typeof school.logo === "string")
+      db.prepare("UPDATE universities SET logo=? WHERE id=?").run(
+        school.logo,
+        school.id,
+      );
+    if (typeof school.background === "string")
+      db.prepare("UPDATE universities SET background=? WHERE id=?").run(
+        school.background,
+        school.id,
+      );
   }
 
   if (config.seedReferenceData) seedReferenceData(db);
   initWorkspace(db);
 
-  console.log('✓ 数据库表创建成功');
+  console.log("✓ 数据库表创建成功");
 }
 
 // 获取数据库连接

@@ -2,6 +2,7 @@ import { read, store, api, modal, session } from "./core.js";
 const avatar = "/assets/brand/xiaozhi-body.png";
 const pet = document.createElement("aside");
 pet.className = "xiaozhi-pet";
+if(location.pathname.startsWith("/canteen")){pet.classList.add("zx-pet-circle");}
 pet.setAttribute("aria-label", "小智互动精灵");
 let state = read("pet", { look: "sprite", x: null, y: null }),
   drag = null,
@@ -14,6 +15,8 @@ const body = pet.querySelector(".pet-body"),
   bubble = pet.querySelector(".pet-bubble");
 let chatDocked = false;
 function position() {
+  const viewport = innerWidth <= 680 ? "mobile" : "desktop";
+  if(state.viewport!==viewport){state.x=null;state.y=null;state.viewport=viewport;}
   const panel = document.getElementById("ai-panel");
   if (chatDocked && panel) {
     const box = panel.getBoundingClientRect();
@@ -56,6 +59,7 @@ function look() {
   pet.classList.toggle("avatar-look", state.look === "avatar");
   position();
 }
+if(location.pathname.startsWith("/canteen"))state.look="avatar";
 look();
 window.addEventListener("resize", position);
 window.addEventListener("xiaozhi-chat-toggle", (event) => {
@@ -153,7 +157,8 @@ pet.addEventListener("click", (e) => {
   if (action === "chat") {
     toggle(false);
     if (location.pathname.startsWith("/canteen")) {
-      if (typeof window.toggleAI === "function") window.toggleAI();
+      if (typeof window.openAgent === "function") window.openAgent();
+      else if (typeof window.toggleAI === "function") window.toggleAI();
       setTimeout(() => document.getElementById("ai-input")?.focus(), 100);
     } else adminChat();
   }

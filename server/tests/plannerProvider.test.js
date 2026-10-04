@@ -15,7 +15,7 @@ const provider = http.createServer(async (req, res) => {
   if (mode === "plan") {
     name = "prepare_meal_plan";
     args = { budget: 30, people: 2, reserve: true, exclusions: ["小麦"] };
-    assert.equal(body.tool_choice.function.name, name);
+    assert.equal(body.tool_choice.name, name);
   } else {
     name = "record_meal";
     args = {
@@ -24,27 +24,27 @@ const provider = http.createServer(async (req, res) => {
         { dishId: 999999, grams: 300 },
       ],
     };
-    assert.equal(body.messages.at(-1).content[1].type, "image_url");
+    assert.equal(body.input.at(-1).content[1].type, "input_image");
   }
   res.setHeader("content-type", "application/json");
   res.end(
     JSON.stringify({
-      choices: [
-        {
-          message: {
-            tool_calls: [
-              { function: { name, arguments: JSON.stringify(args) } },
-            ],
-          },
-        },
-      ],
+      output: [{type:"function_call",call_id:"c1",name,arguments:JSON.stringify(args)}],
     }),
   );
 });
 await new Promise((r) => provider.listen(0, "127.0.0.1", r));
 process.env.AI_BASE_URL = `http://127.0.0.1:${provider.address().port}/v1`;
-process.env.AI_API_KEY = "provider-test";
+process.env.AZURE_OPENAI_API_KEY = "provider-test";
 process.env.AI_MODEL = "compatible-test";
+const realFetch = globalThis.fetch;
+globalThis.fetch = (url, options) => {
+  assert.equal(url, "https://test-openai-allunion-eastus2.services.ai.azure.com/openai/v1/responses");
+  const body = JSON.parse(options.body);
+  assert.equal(body.model, "gpt-6-luna");
+  assert.equal(body.reasoning.effort, "medium");
+  return realFetch(`http://127.0.0.1:${provider.address().port}/responses`, options);
+};
 const { default: app } = await import("../app.js");
 const target = await targetFor(app);
 const { db } = await import("../database.js");

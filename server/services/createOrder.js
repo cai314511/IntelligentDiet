@@ -39,6 +39,75 @@ export function createOrder(user, body) {
         fail(`「${dish.caipinmingcheng}」库存不足`, 409);
       lines.push({ dish, quantity });
     }
+    if (body.expectedTotal !== undefined) {
+      const quoted = Number(body.expectedTotal),
+        actual = lines.reduce(
+          (sum, { dish, quantity }) =>
+            sum + Math.round(Number(dish.jiage) * 100) * quantity,
+          0,
+        );
+      if (!Number.isFinite(quoted) || quoted < 0) fail("请核对订单费用");
+      if (Math.round(quoted * 100) !== actual)
+        fail("菜品价格已更新，请刷新菜单后重新确认费用", 409);
+    }
+    let dining = null;
+    const reservationIds = [];
+    if (body.dining) {
+      const input = body.dining,
+        start = new Date(input.startsAt),
+        end = new Date(start.getTime() + 45 * 60000);
+      const restaurant = db
+        .prepare("SELECT * FROM restaurants WHERE id=? AND school_id=?")
+        .get(Number(input.restaurantId), user.schoolId);
+      if (
+        !restaurant ||
+        !Number.isFinite(start.getTime()) ||
+        start <= new Date()
+      )
+        fail("请核对食堂与用餐时间");
+      const ids = Array.isArray(input.seatIds)
+        ? [...new Set(input.seatIds.map(Number))]
+        : [];
+      if (ids.length > 6) fail("请核对预约座位数量");
+      for (const id of ids) {
+        const seat = db
+          .prepare(
+            "SELECT * FROM restaurant_seats WHERE id=? AND restaurant_id=? AND status='available'",
+          )
+          .get(id, restaurant.id);
+        if (
+          !seat ||
+          db
+            .prepare(
+              "SELECT 1 FROM seat_reservations WHERE seat_id=? AND status='confirmed' AND julianday(starts_at)<julianday(?) AND julianday(ends_at)>julianday(?)",
+            )
+            .get(id, end.toISOString(), start.toISOString())
+        )
+          fail("所选座位已被预约，请重新选择", 409);
+        const reservationId = `SEAT-${randomUUID()}`;
+        db.prepare(
+          "INSERT INTO seat_reservations(reservation_id,user_id,restaurant_id,seat_id,starts_at,ends_at) VALUES(?,?,?,?,?,?)",
+        ).run(
+          reservationId,
+          user.id,
+          restaurant.id,
+          id,
+          start.toISOString(),
+          end.toISOString(),
+        );
+        reservationIds.push(reservationId);
+      }
+      dining = { restaurant, start };
+      db.prepare(
+        "INSERT INTO order_dining(order_id,user_id,restaurant_id,starts_at,reservation_ids_json) VALUES(?,?,?,?,?)",
+      ).run(
+        orderid,
+        user.id,
+        restaurant.id,
+        start.toISOString(),
+        JSON.stringify(reservationIds),
+      );
+    }
     let cents = 0;
     const insert = db.prepare(
       "INSERT INTO orders(orderid,userid,caipinxinxiid,caipinmingcheng,tupian,buyshu,price,total,address,phone,remark,school_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
@@ -62,6 +131,6 @@ export function createOrder(user, body) {
         user.schoolId,
       );
     }
-    return { orderid, totalPrice: cents / 100 };
+    return { orderid, totalPrice: cents / 100, reservationIds };
   })();
 }

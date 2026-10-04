@@ -1,12 +1,21 @@
+import { modelRequest } from "./modelClient.js";
 import { randomUUID } from "crypto";
 import { db } from "../database.js";
 import { config } from "../config.js";
 import { catalog, parse } from "./catalog.js";
 export async function understand(message, history = []) {
   if (!(config.aiBaseUrl && config.aiApiKey && config.aiModel)) {
-    const budget = message.match(/(\d+(?:\.\d+)?)\s*(元|块)/),
-      people = message.match(/([1-6])\s*(人|位)/),
-      time = message.match(/(?:^|\D)([01]?\d|2[0-3])[:：]([0-5]\d)/);
+    const budget = [...message.matchAll(/(\d+(?:\.\d+)?)\s*(元|块)/g)].at(-1),
+      people = [
+        ...message
+          .replace(/一个人/g, "1人")
+          .replace(/两个人|两人/g, "2人")
+          .replace(/三个人/g, "3人")
+          .matchAll(/([1-6])\s*(人|位)/g),
+      ].at(-1),
+      time = [
+        ...message.matchAll(/(?:^|\D)([01]?\d|2[0-3])[:：]([0-5]\d)/g),
+      ].at(-1);
     let startsAt;
     if (time) {
       const day = new Date().toLocaleDateString("sv-SE", {
@@ -20,7 +29,7 @@ export async function understand(message, history = []) {
     }
     return {
       constraints: {
-        budget: budget ? Number(budget[1]) : 30,
+        ...(budget ? { budget: Number(budget[1]) } : {}),
         ...(people ? { people: Number(people[1]) } : {}),
         ...(startsAt ? { startsAt } : {}),
         ...(/低脂|减脂/.test(message)
@@ -28,9 +37,13 @@ export async function understand(message, history = []) {
           : /蛋白|增肌/.test(message)
             ? { goal: "高蛋白" }
             : {}),
-        sort: /排队|最快|快点/.test(message) ? "queue" : "distance",
-        reserve: /占座|选座|座位/.test(message),
-        exclusions: /不辣|不吃辣/.test(message) ? ["辣"] : [],
+        ...(/排队|最快|快点/.test(message) ? { sort: "queue" } : {}),
+        ...(/不.{0,3}(占座|选座|座位|预约)/.test(message)
+          ? { reserve: false }
+          : /占座|选座|座位|预约/.test(message)
+            ? { reserve: true }
+            : {}),
+        ...(/不辣|不吃辣/.test(message) ? { exclusions: ["辣"] } : {}),
       },
       mode: "database",
     };
@@ -38,7 +51,7 @@ export async function understand(message, history = []) {
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), config.aiTimeoutMs);
   try {
-    const response = await fetch(`${config.aiBaseUrl}/chat/completions`, {
+    const response = await requestModel({
       method: "POST",
       signal: controller.signal,
       headers: {
@@ -109,7 +122,12 @@ export async function understand(message, history = []) {
     clearTimeout(timer);
   }
 }
-export function planMeal(user, input = {}, message = "") {
+export function planMeal(
+  user,
+  input = {},
+  message = "",
+  onProgress = () => {},
+) {
   const profile = parse(
     db
       .prepare("SELECT profile_json FROM nutrition_profiles WHERE user_id=?")
@@ -161,6 +179,7 @@ export function planMeal(user, input = {}, message = "") {
   constraints.tastes = Array.isArray(input.tastes)
     ? input.tastes
     : profile.tastes || [];
+  onProgress(2);
   const data = catalog(user.schoolId);
   let candidates = data.dishes.filter(
     (d) =>
@@ -172,12 +191,14 @@ export function planMeal(user, input = {}, message = "") {
       (!constraints.restaurantId ||
         d.restaurantId === Number(constraints.restaurantId)) &&
       (!constraints.query || d.name.includes(constraints.query)) &&
+      (!constraints.category || d.category === constraints.category) &&
       !constraints.exclusions.some((x) =>
         [d.name, ...d.ingredients, ...d.allergens, d.spiceLevel]
           .join(" ")
           .includes(x),
       ),
   );
+  onProgress(3);
   if (constraints.goal === "低脂")
     candidates.sort(
       (a, b) => Number(a.nutrition.fat) - Number(b.nutrition.fat),
@@ -193,7 +214,8 @@ export function planMeal(user, input = {}, message = "") {
         : constraints.sort === "queue"
           ? a.queueMinutes - b.queueMinutes
           : constraints.sort === "rating"
-            ? b.rating - a.rating
+            ? (b.reviewCount >= 2 ? b.rating : 0) -
+              (a.reviewCount >= 2 ? a.rating : 0)
             : constraints.sort === "sales"
               ? b.sales - a.sales
               : a.distanceM - b.distanceM,
@@ -216,17 +238,14 @@ export function planMeal(user, input = {}, message = "") {
       new Error("没有符合当前预算、校区和忌口条件的在售菜品，请调整条件"),
       { status: 409 },
     );
+  onProgress(4);
   const restaurant = data.restaurants.find((r) => r.id === chosen.restaurantId),
     startsAt = input.startsAt
       ? new Date(input.startsAt)
       : new Date(Date.now() + 30 * 60000),
     endsAt = new Date(startsAt.getTime() + 45 * 60000);
-  if (
-    !Number.isFinite(startsAt.getTime()) ||
-    startsAt <= new Date() ||
-    startsAt - new Date() > 30 * 86400000
-  )
-    throw Object.assign(new Error("请选择未来 30 天内的用餐时间"), {
+  if (!Number.isFinite(startsAt.getTime()) || startsAt <= new Date())
+    throw Object.assign(new Error("用餐时间已过，请更新后再确认"), {
       status: 400,
     });
   const seatRows = db
@@ -253,7 +272,9 @@ export function planMeal(user, input = {}, message = "") {
         status: 409,
       });
   }
+  onProgress(5);
   const total = Math.round(chosen.price * constraints.people * 100) / 100;
+  onProgress(6);
   return {
     id: randomUUID(),
     message,
@@ -294,3 +315,5 @@ export function planMeal(user, input = {}, message = "") {
     ],
   };
 }
+
+function requestModel(options) { return modelRequest(JSON.parse(options.body), { signal: options.signal }); }

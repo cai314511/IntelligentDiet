@@ -1,3 +1,4 @@
+import { modelRequest } from "../services/modelClient.js";
 import express from 'express';
 import { db } from '../database.js';
 import { config } from '../config.js';
@@ -81,7 +82,7 @@ async function callModel(messages, schoolId, userId) {
     const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), config.aiTimeoutMs);
     let response;
     try {
-      response = await fetch(`${config.aiBaseUrl}/chat/completions`, { method: 'POST', signal: controller.signal, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.aiApiKey}` }, body: JSON.stringify(request) });
+      response = await requestModel({ method: 'POST', signal: controller.signal, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.aiApiKey}` }, body: JSON.stringify(request) });
     } finally { clearTimeout(timeout); }
     if (!response.ok) throw new Error(`AI provider returned ${response.status}`);
     const payload = await response.json(); const choice = payload.choices?.[0];
@@ -126,3 +127,5 @@ router.post('/analyze-nutrition', optionalAuth, (req, res) => {
 });
 
 export default router;
+
+function requestModel(options) { return modelRequest(JSON.parse(options.body), { signal: options.signal }); }

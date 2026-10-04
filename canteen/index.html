@@ -36,6 +36,8 @@
     <link rel="stylesheet" href="themes.css">
     <link rel="icon" href="/assets/brand/zhixiang-app-icon.png">
     <link rel="stylesheet" href="/shared/pet.css">
+<script src="/config.js"></script>
+<link rel="stylesheet" href="/shared/features.css">
 </head>
 <body class="font-sans antialiased">
 
@@ -74,57 +76,10 @@
                 <span>总计</span>
                 <span id="cart-total" class="text-appleBlue">¥0.00</span>
             </div>
-            <button onclick="simulateCheckout()" class="w-full bg-appleBlue hover:bg-blue-600 text-white font-semibold py-3 rounded-2xl transition-colors shadow-md glass-btn-active">
-                一键下单 (Apple Pay模拟)
+            <button onclick="openCheckout()" class="w-full bg-appleBlue hover:bg-blue-600 text-white font-semibold py-3 rounded-2xl transition-colors shadow-md glass-btn-active">
+                确认下单
             </button>
         </div>
-    </div>
-
-    <div id="ai-chat-anchor" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
-        <div id="ai-panel" class="mb-4 w-80 sm:w-96 glass-panel rounded-[24px] overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-300 origin-bottom-right shadow-2xl flex flex-col relative" style="height: 500px;">
-            <div class="bg-gradient-to-r from-appleBlue to-blue-500 text-white p-4 flex justify-between items-center z-10">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><img src="/assets/brand/xiaozhi-body.png" alt="小智" class="xiaozhi-chat-avatar"></div>
-                    <span class="font-semibold tracking-wide">小智 AI 助理</span>
-                </div>
-                <button onclick="toggleAI()" class="text-white/80 hover:text-white"><i class="fa-solid fa-chevron-down"></i></button>
-            </div>
-            
-            <div id="ai-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50/50 text-sm z-10">
-                <div class="flex items-start space-x-2">
-                    <div class="w-8 h-8 rounded-full bg-appleBlue text-white flex shrink-0 items-center justify-center"><img src="/assets/brand/xiaozhi-body.png" alt="小智" class="xiaozhi-chat-avatar"></div>
-                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-appleText">
-                        同学你好！我是小智。试试顶部的【塔罗牌测运势】，或者直接问我排队情况、帮你搭配减脂餐哦！
-                    </div>
-                </div>
-            </div>
-
-            <!-- 智能语音识别流体声波浮窗 -->
-            <div id="ai-speech-wave-container" class="hidden absolute bottom-16 left-4 right-4 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl p-4 shadow-xl flex items-center space-x-3 transition-all duration-300 z-50 pop-in">
-                <div class="flex items-center space-x-1 h-6 shrink-0">
-                    <div class="w-1 h-3 bg-red-400 rounded speech-wave-bar"></div>
-                    <div class="w-1 h-5 bg-red-500 rounded speech-wave-bar" style="animation-delay: 0.1s"></div>
-                    <div class="w-1 h-4 bg-red-500 rounded speech-wave-bar" style="animation-delay: 0.2s"></div>
-                    <div class="w-1 h-6 bg-red-600 rounded speech-wave-bar" style="animation-delay: 0.3s"></div>
-                    <div class="w-1 h-3 bg-red-400 rounded speech-wave-bar" style="animation-delay: 0.4s"></div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">智能声卡识别</p>
-                    <p id="ai-speech-text" class="text-xs font-semibold text-appleDark truncate leading-normal">正在聆听中，请说话...</p>
-                </div>
-            </div>
-
-            <div class="p-3 border-t border-gray-200/50 bg-white/80 backdrop-blur flex items-center space-x-2 z-10">
-                <button id="ai-mic-btn" onclick="toggleSpeechRecognition()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors flex items-center justify-center"><i class="fa-solid fa-microphone"></i></button>
-                <input type="text" id="ai-input" placeholder="输入指令，例如：去二食堂占座..." class="flex-1 bg-gray-100 rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-appleBlue/50 text-sm">
-                <button onclick="handleAiInput()" class="w-10 h-10 rounded-full bg-appleBlue text-white hover:bg-blue-600 transition-colors shadow-sm glass-btn-active"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
-        </div>
-
-        <button id="original-ai-trigger" onclick="toggleAI()" class="w-16 h-16 rounded-full bg-appleBlue text-white shadow-[0_10px_25px_rgba(0,113,227,0.4)] flex items-center justify-center text-2xl hover:scale-105 transition-transform duration-300 relative glass-btn-active">
-            <img src="/assets/brand/xiaozhi-body.png" alt="小智" class="xiaozhi-chat-avatar">
-            <span class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-        </button>
     </div>
 
     <div id="modal-container"></div>
@@ -133,5 +88,6 @@
     <script src="api.js"></script>
     <script src="app.js"></script>
     <script type="module" src="/shared/pet.js"></script>
+<script type="module" src="/canteen/features/index.js"></script>
 </body>
 </html>

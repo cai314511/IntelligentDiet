@@ -45,9 +45,10 @@ export const config = Object.freeze({
     .filter(Boolean),
   jwtSecret:
     process.env.JWT_SECRET || localSecret || randomBytes(32).toString("hex"),
-  aiBaseUrl: (process.env.AI_BASE_URL || "").replace(/\/$/, ""),
-  aiApiKey: process.env.AI_API_KEY || "",
-  aiModel: process.env.AI_MODEL || "",
+  aiBaseUrl: "https://test-openai-allunion-eastus2.services.ai.azure.com/openai/v1",
+  aiApiKey: process.env.AZURE_OPENAI_API_KEY || "",
+  aiModel: "gpt-6-luna",
+  aiReasoningEffort: "medium",
   aiTimeoutMs: Number(process.env.AI_TIMEOUT_MS || 30000),
   lowStockThreshold: Number(process.env.LOW_STOCK_THRESHOLD || 20),
 });

@@ -50,6 +50,7 @@ export function catalog(schoolId) {
           .get(d.id).n,
         recentCriticism: reviews.filter((r) => r.rating <= 2).slice(0, 3),
         id: d.id,
+        createdAt: d.addtime,
         schoolId: d.school_id,
         name: d.caipinmingcheng,
         category: d.caipinfenlei,
