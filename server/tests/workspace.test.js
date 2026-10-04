@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import request from "supertest";
 process.env.DB_PATH = ":memory:";
 process.env.AI_BASE_URL = "";
-process.env.AZURE_OPENAI_API_KEY = "";
+process.env.DEEPSEEK_API_KEY = "";
 process.env.AI_MODEL = "";
 const { default: app } = await import("../app.js");
 const target = await targetFor(app);
@@ -571,17 +571,18 @@ test("方案从不预约改为指定座位和人数，确认前不创建预约�
       )
       .set(auth(user))
   ).body.data.seats;
-  const seat = seats.find((s) => s.available && s.type === "4人座");
+  const available = seats.filter((s) => s.available).slice(0,2);
+  const seat = available[0];
   const before = db.prepare("SELECT count(*) n FROM orders").get().n;
   const updated = await client
     .put(`/api/tasks/${p.id}`)
     .set(auth(user))
-    .send({ people: 2, reserve: true, seatIds: [seat.id] });
+    .send({ people: 2, reserve: true, seatIds: available.map(s=>s.id) });
   assert.equal(updated.status, 200);
   assert.equal(updated.body.data.items[0].quantity, 2);
   assert.deepEqual(
     updated.body.data.seats.map((s) => s.id),
-    [seat.id],
+    available.map(s=>s.id),
   );
   assert.equal(db.prepare("SELECT count(*) n FROM orders").get().n, before);
   assert.equal(
@@ -631,4 +632,71 @@ test("同一时段座位取消后可以再次预约，保留旧预约记录", as
       .get(first.body.data.reservationIds[0]).status,
     "cancelled",
   );
+});
+
+test("食材搜索覆盖鸡胸肉，不辣严格筛选且不误排除不辣标签", async () => {
+  const {planMeal}=await import('../services/mealPlanner.js');
+  const owner={id:db.prepare("SELECT id FROM yonghu WHERE zhanghao='workspace_test'").get().id,schoolId:'cufe'};
+  const plan=planMeal(owner,{query:'鸡肉',people:1,budget:60,reserve:false,exclusions:['辣','香菜'],startsAt:new Date(Date.now()+86400000).toISOString()},'');
+  assert.equal(plan.items[0].spiceLevel,'不辣');
+  assert.ok(plan.items[0].ingredients.some(x=>/^鸡.*肉$/.test(x)));
+  assert.ok(!plan.items[0].ingredients.includes('香菜'));
+  assert.throws(()=>planMeal(owner,{query:'鸡肉',dietary:'纯素',people:1,budget:60,reserve:false},''),/没有符合/);
+});
+
+test("明确修改忌口时使用最新列表，不从原话重新加入已移除食材",async()=>{
+  const {planMeal}=await import('../services/mealPlanner.js');
+  const owner={id:db.prepare("SELECT id FROM yonghu WHERE zhanghao='workspace_test'").get().id,schoolId:'cufe'};
+  const plan=planMeal(owner,{people:1,budget:60,reserve:false,exclusions:[]},'不要香菜');
+  assert.deepEqual(plan.constraints.exclusions,[]);
+});
+
+test("推荐条件相同时优先完整餐食，不因目录顺序总返回小笼包",async()=>{
+  const {planMeal}=await import('../services/mealPlanner.js');
+  const owner={id:db.prepare("SELECT id FROM yonghu WHERE zhanghao='workspace_test'").get().id,schoolId:'cufe'};
+  const plan=planMeal(owner,{people:1,budget:60,reserve:false,exclusions:[],sort:'distance'},'');
+  assert.ok(['套餐','面食','轻食','自选'].includes(plan.items[0].category));
+});
+
+test("小智菜品与手动菜品通过同一订单入口结算，关联任务并避免重复创建", async()=>{
+  const plan=(await client.post('/api/tasks').set(auth(user)).send({message:'就餐',dialogueReady:true,constraints:{people:1,budget:80,reserve:false,startsAt:new Date(Date.now()+86400000).toISOString()}})).body.data;
+  const extra=db.prepare("SELECT id,jiage FROM caipinxinxi WHERE school_id='cufe' AND id!=? AND shangjia='是' AND kucun>0 LIMIT 1").get(plan.items[0].id);
+  const payload={items:[{dishId:plan.items[0].id,quantity:1},{dishId:extra.id,quantity:1}],expectedTotal:plan.total+Number(extra.jiage),agentTaskId:plan.id,dining:{restaurantId:plan.restaurant.id,startsAt:plan.startsAt,seatIds:[]}};
+  const first=await client.post('/api/orders').set(auth(user)).send(payload);
+  assert.equal(first.status,201);assert.equal(first.body.data.plan.items.length,2);
+  assert.equal(db.prepare('SELECT status FROM agent_tasks WHERE id=?').get(plan.id).status,'confirmed');
+  const repeat=await client.post('/api/orders').set(auth(user)).send(payload);
+  assert.equal(repeat.body.data.orderid,first.body.data.orderid);
+  assert.equal(db.prepare('SELECT count(*) n FROM orders WHERE orderid=?').get(first.body.data.orderid).n,2);
+});
+
+test("座位容量不足时回滚预约和订单",async()=>{
+  const dish=db.prepare("SELECT id FROM caipinxinxi WHERE school_id='cufe' AND shangjia='是' AND kucun>0 LIMIT 1").get();
+  const restaurant=db.prepare("SELECT id FROM restaurants WHERE school_id='cufe' LIMIT 1").get();
+  const seat=db.prepare("SELECT id FROM restaurant_seats WHERE restaurant_id=? AND seat_type='单人座' AND status='available' LIMIT 1").get(restaurant.id);
+  const before=db.prepare('SELECT count(*) n FROM seat_reservations').get().n;
+  const ordersBefore=db.prepare('SELECT count(*) n FROM orders').get().n;
+  const result=await client.post('/api/orders').set(auth(user)).send({items:[{dishId:dish.id,quantity:1}],dining:{restaurantId:restaurant.id,startsAt:new Date(Date.now()+2*86400000).toISOString(),seatIds:[seat.id],people:3}});
+  assert.equal(result.status,409);
+  assert.equal(db.prepare('SELECT count(*) n FROM seat_reservations').get().n,before);
+  assert.equal(db.prepare('SELECT count(*) n FROM orders').get().n,ordersBefore);
+});
+
+test("座位目录包含三层和ABCD区域，每个座位只容纳一人",async()=>{
+  const restaurant=db.prepare("SELECT id FROM restaurants WHERE school_id='cufe' LIMIT 1").get();
+  const response=await client.get(`/api/restaurants/${restaurant.id}/seats`).set(auth(user));
+  const seats=response.body.data.seats;
+  assert.equal(seats.length,96);
+  assert.deepEqual([...new Set(seats.map(s=>s.zone))].sort(),['A','B','C','D']);
+  assert.deepEqual([...new Set(seats.map(s=>s.floor))].sort(),['一层','三层','二层']);
+  assert.ok(seats.every(s=>s.type==='单人座'));
+});
+
+test("历史对话保存并按账号隔离",async()=>{
+  const value={id:'history-test',transcript:[{role:'user',content:'午餐'}],conditions:{},plan:null,task:null,updatedAt:new Date().toISOString(),title:'午餐'};
+  assert.equal((await client.put('/api/tasks/conversations/history-test').set(auth(user)).send(value)).status,200);
+  const rows=(await client.get('/api/tasks/conversations').set(auth(user))).body.data;
+  assert.equal(rows.find(r=>r.id==='history-test').transcript[0].content,'午餐');
+  assert.equal((await client.get('/api/tasks/conversations')).status,401);
+  assert.equal((await client.put('/api/tasks/conversations/other').set(auth(user)).send(value)).status,400);
 });

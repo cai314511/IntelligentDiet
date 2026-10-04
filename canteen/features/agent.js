@@ -5,6 +5,8 @@ import {
   money,
   dateTime,
   session,
+  read,
+  store,
   button,
   card,
   options,
@@ -14,9 +16,11 @@ import {
   formData,
   source,
 } from "../../shared/feature-ui.js";
+let conversationId = null;
 let stage = 0,
   revision = 0;
 export function closeAgent() {
+  saveConversation();
   revision++;
   busy = false;
   host?.remove();
@@ -36,6 +40,8 @@ function localTime(iso) {
   return new Date(new Date(iso).getTime() - new Date(iso).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 export async function openAgent(message = "", constraints = {}) {
+  saveConversation();
+  conversationId = crypto.randomUUID();
   const run = ++revision;
   catalog = (await api("/workspace/catalog")).data;
   if (run !== revision) return;
@@ -65,8 +71,39 @@ function execution() {
       : "正在理解用户需求…";
   return `<div class="zx-thinking" role="status"><span class="zx-thinking-spinner" aria-hidden="true"></span><span><b>思考中</b> · ${esc(status)}</span></div>`;
 }
+function saveConversation() {
+  if(!conversationId || !transcript.length) return;
+  const rows=read("agent-conversations",[]);
+  const old=rows.find(r=>r.id===conversationId);
+  const entry={id:conversationId,title:transcript.find(m=>m.role==='user')?.content.slice(0,36) || '与小智的对话',updatedAt:new Date().toISOString(),transcript,conditions,plan,task};
+  if(old && JSON.stringify({...old,updatedAt:null})===JSON.stringify({...entry,updatedAt:null}))return;
+  store("agent-conversations",[entry,...rows.filter(r=>r.id!==conversationId)]);
+  api(`/tasks/conversations/${entry.id}`,{method:"PUT",body:entry}).catch(()=>{});
+}
+async function showConversations() {
+  saveConversation();
+  let rows=read("agent-conversations",[]);
+  try { const remote=(await api("/tasks/conversations")).data; rows=[...rows,...remote.filter(r=>!rows.some(x=>x.id===r.id))].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));store("agent-conversations",rows); } catch {}
+  const panel=host.querySelector('#agent-history');
+  panel.hidden=!panel.hidden;
+  panel.innerHTML=`<h3>历史对话</h3>${rows.length?rows.map(r=>`<button type="button" class="zx-history-item" data-action="restore" data-id="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc(dateTime(r.updatedAt))}</span></button>`).join(''):'<p>暂无历史对话</p>'}`;
+}
+async function restoreConversation(b) {
+  if(busy)return;
+  saveConversation();
+  const saved=read("agent-conversations",[]).find(r=>r.id===b.dataset.id);
+  if(!saved)return;
+  revision++;conversationId=saved.id;
+  transcript=saved.transcript;conditions=saved.conditions;plan=saved.plan;task=saved.task;
+  if(task) {
+    try { const latest=(await api(`/tasks/${task.id}`)).data; if(latest){plan=latest.plan;task={...task,...latest};} else {plan=null;task=null;} }
+    catch { plan=null;task=null; }
+  }
+  phase=task?.status==='confirmed'?'ordered':'chat';draw();
+}
 function draw(prefill = "") {
-  host.innerHTML = `<div class="zx-row" style="justify-content:space-between">${button("返回点餐", "close")}<span>${esc(session()?.school?.name)} · 小智</span>${button("查看订单", "orders")}</div><img class="zx-agent-mascot" src="/assets/brand/xiaozhi-body.png" alt="小智"><h1>不知道吃什么？让<em>小智</em>帮您决定！</h1>${card("和小智聊聊", `<div class="zx-conversation" aria-live="polite">${transcript.map((m) => `<div class="zx-chat-message ${m.role}"><b>${m.role === "assistant" ? "小智" : m.role === "system" ? "系统" : "我"}</b><p>${esc(m.content)}</p></div>`).join("")}</div><div class="zx-execution" aria-live="polite">${execution()}</div><form id="agent-chat">${field("message", "回复小智", `<textarea maxlength="2000" placeholder="说说你想吃什么…">${esc(prefill)}</textarea>`)}<div class="zx-row"><button type="submit" class="zx-button zx-primary" ${busy ? "disabled" : ""}>${busy ? "小智处理中…" : "发送"}</button>${button("语音输入", "voice")}${button("新对话", "new")}</div></form><div data-status></div>`)}<section id="agent-result">${planHTML()}</section>`;
+  saveConversation();
+  host.innerHTML = `<div class="zx-row" style="justify-content:space-between">${button("返回点餐", "close")}<span>${esc(session()?.school?.name)} · 小智</span>${button("查看订单", "orders")}</div><img class="zx-agent-mascot" src="/assets/brand/xiaozhi-body.png" alt="小智"><h1>不知道吃什么？让<em>小智</em>帮您决定！</h1>${card("和小智聊聊", `<div class="zx-chat-tools">${button("新对话", "new")}${button("历史对话", "history")}</div><section id="agent-history" class="zx-history" hidden></section><div class="zx-conversation" aria-live="polite">${transcript.map((m) => `<div class="zx-chat-message ${m.role}"><b>${m.role === "assistant" ? "小智" : m.role === "system" ? "系统" : "我"}</b><p>${esc(m.content)}</p></div>`).join("")}</div><div class="zx-execution" aria-live="polite">${execution()}</div><form id="agent-chat">${field("message", "回复小智", `<button type="button" class="zx-mic" data-action="voice" aria-label="语音输入"><i class="fa-solid fa-microphone" aria-hidden="true"></i></button><textarea maxlength="2000" placeholder="说说你想吃什么…" class="zx-chat-input">${esc(prefill)}</textarea>`)}<div class="zx-row"><button type="submit" class="zx-button zx-primary" ${busy ? "disabled" : ""}>${busy ? "小智处理中…" : "发送"}</button></div></form><div data-status></div>`)}<section id="agent-result">${planHTML()}</section>`;
   bind(host, {
     close: () => {
       closeAgent();
@@ -78,17 +115,20 @@ function draw(prefill = "") {
     },
     voice,
     new: () => openAgent(),
+    history: showConversations,
+    restore: restoreConversation,
     cancel,
     confirm,
     modify,
     "back-plan": () => draw(),
+    seats: () => window.openSeatPicker(),
     pay: () => window.openCashier(task.order_id, plan.total),
   });
   const form = host.querySelector("form");
   if (busy)
     host
       .querySelectorAll(
-        'select,textarea,button[data-action="new"],button[data-action="quick"],button[data-action="regenerate"]',
+        'select,textarea,button[data-action="new"],button[data-action="history"],button[data-action="restore"],button[data-action="quick"],button[data-action="regenerate"],button[data-action="confirm"],button[data-action="modify"],button[data-action="cancel"],button[data-action="pay"],button[data-action="voice"]',
       )
       .forEach((x) => (x.disabled = true));
   form.onsubmit = async (e) => {
@@ -107,6 +147,12 @@ function draw(prefill = "") {
   };
   const log = host.querySelector(".zx-conversation");
   log.scrollTop = log.scrollHeight;
+}
+function conditionKey(value) {
+  return JSON.stringify(Object.fromEntries(Object.entries(value)
+    .filter(([,v]) => v != null)
+    .sort(([a],[b]) => a.localeCompare(b))
+    .map(([key,v]) => [key, key === "startsAt" ? Date.parse(v) : Array.isArray(v) ? [...v].sort() : v])));
 }
 async function reply(message) {
   if (busy) return;
@@ -134,16 +180,25 @@ async function reply(message) {
   busy = true;
   const history = transcript.slice();
   if (message) transcript.push({ role: "user", content: message });
-  plan = null;
-  task = null;
+  const previousPlan = plan, previousTask = task, previousConditions = conditions;
   phase = "chat";
   draw();
   try {
     const r = (await api("/tasks/conversation", {
-      method: "POST", body: { message, history, conditions },
+      method: "POST", body: { message, history, conditions, taskId: task?.id },
     })).data;
     if (!active(run)) return;
-    conditions = { ...r.constraints };
+    if (r.intent === "cancel" && previousTask?.status === "draft") {
+      busy = false;
+      await cancel();
+      return;
+    }
+    if (r.intent !== "answer") conditions = { ...r.constraints };
+    const changed = conditionKey(conditions) !== conditionKey(previousConditions);
+    if (r.ready || changed) {
+      if (previousTask?.status === "draft") window.removeAgentCart(previousTask.id);
+      plan = null; task = null;
+    }
     transcript.push({ role: "assistant", content: r.reply });
     if (r.ready) {
       busy = false;
@@ -152,7 +207,10 @@ async function reply(message) {
     }
     phase = "preferences";
   } catch (e) {
-    if (active(run)) transcript.push({ role: "system", content: e.message });
+    if (active(run)) {
+      plan = previousPlan; task = previousTask;
+      transcript.push({ role: "system", content: e.message });
+    }
   } finally {
     if (active(run)) {
       busy = false;
@@ -170,7 +228,7 @@ function planHTML() {
   if (!plan) return "";
   const confirmed = task?.status === "confirmed",
     cancelled = task?.status === "cancelled";
-  return `${card(confirmed ? "订单已创建" : cancelled ? "任务已取消" : "等待你确认的就餐方案", `<ul class="zx-plan-items">${plan.items.map((d) => `<li><b>${esc(d.name)} × ${d.quantity}</b><span>${money(d.price * d.quantity)}</span></li>`).join("")}</ul><div class="zx-grid"><p>食堂：${esc(plan.restaurant.name)}<br>窗口：${esc(plan.items[0].window)}<br>距离：${esc(plan.restaurant.distanceM)} 米<br>排队：${esc(plan.restaurant.queueMinutes)} 分钟</p><p>座位：${plan.seats.map((s) => esc(s.label || s.seat_label || s.id)).join("、") || "不预约"}<br>就餐时间：${esc(dateTime(plan.startsAt))}<br>预计完成：${esc(plan.estimatedMinutes)} 分钟<br>费用：<b>${money(plan.total)}</b></p></div><p class="zx-source">采用偏好：${esc(plan.preferences?.goal || "均衡饮食")} · 忌口 ${esc((plan.constraints.exclusions || []).join("、") || "无")} · 口味 ${esc((plan.constraints.tastes || []).join("、") || "不限")}</p>${plan.items.map((d) => `<p class="zx-source">口碑：${d.reviewCount ? esc(d.rating) + "分 · " + d.reviewCount + "条评价" : "暂无评价"}${(d.recentCriticism || []).map((r) => "<br>近期反馈：" + esc(r.content) + (r.reply ? " · 校方回复：" + esc(r.reply) : "")).join("")}</p>`).join("")}${source(plan.sourceName, plan.updatedAt)}<div class="zx-row">${confirmed ? `${button("前往支付", "pay", true)}${button("查看取餐状态", "orders")}` : cancelled ? "" : `${button("确认执行 · " + money(plan.total), "confirm", true)}${button("修改方案", "modify")}${button("取消任务", "cancel")}`}</div><div data-status>${confirmed ? notice("订单已保留为未支付，请核对费用后另行确认支付。", "success") : ""}</div>`)} `;
+  return `${card(confirmed ? "订单已创建" : cancelled ? "任务已取消" : "已加入餐盘的就餐方案", `<ul class="zx-plan-items">${plan.items.map((d) => `<li><b>${esc(d.name)} × ${d.quantity}</b><span>${money(d.price * d.quantity)}</span></li>`).join("")}</ul><div class="zx-grid"><p>食堂：${esc(plan.restaurant.name)}<br>窗口：${esc(plan.items[0].window)}<br>距离：${esc(plan.restaurant.distanceM)} 米<br>排队：${esc(plan.restaurant.queueMinutes)} 分钟</p><p>座位：${plan.seats.map((s) => esc(s.label || s.seat_label || s.id)).join("、") || "不预约"}<br>就餐时间：${esc(dateTime(plan.startsAt))}<br>预计完成：${esc(plan.estimatedMinutes)} 分钟<br>费用：<b>${money(plan.total)}</b></p></div><p class="zx-source">采用偏好：${esc(plan.preferences?.goal || "均衡饮食")} · 忌口 ${esc((plan.constraints.exclusions || []).join("、") || "无")} · 口味 ${esc((plan.constraints.tastes || []).join("、") || "不限")}</p>${plan.items.map((d) => `<p class="zx-source">口碑：${d.reviewCount ? esc(d.rating) + "分 · " + d.reviewCount + "条评价" : "暂无评价"}${(d.recentCriticism || []).map((r) => "<br>近期反馈：" + esc(r.content) + (r.reply ? " · 校方回复：" + esc(r.reply) : "")).join("")}</p>`).join("")}${source(plan.sourceName, plan.updatedAt)}<div class="zx-row">${confirmed ? `${button("前往支付", "pay", true)}${button("查看取餐状态", "orders")}` : cancelled ? "" : `${button("查看餐盘 · " + money(plan.total), "confirm", true)}${button("修改方案", "modify")}${button("选择食堂座位", "seats")}${button("取消任务", "cancel")}`}</div><div data-status>${confirmed ? notice("订单已保留为未支付，请核对费用后另行确认支付。", "success") : ""}</div>`)} `;
 }
 async function generate() {
   if (busy) return;
@@ -205,6 +263,7 @@ async function generate() {
       startsAt: plan.startsAt,
     };
     task = { id: result.id, status: "draft", plan: result };
+    window.addPlanToCart(plan);
     phase = "review";
 
   } catch (e) {
@@ -222,40 +281,28 @@ async function generate() {
   }
 }
 async function confirm() {
-  if (!plan || task?.status !== "draft") return;
-  const run = revision;
-  window.openCheckout({
-    plan,
-    taskId: task.id,
-    onSubmitting: () => {
-      if (!active(run)) return;
-      phase = "creating";
-      draw();
-    },
-    onQuoteUpdated: (updatedPlan) => {
-      if (!active(run)) return;
-      plan = updatedPlan;
-      conditions = { ...plan.constraints, startsAt: plan.startsAt };
-      phase = "review";
-      draw();
-    },
-    onError: () => {
-      if (!active(run)) return;
-      phase = "review";
-      draw();
-    },
-    onConfirmed: (r, updatedPlan) => {
-      if (!active(run)) return;
-      plan = updatedPlan || plan;
-      task = { ...task, status: "confirmed", order_id: r.orderid };
-      phase = "ordered";
-      transcript.push({ role: "assistant", content: "执行完成，订单和所选座位已确认。订单尚未支付，可以前往支付或查看取餐状态。" });
-      draw();
-    },
-  });
+  if (busy || !plan || task?.status !== "draft") return;
+  window.showCart();
 }
+window.addEventListener("cart-order-created", e => {
+  if (!host?.isConnected || !task || e.detail.taskId !== task.id) return;
+  if (e.detail.plan) plan = e.detail.plan;
+  task = {...task,status:"confirmed",order_id:e.detail.orderid};
+  phase = "ordered";
+  transcript.push({role:"assistant",content:"订单已创建，尚未支付。可以在收银台确认支付。"});
+  draw();
+});
+window.addEventListener("cart-dining-updated", e => {
+  if (!plan || task?.status !== "draft") return;
+  plan.startsAt=e.detail.startsAt;
+  plan.restaurant=catalog.restaurants.find(r=>r.id===e.detail.restaurantId) || plan.restaurant;
+  plan.seats=e.detail.seats || [];
+  conditions={...conditions,startsAt:plan.startsAt,restaurantId:plan.restaurant.id,reserve:plan.seats.length>0};
+  draw();
+});
 async function cancel() {
   await api(`/tasks/${plan.id}/cancel`, { method: "POST" });
+  window.removeAgentCart(task.id);
   task.status = "cancelled";
   transcript.push({
     role: "assistant",
@@ -349,6 +396,7 @@ async function modify() {
       if (!active(run) || !form.isConnected) return;
       plan = updatedPlan;
       task.plan = plan;
+      window.addPlanToCart(plan);
       conditions = { ...plan.constraints, startsAt: plan.startsAt };
       transcript.push({
         role: "assistant",
@@ -374,6 +422,8 @@ async function modify() {
 }
 
 function voice() {
+  if (busy) return;
+  const run = revision;
   const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Speech) {
     host.querySelector("[data-status]").innerHTML = notice(
@@ -384,9 +434,12 @@ function voice() {
   const recognition = new Speech();
   recognition.lang = "zh-CN";
   recognition.onresult = (e) => {
+    if (!active(run) || busy) return;
     host.querySelector("textarea").value += e.results[0][0].transcript;
+    host.querySelector("[data-status]").innerHTML = notice("识别完成，可以修改后发送。", "success");
   };
   recognition.onerror = (e) => {
+    if (!active(run)) return;
     host.querySelector("[data-status]").innerHTML = notice(
       e.error === "not-allowed"
         ? "请允许麦克风权限或使用文字输入。"
@@ -394,5 +447,10 @@ function voice() {
       "error",
     );
   };
-  recognition.start();
+  try {
+    recognition.start();
+    host.querySelector("[data-status]").innerHTML = notice("正在听，请说出你的就餐需求…");
+  } catch {
+    if (active(run)) host.querySelector("[data-status]").innerHTML = notice("语音输入未能启动，请使用文字输入。", "error");
+  }
 }

@@ -243,7 +243,7 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
           insertSeat.run(
             restaurant.id,
             `${String.fromCharCode(64 + Math.ceil(i / 12))}-${String(i).padStart(2, "0")}`,
-            i % 5 === 0 ? "4人座" : "2人座",
+            "单人座",
           );
     }
   });
@@ -344,7 +344,7 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
         .get(r.id)
     )
       for (let i = 1; i <= 24; i++)
-        insertSeat.run(r.id, `A-${String(i).padStart(2, "0")}`, "2人座");
+        insertSeat.run(r.id, `A-${String(i).padStart(2, "0")}`, "单人座");
   }
   const addCategory = database.prepare(
     "INSERT OR IGNORE INTO caipinfenlei(caipinfenlei) VALUES(?)",
@@ -520,4 +520,10 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
         );
     }
   }
+  database.prepare("UPDATE restaurant_seats SET seat_type='单人座',floor=CASE WHEN CAST(substr(seat_label,3) AS INTEGER)<=8 THEN '一层' WHEN CAST(substr(seat_label,3) AS INTEGER)<=16 THEN '二层' ELSE '三层' END").run();
+  const seatInsert=database.prepare("INSERT OR IGNORE INTO restaurant_seats(restaurant_id,seat_label,seat_type,floor) VALUES(?,?,'单人座',?)");
+  for(const restaurant of database.prepare("SELECT id FROM restaurants").all()) {
+    for(const zone of ['A','B','C','D']) for(let n=1;n<=24;n++) seatInsert.run(restaurant.id,`${zone}-${String(n).padStart(2,'0')}`,['一层','二层','三层'][Math.floor((n-1)/8)]);
+  }
+
 }

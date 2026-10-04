@@ -16,9 +16,9 @@ export async function modelRequest(request, { signal, settings = config } = {}) 
   const requestSignal = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
   const headers = { "Content-Type": "application/json", Authorization: `Bearer ${settings.aiApiKey}` };
   try {
-    if (!settings.aiApiKey) throw new Error("请配置 AZURE_OPENAI_API_KEY");
+    if (!settings.aiApiKey) throw new Error("请配置 DEEPSEEK_API_KEY");
     const body = {
-      model: settings.aiModel, reasoning: { effort: settings.aiReasoningEffort || "medium" },
+      model: settings.aiModel, reasoning: { effort: typeof request.tool_choice === "object" ? "none" : settings.aiReasoningEffort || "medium" },
       input: responseInput(request.messages || []), store: false,
       ...(request.tools ? { tools: request.tools.map(tool => ({ type: "function", ...tool.function, strict: false })) } : {}),
       ...(request.tool_choice ? { tool_choice: typeof request.tool_choice === "string" ? request.tool_choice : { type: "function", name: request.tool_choice.function.name } } : {}),
@@ -34,9 +34,9 @@ export async function modelRequest(request, { signal, settings = config } = {}) 
           const result = await listed.json();
           models = listed.ok ? (result.data || []).map(model => model.id).filter(Boolean).join("、") || "列表为空" : `模型列表查询失败（${listed.status}）`;
         } catch { models = "模型列表查询失败"; }
-        throw Object.assign(new Error(`Azure 未找到 ${settings.aiModel}。可用模型：${models}。配置未自动更改。`), { status: 502 });
+        throw Object.assign(new Error(`DeepSeek 未找到 ${settings.aiModel}。可用模型：${models}。配置未自动更改。`), { status: 502 });
       }
-      throw Object.assign(new Error(`Azure 模型请求失败（${response.status}）`), { status: 502 });
+      throw Object.assign(new Error(`DeepSeek 模型请求失败（${response.status}）`), { status: 502 });
     }
     if (payload.status === "incomplete" || payload.error) throw new Error("模型回复未完成，请重试");
     const output = payload.output || [];

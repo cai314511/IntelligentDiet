@@ -21,6 +21,7 @@ import { openAgent } from "./agent.js";
 let root, catalog, report, records, advanced, selectedDay;
 export async function renderNutrition() {
   root = document.getElementById("app-root");
+  root.dataset.view = "nutrition";
   root.innerHTML = notice("正在读取饮食记录…");
   try {
     const data = await Promise.all([
@@ -42,7 +43,7 @@ export async function renderNutrition() {
 function draw() {
   const day = report.days.find((d) => d.day === selectedDay) || report.today;
   const energy = day.protein * 4 + day.carbs * 4 + day.fat * 9;
-  root.innerHTML = `<h1 class="text-4xl font-bold mb-6">AI营养师</h1><div class="zx-row" style="margin-bottom:22px">${button("手动记录", "record", true)}${button("拍照 / 上传识别", "photo")}${button("编辑饮食目标与偏好", "preferences")}</div><div class="zx-grid">${card("今日评分", `<p class="zx-stat">${report.score ?? "—"}</p><p>目标 ${report.profile.calorieTarget} kcal · 已记录 ${report.today.calories.toFixed(0)} kcal</p>`)}${card("营养结构", `${["protein", "carbs", "fat"].map((k, i) => `<p>${["蛋白质", "碳水化合物", "脂肪"][i]}：${day[k].toFixed(1)}g · ${energy ? Math.round(((day[k] * (k === "fat" ? 9 : 4)) / energy) * 100) : 0}%</p>`).join("")}`)}${card("主要问题", report.issues.map((t) => `<p>${esc(t)}</p>`).join(""))}${card("下一餐建议", "<p>结合已记录餐次与饮食目标选择份量，优先搭配蔬菜、蛋白质和主食。</p>")}</div>${card(
+  root.innerHTML = `<h1 class="text-4xl font-bold mb-6">AI营养师</h1><div class="zx-row" style="margin-bottom:22px">${button("手动记录", "record", true)}${button("拍照 / 上传识别", "photo")}${button("编辑饮食目标与偏好", "preferences")}</div><div class="zx-grid">${card("今日评分", `<p class="zx-stat">${report.score ?? "—"}</p><p>目标 ${report.profile.calorieTarget} kcal · 已记录 ${report.today.calories.toFixed(0)} kcal</p>`)}${card("营养结构", `${["protein", "carbs", "fat"].map((k, i) => `<div class="zx-macro"><p>${["蛋白质", "碳水化合物", "脂肪"][i]}：${day[k].toFixed(1)}g · ${energy ? Math.round(((day[k] * (k === "fat" ? 9 : 4)) / energy) * 100) : 0}%</p><div><i style="width:${energy ? Math.min(100, (day[k] * (k === "fat" ? 9 : 4)) / energy * 100) : 0}%;background:${["#ff9500", "#ff453a", "#30c65a"][i]}"></i></div></div>`).join("")}`)}${card("主要问题", report.issues.map((t) => `<p>${esc(t)}</p>`).join(""))}${card("下一餐建议", "<p>结合已记录餐次与饮食目标选择份量，优先搭配蔬菜、蛋白质和主食。</p>")}</div>${card(
     "近14天饮食记录",
     `<p>已记录 ${report.recordedDays}天 · 缺失 ${report.missingDays}天</p><div class="zx-calendar">${report.days.map((d) => `<button class="${d.records ? "recorded" : ""}" data-action="day" data-day="${d.day}">${d.day.slice(5)}<br>${d.records ? Math.round(d.calories) + " kcal" : "未记录"}<br>${esc(d.meals.join("、"))}</button>`).join("")}</div><h4 style="margin:18px 0">${esc(selectedDay)}</h4>${
       records
@@ -58,7 +59,7 @@ function draw() {
         )
         .join("") || "<p>这一天尚未记录餐次。</p>"
     }`,
-  )}${card("本校下一餐推荐", `<div class="zx-grid">${(advanced ? report.recommendations : report.recommendations.slice(0, 1)).map((d) => `<div><b>${esc(d.name)}</b><p>${esc(d.restaurant)} · ${money(d.price)} · ${d.nutrition.calories} kcal</p>${button("请小智规划", "recommend", true).replace('data-action="recommend"', `data-action="recommend" data-id="${d.id}"`)}</div>`).join("")}</div>`)}${card("深度点评与长期趋势", advanced ? `${button("生成深度点评", "deep", true)}${button("查看90天趋势", "trend")}<div id="nutrition-deep"></div>` : `<div class="zx-locked"><p>营养问题分析 · 精准推荐 · 长期饮食趋势</p><div class="zx-chart"><i style="height:80px;width:100%;background:#eef5fc"></i></div></div><p>会员权益：拍照识别、AI深度点评、本校精准推荐和长期趋势。</p>${button("查看会员权益", "upgrade")}`)}${source(report.sourceName, report.updatedAt)}`;
+  )}${card("本校下一餐推荐", `<div class="zx-grid">${(advanced ? report.recommendations : report.recommendations.slice(0, 1)).map((d) => `<div class="zx-nutrition-dish"><img src="${esc(d.image || "/canteen/dish-placeholder.svg")}" alt="${esc(d.name)}"><b>${esc(d.name)}</b><p>${esc(d.restaurant)} · ${money(d.price)} · ${d.nutrition.calories} kcal</p>${button("请小智规划", "recommend", true).replace('data-action="recommend"', `data-action="recommend" data-id="${d.id}"`)}</div>`).join("")}</div>`)}${card("深度点评与长期趋势", advanced ? `${button("生成深度点评", "deep", true)}${button("查看90天趋势", "trend")}<div id="nutrition-deep"></div>` : `<div class="zx-locked"><p>营养问题分析 · 精准推荐 · 长期饮食趋势</p><div class="zx-chart"><i style="height:80px;width:100%;background:#eef5fc"></i></div></div><p>会员权益：拍照识别、AI深度点评、本校精准推荐和长期趋势。</p>${button("查看会员权益", "upgrade")}`)}${source(report.sourceName, report.updatedAt)}`;
   bind(root, {
     reload: renderNutrition,
     record: () => record(),

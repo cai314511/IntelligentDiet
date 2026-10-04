@@ -5,7 +5,7 @@ import request from 'supertest';
 
 process.env.DB_PATH = ':memory:';
 process.env.AI_BASE_URL = 'https://provider.example/v1';
-process.env.AZURE_OPENAI_API_KEY = 'test-only-key';
+process.env.DEEPSEEK_API_KEY = 'test-only-key';
 process.env.AI_MODEL = 'test-model';
 const { default: app } = await import('../app.js');
 const target=await targetFor(app);
@@ -25,9 +25,9 @@ test('OpenAI-compatible agent uses read-only tools with the selected school cont
   assert.equal(result.body.mode, 'agent');
   assert.match(result.body.reply, /天津大学餐厅查询完成/);
   assert.equal(requests.length, 2);
-  assert.equal(requests[0].url, 'https://test-openai-allunion-eastus2.services.ai.azure.com/openai/v1/responses');
+  assert.equal(requests[0].url, 'https://api.deepseek.com/responses');
   assert.equal(requests[0].headers.Authorization, 'Bearer test-only-key');
-  assert.equal(requests[0].body.model, 'gpt-6-luna');
+  assert.equal(requests[0].body.model, 'deepseek-v4-flash');
   assert.ok(requests[0].body.tools.every(tool => tool.type === 'function'));
 
   const toolResultMessage = requests[1].body.input.find(message => message.type === 'function_call_output' && message.call_id === 'call-restaurants');

@@ -169,9 +169,9 @@ export function planMeal(
   );
   constraints.exclusions = [
     ...new Set([
-      ...messageExclusions,
-      ...(profile.exclusions || []),
-      ...(Array.isArray(input.exclusions) ? input.exclusions : []),
+      ...(Array.isArray(input.exclusions)
+        ? input.exclusions
+        : [...messageExclusions, ...(profile.exclusions || [])]),
     ]),
   ]
     .map(String)
@@ -190,12 +190,17 @@ export function planMeal(
       (!constraints.campus || d.campus === constraints.campus) &&
       (!constraints.restaurantId ||
         d.restaurantId === Number(constraints.restaurantId)) &&
-      (!constraints.query || d.name.includes(constraints.query)) &&
+      (!constraints.query || [d.name, ...d.ingredients].some(text =>
+        text.includes(constraints.query) || (/^[鸡牛猪羊]肉$/.test(constraints.query) &&
+          new RegExp(`^${constraints.query[0]}.*肉$`).test(text)))) &&
+      (!constraints.dietary || (constraints.dietary === "纯素"
+        ? d.dietaryTags.includes("素食") && ![d.name, ...d.ingredients, ...d.allergens].join(" ").match(/蛋|奶|乳|蜂蜜/)
+        : d.dietaryTags.includes(constraints.dietary))) &&
       (!constraints.category || d.category === constraints.category) &&
       !constraints.exclusions.some((x) =>
-        [d.name, ...d.ingredients, ...d.allergens, d.spiceLevel]
-          .join(" ")
-          .includes(x),
+        x === "辣"
+          ? !["不辣", "无辣", "无", ""].includes(d.spiceLevel || "") || [d.name, ...d.ingredients].join(" ").includes("辣")
+          : [d.name, ...d.ingredients, ...d.allergens].join(" ").includes(x),
       ),
   );
   onProgress(3);
@@ -208,18 +213,15 @@ export function planMeal(
       (a, b) => Number(b.nutrition.protein) - Number(a.nutrition.protein),
     );
   else
-    candidates.sort((a, b) =>
-      constraints.sort === "price"
-        ? a.price - b.price
-        : constraints.sort === "queue"
-          ? a.queueMinutes - b.queueMinutes
-          : constraints.sort === "rating"
-            ? (b.reviewCount >= 2 ? b.rating : 0) -
-              (a.reviewCount >= 2 ? a.rating : 0)
-            : constraints.sort === "sales"
-              ? b.sales - a.sales
-              : a.distanceM - b.distanceM,
-    );
+    candidates.sort((a, b) => {
+      const primary = constraints.sort === "price" ? a.price - b.price
+        : constraints.sort === "queue" ? a.queueMinutes - b.queueMinutes
+        : constraints.sort === "rating" ? (b.reviewCount >= 2 ? b.rating : 0) - (a.reviewCount >= 2 ? a.rating : 0)
+        : constraints.sort === "sales" ? b.sales - a.sales
+        : a.distanceM - b.distanceM;
+      const mealRank = dish => ["套餐", "面食", "轻食", "自选"].includes(dish.category) ? 1 : 0;
+      return primary || mealRank(b) - mealRank(a);
+    });
   if (constraints.tastes.length)
     candidates.sort(
       (a, b) =>
@@ -250,7 +252,7 @@ export function planMeal(
     });
   const seatRows = db
     .prepare(
-      `SELECT s.* FROM restaurant_seats s WHERE s.restaurant_id=? AND s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations r WHERE r.seat_id=s.id AND r.status='confirmed' AND julianday(r.starts_at)<julianday(?) AND julianday(r.ends_at)>julianday(?)) ORDER BY CASE WHEN seat_type='4人座' THEN 0 ELSE 1 END,seat_label`,
+      `SELECT s.* FROM restaurant_seats s WHERE s.restaurant_id=? AND s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations r WHERE r.seat_id=s.id AND r.status='confirmed' AND julianday(r.starts_at)<julianday(?) AND julianday(r.ends_at)>julianday(?)) ORDER BY floor,seat_label`,
     )
     .all(restaurant.id, endsAt.toISOString(), startsAt.toISOString());
   const seats = [];
@@ -265,7 +267,7 @@ export function planMeal(
         continue;
       if (capacity >= constraints.people) break;
       seats.push({ id: row.id, label: row.seat_label, type: row.seat_type });
-      capacity += row.seat_type === "4人座" ? 4 : 2;
+      capacity += 1;
     }
     if (capacity < constraints.people)
       throw Object.assign(new Error("所选时段座位不足，请调整食堂或时段"), {

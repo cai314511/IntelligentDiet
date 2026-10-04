@@ -7,7 +7,7 @@ const DB = {
   leaderboards: { top: [], cheap: [], avoid: [] },
 };
 
-let state = { cart: [], currentView: "order" };
+let state = { cart: [], dining: null, currentView: "order" };
 
 const appRoot = document.getElementById("app-root");
 const modalRoot = document.getElementById("modal-container");
@@ -74,6 +74,7 @@ function closeModal() {
 
 // ================= 购物车与AI管家系统 =================
 // --- 购物车：localStorage 持久化 + 同款合并 ---
+function cartKey() { return "zx_cart_" + currentUser()?.school_id + "_" + currentUser()?.id; }
 function loadCart() {
   try {
     state.cart =
@@ -82,12 +83,15 @@ function loadCart() {
           "zx_cart_" + currentUser()?.school_id + "_" + currentUser()?.id,
         ),
       ) || [];
+    state.dining = JSON.parse(localStorage.getItem(cartKey() + "_dining") || "null");
   } catch {
     state.cart = [];
+    state.dining = null;
   }
 }
 
 function saveCart() {
+  localStorage.setItem(cartKey() + "_dining", JSON.stringify(state.dining));
   localStorage.setItem(
     "zx_cart_" + currentUser()?.school_id + "_" + currentUser()?.id,
     JSON.stringify(state.cart),
@@ -100,7 +104,7 @@ function addToCart(id) {
   if (dish.stock !== undefined && dish.stock <= 0) {
     return toast(`「${dish.name}」今日已售罄`, "warning");
   }
-  const existing = state.cart.find((i) => i.id === id);
+  const existing = state.cart.find((i) => i.id === id && !i.agentTaskId);
   if (existing) existing.qty += 1;
   else
     state.cart.push({
@@ -115,8 +119,9 @@ function addToCart(id) {
   toast(`${dish.name} 已加入餐盘`, "success");
 }
 
-function removeFromCart(id) {
-  state.cart = state.cart.filter((i) => i.id !== id);
+function removeFromCart(id, agentTaskId = null) {
+  state.cart = state.cart.filter((i) => !(i.id === id && (i.agentTaskId || null) === agentTaskId));
+  if (state.dining?.taskId && !state.cart.some(i=>i.agentTaskId === state.dining.taskId)) state.dining.taskId = null;
   saveCart();
   updateCartUI();
 }
@@ -148,20 +153,38 @@ function updateCartUI() {
                             </div>
                             <div class="flex items-center space-x-3">
                                 <span class="text-sm font-medium">x${item.qty}</span>
-                                <button onclick="removeFromCart(${item.id})" class="text-red-400 hover:text-red-600 glass-btn-active"><i class="fa-regular fa-trash-can"></i></button>
+                                <button onclick="removeFromCart(${item.id}, ${escapeHtml(JSON.stringify(item.agentTaskId || null))})" class="text-red-400 hover:text-red-600 glass-btn-active"><i class="fa-regular fa-trash-can"></i></button>
                             </div>
                         </div>
                     `;
     });
   }
+  if(state.dining) drawer.innerHTML += `<div class="text-sm p-3 rounded-xl bg-appleGray"><b>用餐安排</b><p>${escapeHtml(DB.restaurants.find(r=>r.id===state.dining.restaurantId)?.name || "")} · ${escapeHtml(new Date(state.dining.startsAt).toLocaleString('zh-CN'))}</p><p>座位：${escapeHtml((state.dining.seats || []).map(s=>s.label).join('、') || (state.dining.seatIds?.length ? '已选择' : '未选座'))}</p><button onclick="openSeatPicker()" class="text-appleBlue mt-2">选择食堂与座位</button></div>`;
   totalEl.innerText = `¥${total.toFixed(2)}`;
   qtyTotal > 0
     ? ((badge.innerText = qtyTotal), badge.classList.remove("hidden"))
     : badge.classList.add("hidden");
 }
 
+function showCart() {
+  updateCartUI();
+  document.getElementById("cart-drawer").classList.remove("translate-x-full");
+}
+function hideCart() { document.getElementById("cart-drawer").classList.add("translate-x-full"); }
 function toggleCart() {
-  document.getElementById("cart-drawer").classList.toggle("translate-x-full");
+  const drawer = document.getElementById("cart-drawer");
+  drawer.classList.contains("translate-x-full") ? showCart() : hideCart();
+}
+function removeAgentCart(taskId) {
+  state.cart = state.cart.filter(i => i.agentTaskId !== taskId);
+  if (state.dining?.taskId === taskId) state.dining = null;
+  saveCart(); updateCartUI();
+}
+function addPlanToCart(plan) {
+  state.cart = state.cart.filter(i => !i.agentTaskId);
+  state.cart.push(...plan.items.map(d => ({id:d.id,name:d.name,price:d.price,img:d.image || '/canteen/dish-placeholder.svg',qty:d.quantity,agentTaskId:plan.id})));
+  state.dining = {taskId:plan.id,people:plan.constraints.people,remark:(plan.constraints.exclusions || []).length ? "忌口：" + plan.constraints.exclusions.join("、") : "",restaurantId:plan.restaurant.id,startsAt:plan.startsAt,seatIds:plan.seats.map(s=>s.id),seats:plan.seats};
+  saveCart(); updateCartUI();
 }
 
 // ================= 结算链路：确认 → 收银台 → 支付 → 取餐码 =================
@@ -169,24 +192,17 @@ function cartTotal() {
   return state.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
 }
 
-let checkoutContext = null,
-  checkoutSubmitting = false,
+let checkoutSubmitting = false,
   seatLoad = 0;
-function openCheckout(context = null) {
-  checkoutContext = context;
+function openCheckout() {
   checkoutSubmitting = false;
-  if (!context && state.cart.length === 0)
-    return toast("请先添加菜品！", "warning");
+  if (!state.cart.length) return toast("请先添加菜品！", "warning");
   if (!requireLogin()) return;
-  if (!context) toggleCart();
-  const checkoutItems = context
-    ? context.plan.items.map((d) => ({ ...d, qty: d.quantity, img: d.image }))
-    : state.cart;
-  const chosenRestaurantId =
-    context?.plan.restaurant.id ||
-    DB.menu.find((d) => d.id === checkoutItems[0]?.id)?.restaurantId;
+  hideCart();
+  const checkoutItems = state.cart;
+  const chosenRestaurantId = state.dining?.restaurantId || DB.menu.find(d=>d.id===checkoutItems[0]?.id)?.restaurantId;
   const user = currentUser();
-  const total = context ? context.plan.total : cartTotal();
+  const total = cartTotal();
   modalRoot.innerHTML = `
                 <div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal" onclick="if(event.target===this)closeModal()">
                     <div class="bg-white rounded-[28px] p-8 w-[92%] max-w-[480px] shadow-appleHover slide-up max-h-[85vh] overflow-y-auto">
@@ -210,11 +226,6 @@ function openCheckout(context = null) {
                             <label class="text-sm text-appleLightGray block mb-2">取餐食堂</label>
                             <select id="checkout-address" class="w-full bg-appleGray rounded-xl px-4 py-3 outline-none text-sm">
                                 ${DB.restaurants
-                                  .filter(
-                                    (r) =>
-                                      !context ||
-                                      r.id === context.plan.restaurant.id,
-                                  )
                                   .map(
                                     (r) =>
                                       `<option value="${r.id}" ${r.id === chosenRestaurantId ? "selected" : ""}>${escapeHtml(r.name)}</option>`,
@@ -222,11 +233,11 @@ function openCheckout(context = null) {
                                   .join("")}
                             </select>
                         </div>
-                        <div class="mb-4"><label class="text-sm text-appleLightGray block mb-2">就餐时间</label><input id="checkout-time" aria-label="就餐时间" type="datetime-local" class="w-full bg-appleGray rounded-xl px-4 py-3" value="${new Date(new Date(context?.plan.startsAt || Date.now() + 30 * 60000).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}"></div>
-                        <div class="mb-4"><label class="text-sm text-appleLightGray block mb-2">预约座位（可不选）</label><div id="checkout-seats" class="flex flex-wrap gap-3"></div></div>
+                        <div class="mb-4"><label class="text-sm text-appleLightGray block mb-2">就餐时间</label><input id="checkout-time" aria-label="就餐时间" type="datetime-local" class="w-full bg-appleGray rounded-xl px-4 py-3" value="${new Date(new Date(state.dining?.startsAt || Date.now() + 30 * 60000).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}"></div>
+                        <div class="mb-4"><label class="text-sm text-appleLightGray block mb-2">预约座位（可不选）</label><button type="button" onclick="openSeatPicker()" class="text-appleBlue text-sm mb-3">查看食堂座位图 / 选择座位</button><div id="checkout-seats" class="flex flex-wrap gap-3"></div></div>
                         <div class="mb-6">
                             <label class="text-sm text-appleLightGray block mb-2">备注（口味偏好等）</label>
-                            <input id="checkout-remark" placeholder="少辣 / 不要香菜…" class="w-full bg-appleGray rounded-xl px-4 py-3 outline-none text-sm">
+                            <input id="checkout-remark" value="${escapeHtml(state.dining?.remark || '')}" placeholder="少辣 / 不要香菜…" class="w-full bg-appleGray rounded-xl px-4 py-3 outline-none text-sm">
                         </div>
                         <div class="flex justify-between items-center mb-6">
                             <span class="text-appleLightGray text-sm">账户余额 <b class="text-appleDark">¥${Number(user.jine).toFixed(2)}</b></span>
@@ -236,7 +247,7 @@ function openCheckout(context = null) {
                         <button onclick="closeModal()" class="w-full text-appleLightGray text-sm mt-4">返回修改</button>
                     </div>
                 </div>`;
-  document.getElementById("checkout-address").onchange = loadCheckoutSeats;
+  document.getElementById("checkout-address").onchange = () => { state.dining = {...state.dining, seatIds:[]}; saveCart(); loadCheckoutSeats(); };
   document.getElementById("checkout-time").onchange = loadCheckoutSeats;
   loadCheckoutSeats();
 }
@@ -271,7 +282,7 @@ async function loadCheckoutSeats() {
       ? json.data.seats
           .map(
             (s) =>
-              `<label><input type="checkbox" name="checkout-seat" value="${s.id}" ${s.available ? "" : "disabled"} ${(alreadyLoaded ? previous.includes(s.id) : checkoutContext?.plan.seats.some((x) => x.id === s.id)) && s.available ? "checked" : ""}> ${escapeHtml(s.label)}${s.available ? "" : " · 已占用"}</label>`,
+              `<label><input type="checkbox" name="checkout-seat" value="${s.id}" ${s.available ? "" : "disabled"} ${(alreadyLoaded ? previous.includes(s.id) : state.dining?.seatIds?.includes(s.id)) && s.available ? "checked" : ""}> ${escapeHtml(s.label)}${s.available ? "" : " · 已占用"}</label>`,
           )
           .join("")
       : escapeHtml(json.message) +
@@ -307,48 +318,12 @@ async function confirmOrder() {
 
   checkoutSubmitting = true;
   let result;
-  if (checkoutContext) {
-    checkoutContext.onSubmitting?.();
-    const updated = await api("PUT", `/tasks/${checkoutContext.taskId}`, {
-      startsAt,
-      restaurantId,
-      dishId: checkoutContext.plan.items[0].id,
-      seatIds,
-      reserve: seatIds.length > 0,
-    });
-    if (updated.status !== 200) {
-      if (btn) {
-        btn.disabled = false;
-        btn.innerText = "去支付";
-      }
-      checkoutSubmitting = false;
-      checkoutContext.onError?.();
-      return toast(updated.json.message, "error");
-    }
-    if (
-      Number(updated.json.data.total) !== Number(checkoutContext.plan.total)
-    ) {
-      checkoutSubmitting = false;
-      checkoutContext.plan = updated.json.data;
-      closeModal();
-      checkoutContext.onQuoteUpdated?.(updated.json.data);
-      return toast("价格已更新，请重新核对方案费用。", "warning");
-    }
-    result = await api("POST", `/tasks/${checkoutContext.taskId}/confirm`, {
-      expectedTotal: checkoutContext.plan.total,
-      remark,
-    });
-    if (result.status === 200)
-      checkoutContext.onConfirmed?.(result.json.data, updated.json.data);
-  } else
-    result = await api("POST", "/orders", {
-      items,
-      expectedTotal: cartTotal(),
-      address,
-      remark,
-      phone: user.lianxifangshi || "",
-      dining: { restaurantId, startsAt, seatIds },
-    });
+  result = await api("POST", "/orders", {
+    items, expectedTotal: cartTotal(), address, remark,
+    phone: user.lianxifangshi || "",
+    dining: { restaurantId, startsAt, seatIds, people:state.dining?.people || 1 },
+    agentTaskId: state.dining?.taskId || undefined,
+  });
   const { status, json } = result;
   if (status < 200 || status >= 300) {
     if (btn) {
@@ -356,15 +331,13 @@ async function confirmOrder() {
       btn.innerText = "去支付";
     }
     checkoutSubmitting = false;
-    checkoutContext?.onError?.();
     return toast(json.message || "下单失败", "error");
   }
   checkoutSubmitting = false;
-  openCashier(
-    json.data.orderid,
-    json.data.totalPrice ?? checkoutContext?.plan.total,
-    !checkoutContext,
-  );
+  const taskId = state.dining?.taskId;
+  state.cart = []; state.dining = null; saveCart(); updateCartUI();
+  window.dispatchEvent(new CustomEvent("cart-order-created", {detail:{taskId,...json.data}}));
+  openCashier(json.data.orderid, json.data.totalPrice, false);
 }
 
 let cashierClearsCart = false;
@@ -512,4 +485,61 @@ function syncLiveCatalog(catalog) {
     });
   saveCart();
   updateCartUI();
+}
+
+let seatPickerRevision = 0;
+async function openSeatPicker(initialRestaurantId = null) {
+  if (checkoutSubmitting) return;
+  const fromCheckout = Boolean(document.getElementById('checkout-time'));
+  if (fromCheckout) state.dining = {...state.dining,
+    restaurantId:Number(document.getElementById('checkout-address').value),
+    startsAt:new Date(document.getElementById('checkout-time').value).toISOString(),
+    seatIds:[...document.querySelectorAll('input[name="checkout-seat"]:checked')].map(x=>Number(x.value))};
+  const dining = {...(state.dining || {restaurantId:DB.restaurants[0]?.id,startsAt:new Date(Date.now()+1800000).toISOString(),seatIds:[]})};
+  if(initialRestaurantId && Number(initialRestaurantId)!==dining.restaurantId) {dining.restaurantId=Number(initialRestaurantId);dining.seatIds=[];}
+  let selected = new Set(dining.seatIds || []), seatRows = [];
+  hideCart();
+  modalRoot.innerHTML = `<div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal"><section class="zx-seat-page bg-white rounded-[28px] p-6 w-[94%] max-w-[760px] max-h-[90vh] overflow-y-auto"><h2 id="seat-title" class="text-2xl font-bold mb-5">食堂座位</h2><div class="zx-grid"><label>就餐食堂<select id="seat-place" class="w-full bg-appleGray rounded-xl p-3">${DB.restaurants.map(r=>`<option value="${r.id}" ${r.id===dining.restaurantId?'selected':''}>${escapeHtml(r.campus)} · ${escapeHtml(r.name)}</option>`).join('')}</select></label><label>就餐时间<input id="seat-time" type="datetime-local" class="w-full bg-appleGray rounded-xl p-3" value="${new Date(new Date(dining.startsAt).getTime()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)}"></label></div><p class="text-sm my-4">点击座位选择或取消选择</p><div class="zx-seat-legend"><span class="available">可选</span><span class="selected">已选</span><span class="occupied">已占用</span></div><div class="zx-row my-4"><label>楼层<select id="seat-floor" class="zx-button"></select></label><label>区域<select id="seat-zone" class="zx-button"><option value="">全部区域</option>${["A","B","C","D"].map(z=>`<option value="${z}">${z} 区</option>`).join('')}</select></label></div><div class="zx-seat-window">取餐 / 打饭窗口</div><div id="seat-map" class="zx-seat-map" aria-label="食堂座位图"></div><p id="seat-feedback" role="status" class="my-4"></p><div class="zx-row"><button id="seat-apply" class="zx-button zx-primary">保存座位</button><button id="seat-back" class="zx-button">返回</button></div></section></div>`;
+  const place=document.getElementById('seat-place'), time=document.getElementById('seat-time');
+  const apply=document.getElementById('seat-apply'), map=document.getElementById('seat-map');
+  const floor=document.getElementById('seat-floor'),zone=document.getElementById('seat-zone');
+  function renderSeats() {
+    document.getElementById("seat-title").textContent=`${DB.restaurants.find(r=>r.id===Number(place.value))?.name || "食堂"} · ${floor.value} · ${zone.value?zone.value+"区":"全部区域"}`;
+    const rows=seatRows.filter(s=>(!floor.value||s.floor===floor.value)&&(!zone.value||s.zone===zone.value));
+    map.innerHTML=rows.map(s=>`<button type="button" class="zx-seat ${selected.has(s.id)?'selected':''}" data-seat="${s.id}" aria-label="座位 ${escapeHtml(s.label)}" aria-pressed="${selected.has(s.id)}" ${s.available?'':'disabled'}><i class="fa-solid fa-chair" aria-hidden="true"></i><b>${escapeHtml(s.label)}</b><small>${selected.has(s.id)?'已选':s.available?'可选':'已占用'}</small></button>`).join('');
+    map.querySelectorAll('[data-seat]').forEach(button=>button.onclick=()=>{
+      const id=Number(button.dataset.seat);
+      if(selected.has(id))selected.delete(id);else if(selected.size<6)selected.add(id);else return toast('最多选择6个座位','warning');
+      renderSeats();
+    });
+    document.getElementById('seat-feedback').textContent=`已选择 ${selected.size} 个座位`;
+  }
+  floor.onchange=renderSeats;zone.onchange=renderSeats;
+  async function load(reset=false) {
+    if(reset)selected.clear();
+    const run=++seatPickerRevision;
+    apply.disabled=true; map.innerHTML='正在加载座位…';
+    if(!time.value) return;
+    const r=await api('GET',`/restaurants/${place.value}/seats?startsAt=${encodeURIComponent(new Date(time.value).toISOString())}`);
+    if(run!==seatPickerRevision || !map.isConnected)return;
+    if(r.status!==200){map.innerHTML=escapeHtml(r.json.message || '座位加载失败');return;}
+    seatRows=r.json.data.seats;
+    selected=new Set([...selected].filter(id=>r.json.data.seats.some(s=>s.id===id&&s.available)));
+    apply.disabled=false;
+    const oldFloor=floor.value;
+    const floors=[...new Set(seatRows.map(s=>s.floor))];
+    floor.innerHTML=floors.map(f=>`<option>${escapeHtml(f)}</option>`).join('');
+    const chosen=seatRows.find(s=>selected.has(s.id));
+    floor.value=reset?floors[0]:(chosen?.floor || (floors.includes(oldFloor)?oldFloor:floors[0]));
+    renderSeats();
+  }
+  place.onchange=()=>load(true);time.onchange=()=>load(true);
+  document.getElementById('seat-back').onclick=()=>{seatPickerRevision++;fromCheckout?openCheckout():closeModal();};
+  apply.onclick=()=>{
+    state.dining={...dining,restaurantId:Number(place.value),startsAt:new Date(time.value).toISOString(),seatIds:[...selected],seats:seatRows.filter(s=>selected.has(s.id))};
+    saveCart();updateCartUI();seatPickerRevision++;
+    window.dispatchEvent(new CustomEvent('cart-dining-updated',{detail:state.dining}));
+    fromCheckout?openCheckout():(closeModal(),showCart());
+  };
+  await load();
 }

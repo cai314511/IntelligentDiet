@@ -35,14 +35,14 @@ const provider = http.createServer(async (req, res) => {
 });
 await new Promise((r) => provider.listen(0, "127.0.0.1", r));
 process.env.AI_BASE_URL = `http://127.0.0.1:${provider.address().port}/v1`;
-process.env.AZURE_OPENAI_API_KEY = "provider-test";
+process.env.DEEPSEEK_API_KEY = "provider-test";
 process.env.AI_MODEL = "compatible-test";
 const realFetch = globalThis.fetch;
 globalThis.fetch = (url, options) => {
-  assert.equal(url, "https://test-openai-allunion-eastus2.services.ai.azure.com/openai/v1/responses");
+  assert.equal(url, "https://api.deepseek.com/responses");
   const body = JSON.parse(options.body);
-  assert.equal(body.model, "gpt-6-luna");
-  assert.equal(body.reasoning.effort, "medium");
+  assert.equal(body.model, "deepseek-v4-flash");
+  assert.equal(body.reasoning.effort, typeof body.tool_choice === "object" ? "none" : "medium");
   return realFetch(`http://127.0.0.1:${provider.address().port}/responses`, options);
 };
 const { default: app } = await import("../app.js");

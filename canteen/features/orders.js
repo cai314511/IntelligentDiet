@@ -12,6 +12,7 @@ import {
 const flow = ["已支付", "制作中", "待取餐", "已完成"];
 export async function renderOrders() {
   const root = document.getElementById("app-root");
+  root.dataset.view = "orders";
   try {
     const rows = (await api("/orders/user/" + session().user.id)).data;
     if (location.hash !== "#orders") return;

@@ -44,7 +44,7 @@ function diningFor(orderid) {
   const task = db
     .prepare("SELECT plan_json FROM agent_tasks WHERE order_id=?")
     .get(orderid);
-  if (task) {
+  if (task && !direct) {
     const plan = JSON.parse(task.plan_json);
     return {
       startsAt: plan.startsAt,

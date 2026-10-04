@@ -23,6 +23,7 @@ let currentFilters = filters.dishes || filters.restaurants || {};
 delete currentFilters.query;
 export async function renderMenu() {
   root = document.getElementById("app-root");
+  root.dataset.view = "order";
   root.innerHTML = notice("正在读取本校菜单…");
   try {
     catalog = (await api("/workspace/catalog")).data;
@@ -31,7 +32,8 @@ export async function renderMenu() {
     draw();
   } catch (e) {
     root.innerHTML = notice(e.message, "error") + button("重新加载", "retry");
-    bind(root, { retry: renderMenu });
+    bind(root, {
+    seats: (b) => window.openSeatPicker(Number(b.dataset.id)), retry: renderMenu });
   }
 }
 function draw() {
@@ -65,6 +67,7 @@ function draw() {
     )}<button class="zx-button zx-primary">应用筛选</button></div></form>`,
   )}<section id="menu-results">${results(f)}</section>${source(catalog.sourceName, catalog.updatedAt)}`;
   bind(root, {
+    seats: (b) => window.openSeatPicker(Number(b.dataset.id)),
     cart: (b) => window.addToCart(Number(b.dataset.id)),
     agent: () => openAgent(),
     place: (b) => selectRestaurant(Number(b.dataset.id)),
@@ -137,7 +140,7 @@ function restaurantCards(f) {
               : status === "适中"
                 ? "#f59e0b"
                 : "#22c55e";
-        return `<section class="zx-card bg-white rounded-[20px] shadow-apple border border-gray-100" style="border-right:8px solid ${color}"><h3>${esc(r.name)}</h3><p>${esc(r.campus)} · ${r.distanceM}米</p><p>排队 ${r.queueCount}人 · 等待 ${r.queueMinutes}分钟 · <b style="color:${color}">${status}</b></p>${button("筛选此食堂", "place").replace('data-action="place"', `data-action="place" data-id="${r.id}"`)}${source(r.sourceName, r.updatedAt)}</section>`;
+        return `<section class="zx-card bg-white rounded-[20px] shadow-apple border border-gray-100" style="border-right:8px solid ${color}"><h3>${esc(r.name)}</h3><p>${esc(r.campus)} · ${r.distanceM}米</p><div class="zx-restaurant-metrics"><p><span><i class="fa-solid fa-users" aria-hidden="true"></i> 排队人数</span><b>${r.queueCount} 人</b></p><p><span><i class="fa-regular fa-clock" aria-hidden="true"></i> 预计时长</span><b>${r.queueMinutes} 分钟</b></p><p><span>当前状态</span><b style="color:${color}">${status}</b></p></div>${button("查看座位", "seats").replace('data-action="seats"', `data-action="seats" data-id="${r.id}"`)}${button("筛选此食堂", "place").replace('data-action="place"', `data-action="place" data-id="${r.id}"`)}${source(r.sourceName, r.updatedAt)}</section>`;
       })
       .join("");
 }

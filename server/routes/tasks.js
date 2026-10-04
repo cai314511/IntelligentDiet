@@ -26,12 +26,27 @@ router.get("/", (req, res) =>
       .map((r) => ({ ...r, plan: parse(r.plan_json, {}) })),
   }),
 );
+router.get("/conversations", (req,res)=>res.json({code:200,data:db.prepare("SELECT payload FROM agent_conversations WHERE user_id=? AND school_id=? ORDER BY updated_at DESC").all(req.user.id,req.user.schoolId).map(r=>parse(r.payload,{}))}));
+router.put("/conversations/:id", (req,res)=>{
+  const value=req.body;
+  if(value.id!==req.params.id || !Array.isArray(value.transcript) || value.transcript.some(m=>!['user','assistant','system'].includes(m.role)||typeof m.content!=='string') || JSON.stringify(value).length>1000000)return res.status(400).json({message:'对话格式无效'});
+  db.prepare("INSERT INTO agent_conversations VALUES(?,?,?,?,?) ON CONFLICT(id,user_id,school_id) DO UPDATE SET payload=excluded.payload,updated_at=excluded.updated_at").run(value.id,req.user.id,req.user.schoolId,JSON.stringify(value),new Date().toISOString());
+  res.json({code:200,data:value});
+});
+router.get("/:id",(req,res)=>{
+  const row=own(req);
+  if(!row)return res.status(404).json({message:'方案不存在'});
+  res.json({code:200,data:{...row,plan:parse(row.plan_json,{})}});
+});
 router.post("/conversation", async (req, res) => {
   try {
     const message = String(req.body?.message || "").trim();
     if (message.length > 2000) return res.status(400).json({ message: "消息最多2000字" });
     const preferences = parse(db.prepare("SELECT profile_json FROM nutrition_profiles WHERE user_id=?").get(req.user.id)?.profile_json, {});
-    const turn = await diningTurn({ message, history: Array.isArray(req.body?.history) ? req.body.history : [], conditions: req.body?.conditions || {}, preferences, data: catalog(req.user.schoolId) });
+    const currentTask = req.body?.taskId ? db.prepare("SELECT status,order_id,plan_json FROM agent_tasks WHERE id=? AND user_id=? AND school_id=?").get(String(req.body.taskId), req.user.id, req.user.schoolId) : null;
+    const orderState = currentTask?.order_id ? db.prepare("SELECT status FROM orders WHERE orderid=? AND userid=? LIMIT 1").get(currentTask.order_id, req.user.id) : null;
+    const executionState = currentTask ? { status: currentTask.status, orderId: currentTask.order_id, orderStatus: orderState?.status || null, plan: parse(currentTask.plan_json, {}) } : null;
+    const turn = await diningTurn({ executionState, message, history: Array.isArray(req.body?.history) ? req.body.history : [], conditions: req.body?.conditions || {}, preferences, data: catalog(req.user.schoolId) });
     res.json({ code: 200, data: turn });
   } catch (error) {
     res.status(error.status || 502).json({ message: error.status ? error.message : "小智模型服务暂不可用，请重试。" });

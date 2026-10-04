@@ -30,7 +30,7 @@ router.get('/:restaurantId/seats', (req, res) => {
   const start=req.query.startsAt?new Date(String(req.query.startsAt)):new Date();
   const end=req.query.endsAt?new Date(String(req.query.endsAt)):new Date(start.getTime()+45*60000);
   if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start)return res.status(400).json({message:'时段格式无效'});
-  const seats=db.prepare(`SELECT s.id,s.seat_label AS label,s.seat_type AS type,CASE WHEN s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations r WHERE r.seat_id=s.id AND r.status='confirmed' AND julianday(r.starts_at)<julianday(?) AND julianday(r.ends_at)>julianday(?)) THEN 1 ELSE 0 END AS available FROM restaurant_seats s WHERE s.restaurant_id=? ORDER BY s.seat_label`).all(end.toISOString(),start.toISOString(),restaurant.id);
+  const seats=db.prepare(`SELECT s.id,s.seat_label AS label,s.seat_type AS type,s.floor,substr(s.seat_label,1,1) AS zone,CASE WHEN s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations r WHERE r.seat_id=s.id AND r.status='confirmed' AND julianday(r.starts_at)<julianday(?) AND julianday(r.ends_at)>julianday(?)) THEN 1 ELSE 0 END AS available FROM restaurant_seats s WHERE s.restaurant_id=? ORDER BY s.seat_label`).all(end.toISOString(),start.toISOString(),restaurant.id);
   res.json({ code: 200, data: { restaurant, seats, timeSlots: ['11:00','11:30','12:00','12:30','17:00','17:30','18:00','18:30'] } });
 });
 

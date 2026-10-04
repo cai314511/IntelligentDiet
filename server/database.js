@@ -343,7 +343,7 @@ export function initDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       restaurant_id INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
       seat_label TEXT NOT NULL,
-      seat_type TEXT NOT NULL DEFAULT '2人座',
+      seat_type TEXT NOT NULL DEFAULT '单人座',
       status TEXT NOT NULL DEFAULT 'available',
       UNIQUE(restaurant_id, seat_label)
     );
@@ -519,7 +519,10 @@ export function initDatabase() {
       );
   }
 
+  if (!db.prepare("PRAGMA table_info(restaurant_seats)").all().some(c=>c.name==='floor')) db.exec("ALTER TABLE restaurant_seats ADD COLUMN floor TEXT NOT NULL DEFAULT '一层'");
+  db.prepare("UPDATE restaurant_seats SET seat_type='单人座'").run();
   if (config.seedReferenceData) seedReferenceData(db);
+  db.exec("CREATE TABLE IF NOT EXISTS agent_conversations(id TEXT NOT NULL,user_id INTEGER NOT NULL,school_id TEXT NOT NULL,payload TEXT NOT NULL,updated_at TEXT NOT NULL,PRIMARY KEY(id,user_id,school_id))");
   initWorkspace(db);
 
   console.log("✓ 数据库表创建成功");

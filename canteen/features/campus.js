@@ -16,6 +16,7 @@ import {
 } from "../../shared/feature-ui.js";
 export async function renderCampus(kind) {
   const root = document.getElementById("app-root");
+  root.dataset.view = kind;
   root.innerHTML = notice("正在加载校园内容…");
   try {
     if (kind === "social") {

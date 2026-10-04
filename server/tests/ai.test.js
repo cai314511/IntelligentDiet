@@ -5,7 +5,7 @@ import request from 'supertest';
 
 process.env.DB_PATH = ':memory:';
 process.env.AI_BASE_URL = '';
-process.env.AZURE_OPENAI_API_KEY = '';
+process.env.DEEPSEEK_API_KEY = '';
 process.env.AI_MODEL = '';
 const { default: app } = await import('../app.js');
 const target=await targetFor(app);
