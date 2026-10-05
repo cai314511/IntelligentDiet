@@ -101,7 +101,7 @@ $("auth-form").onsubmit = async (e) => {
       school: schools.find((s) => s.id === body.schoolId),
     });
     location.href =
-      identity === "admin" ? "/management/#dashboard" : "/canteen/";
+      identity === "admin" ? "/management/#dashboard" : "/canteen/#order";
   } catch (error) {
     $("auth-status").textContent = error.message;
   } finally {

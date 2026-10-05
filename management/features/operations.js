@@ -1,3 +1,4 @@
+import {dishPhoto} from '../../shared/dish-photo.js';
 import {
   api,
   esc,
@@ -250,7 +251,7 @@ export async function dishes(root, context, reload) {
     root.querySelector("#dishes-table"),
     rows,
     [
-      { key: "name", label: "菜品" },
+      { key: "name", label: "菜品", render:r=>`<div style="display:flex;align-items:center;gap:10px">${dishPhoto(r,{width:"56px",height:56})}<span>${esc(r.name)}</span></div>` },
       { key: "restaurant", label: "食堂" },
       { key: "window", label: "窗口" },
       { key: "price", label: "价格" },
@@ -298,8 +299,9 @@ export async function orders(root, context, reload) {
   });
   list = Object.values(
     list.reduce((o, r) => {
-      const a = (o[r.orderid] ??= { ...r, names: [], amount: 0 });
+      const a = (o[r.orderid] ??= { ...r, names: [], items: [], amount: 0 });
       a.names.push(r.caipinmingcheng + " × " + r.buyshu);
+      a.items.push(r);
       a.amount += Number(r.total);
       return o;
     }, {}),
@@ -316,7 +318,7 @@ export async function orders(root, context, reload) {
       status === "全部" ? list : list.filter((r) => r.status === status),
       [
         { key: "orderid", label: "订单" },
-        { key: "names", label: "菜品", render: (r) => esc(r.names.join("、")) },
+        { key: "names", label: "菜品", render: (r) => r.items.map(i=>`<div style="display:flex;align-items:center;gap:10px;margin:5px 0">${dishPhoto(i,{width:"44px",height:44})}<span>${esc(i.caipinmingcheng)} × ${i.buyshu}</span></div>`).join("") },
         { key: "amount", label: "金额" },
         { key: "status", label: "状态" },
         { key: "phone", label: "联系方式" },

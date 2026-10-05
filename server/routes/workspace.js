@@ -1,3 +1,4 @@
+import {entitlements} from "../services/nutritionMembership.js";
 import express from "express";
 import { db } from "../database.js";
 import { optionalAuth, requireAuth } from "../middleware/auth.js";
@@ -56,6 +57,7 @@ router.get("/preferences", requireAuth, (req, res) => {
 router.put("/preferences", requireAuth, (req, res) => {
   const b = req.body || {};
   const macros = b.macros || {};
+  if ((b.portrait || b.profileEstablished) && !entitlements(db,req.user).advanced) return res.status(403).json({message:"口味画像属于会员权益"});
   if (
     typeof b.goal !== "string" ||
     b.goal.length > 80 ||
@@ -86,6 +88,8 @@ router.put("/preferences", requireAuth, (req, res) => {
     tastes: b.tastes,
     calorieTarget: Number(b.calorieTarget),
     macros,
+    profileEstablished: b.profileEstablished === true,
+    portrait: b.portrait && typeof b.portrait === "object" ? Object.fromEntries(Object.entries(b.portrait).filter(([k,v])=>["goal","tastes","allergies","dislikes","habits"].includes(k)&&Array.isArray(v)&&v.length<=30&&v.every(x=>typeof x==="string"&&x.length<=60))) : undefined,
   };
   db.prepare(
     "INSERT INTO nutrition_profiles(user_id,profile_json) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET profile_json=excluded.profile_json,updated_at=CURRENT_TIMESTAMP",

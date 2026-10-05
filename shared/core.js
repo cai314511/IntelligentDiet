@@ -213,6 +213,8 @@ export function download(name, rows) {
 }
 export function applySchool(school) {
   if (school?.id) document.body.dataset.school = school.id;
+  else delete document.body.dataset.school;
+  window.ZX_SCHOOL_SKIN?.apply(school?.id);
   document.documentElement.style.removeProperty("--school-background");
   if (school?.background) {
     try {

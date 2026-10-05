@@ -9,11 +9,13 @@ export const parse = (value, fallback = []) => {
 export function catalog(schoolId) {
   const restaurants = db
     .prepare(
-      `SELECT r.*, (SELECT COUNT(*) FROM restaurant_seats s WHERE s.restaurant_id=r.id AND s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations sr WHERE sr.seat_id=s.id AND sr.status='confirmed' AND julianday(sr.starts_at)<=julianday('now') AND julianday(sr.ends_at)>julianday('now'))) AS availableSeats,(SELECT COUNT(*) FROM restaurant_seats s WHERE s.restaurant_id=r.id) AS bookableSeats FROM restaurants r WHERE school_id=? ORDER BY campus,name`,
+      `SELECT r.*, (SELECT COUNT(*) FROM restaurant_seats s WHERE s.restaurant_id=r.id AND r.has_seating=1 AND s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations sr WHERE sr.seat_id=s.id AND sr.status='confirmed' AND julianday(sr.starts_at)<=julianday('now') AND julianday(sr.ends_at)>julianday('now'))) AS availableSeats,(SELECT COUNT(*) FROM restaurant_seats s WHERE s.restaurant_id=r.id AND r.has_seating=1) AS bookableSeats FROM restaurants r WHERE school_id=? AND (canonical_id IS NULL OR canonical_id=id) ORDER BY campus,name`,
     )
     .all(schoolId)
     .map((r) => ({
       id: r.id,
+      hasSeating:Boolean(r.has_seating),
+      floors:parse(r.floors_json),
       schoolId: r.school_id,
       campus: r.campus,
       name: r.name,
@@ -62,6 +64,8 @@ export function catalog(schoolId) {
         restaurant: d.restaurant_name,
         restaurantId: restaurant?.id || null,
         window: d.window_name,
+        floor: d.floor,
+        locationBasis: d.location_basis,
         nutrition: parse(d.nutrition_json, {}),
         ingredients: parse(d.ingredients_json),
         allergens: parse(d.allergens_json),

@@ -1,1 +1,16 @@
-{"name":"zhixiang-campus-workspace","private":true,"type":"module","scripts":{"frontend":"node scripts/serve-frontend.mjs","api":"npm --prefix server start","init-db":"npm --prefix server run init-db","test":"npm --prefix server test"}}
+{
+  "name": "zhixiang-campus-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "frontend": "node scripts/serve-frontend.mjs",
+    "api": "npm --prefix server start",
+    "init-db": "npm --prefix server run init-db",
+    "test": "npm --prefix server test",
+    "setup": "npm --prefix server ci && node scripts/prepare-local.mjs",
+    "start": "node scripts/start-local.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

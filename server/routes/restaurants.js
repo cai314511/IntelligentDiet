@@ -1,3 +1,4 @@
+import {displaySeat,floorLayout} from "../services/floorLayout.js";
 import express from 'express';
 import { randomUUID } from 'crypto';
 import { db } from '../database.js';
@@ -14,24 +15,24 @@ router.get('/', (req, res) => {
   const schoolId = validSchool(req);
   if (!schoolId) return res.status(400).json({ code: 400, message: '请选择有效学校' });
   const rows = db.prepare(`SELECT r.id,r.school_id AS schoolId,r.campus,r.name,r.category,r.description,r.opening_hours AS openingHours,
-    r.queue_minutes AS queueMinutes,r.queue_count AS queueCount,r.total_seats AS totalSeats,
-    SUM(CASE WHEN rs.status='available' AND sr.id IS NULL THEN 1 ELSE 0 END) AS availableSeats
+    r.has_seating AS hasSeating,r.floors_json AS floorsJson,r.queue_minutes AS queueMinutes,r.queue_count AS queueCount,r.total_seats AS totalSeats,
+    SUM(CASE WHEN r.has_seating=1 AND rs.status='available' AND sr.id IS NULL THEN 1 ELSE 0 END) AS availableSeats
     FROM restaurants r LEFT JOIN restaurant_seats rs ON rs.restaurant_id=r.id
     LEFT JOIN seat_reservations sr ON sr.seat_id=rs.id AND sr.status='confirmed' AND julianday(sr.starts_at)<=julianday('now') AND julianday(sr.ends_at)>julianday('now')
-    WHERE r.school_id=? GROUP BY r.id ORDER BY r.campus,r.name`).all(schoolId);
+    WHERE r.school_id=? AND (r.canonical_id IS NULL OR r.canonical_id=r.id) GROUP BY r.id ORDER BY r.campus,r.name`).all(schoolId);
   res.json({ code: 200, data: rows.map(row => ({ ...row, name: `${row.campus}·${row.name}`, queueTime: row.queueMinutes })) });
 });
 
 router.get('/:restaurantId/seats', (req, res) => {
   const schoolId = validSchool(req);
   if (!schoolId) return res.status(400).json({ code: 400, message: '请选择有效学校' });
-  const restaurant = db.prepare('SELECT id,name,campus FROM restaurants WHERE id=? AND school_id=?').get(req.params.restaurantId, schoolId);
+  const restaurant = db.prepare('SELECT id,name,campus,school_id AS schoolId,has_seating AS hasSeating FROM restaurants WHERE id=? AND school_id=?').get(req.params.restaurantId, schoolId);
   if (!restaurant) return res.status(404).json({ code: 404, message: '餐厅不存在' });
   const start=req.query.startsAt?new Date(String(req.query.startsAt)):new Date();
   const end=req.query.endsAt?new Date(String(req.query.endsAt)):new Date(start.getTime()+45*60000);
   if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start)return res.status(400).json({message:'时段格式无效'});
-  const seats=db.prepare(`SELECT s.id,s.seat_label AS label,s.seat_type AS type,s.floor,substr(s.seat_label,1,1) AS zone,CASE WHEN s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations r WHERE r.seat_id=s.id AND r.status='confirmed' AND julianday(r.starts_at)<julianday(?) AND julianday(r.ends_at)>julianday(?)) THEN 1 ELSE 0 END AS available FROM restaurant_seats s WHERE s.restaurant_id=? ORDER BY s.seat_label`).all(end.toISOString(),start.toISOString(),restaurant.id);
-  res.json({ code: 200, data: { restaurant, seats, timeSlots: ['11:00','11:30','12:00','12:30','17:00','17:30','18:00','18:30'] } });
+  const seats=db.prepare(`SELECT s.id,s.seat_label AS label,s.seat_type AS type,s.seat_number AS seatNumber,s.floor,substr(s.seat_label,1,1) AS zone,CASE WHEN s.status='available' AND NOT EXISTS(SELECT 1 FROM seat_reservations r WHERE r.seat_id=s.id AND r.status='confirmed' AND julianday(r.starts_at)<julianday(?) AND julianday(r.ends_at)>julianday(?)) THEN 1 ELSE 0 END AS available FROM restaurant_seats s WHERE s.restaurant_id=? ORDER BY s.seat_label`).all(end.toISOString(),start.toISOString(),restaurant.id);
+  res.json({ code: 200, data: { restaurant, seats:restaurant.hasSeating?seats.map(s=>displaySeat(s,restaurant)):[], layouts:restaurant.hasSeating?[...new Set(seats.map(s=>displaySeat(s,restaurant).floor))].map(f=>floorLayout(restaurant,f)):[], timeSlots: ['11:00','11:30','12:00','12:30','17:00','17:30','18:00','18:30'] } });
 });
 
 router.post('/:restaurantId/reserve-seat', requireAuth, (req, res) => {
@@ -39,7 +40,7 @@ router.post('/:restaurantId/reserve-seat', requireAuth, (req, res) => {
   if (!Number.isSafeInteger(Number(seatId)) || typeof startsAt !== 'string' || typeof endsAt !== 'string') return res.status(400).json({ code: 400, message: '请选择座位和时段' });
   const start = new Date(startsAt), end = new Date(endsAt), now = new Date();
   if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || start <= now || end <= start || end - start > 2 * 60 * 60 * 1000 || start - now > 30 * 24 * 60 * 60 * 1000) return res.status(400).json({ code: 400, message: '预约时段格式无效' });
-  const restaurant = db.prepare('SELECT id FROM restaurants WHERE id=? AND school_id=?').get(req.params.restaurantId, req.user.schoolId);
+  const restaurant = db.prepare('SELECT id FROM restaurants WHERE id=? AND school_id=? AND has_seating=1').get(req.params.restaurantId, req.user.schoolId);
   if (!restaurant) return res.status(404).json({ code: 404, message: '餐厅不存在' });
   const seat = db.prepare("SELECT id FROM restaurant_seats WHERE id=? AND restaurant_id=? AND status='available'").get(seatId, restaurant.id);
   if (!seat) return res.status(404).json({ code: 404, message: '座位不存在或不可预约' });

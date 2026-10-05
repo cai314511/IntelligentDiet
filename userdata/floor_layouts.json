@@ -1,0 +1,185 @@
+[
+  {
+    "schoolId": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "positionBasis": "configurable schematic; public source confirms food categories, not precise stall coordinates",
+    "stalls": [
+      {
+        "name": "韩式石锅拌饭"
+      },
+      {
+        "name": "新疆炒米粉"
+      },
+      {
+        "name": "重庆火锅鸡"
+      },
+      {
+        "name": "麻辣烫"
+      },
+      {
+        "name": "蛋包饭"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.sohu.com/a/924080030_121124332",
+        "title": "2025中央财经大学新生入学指南",
+        "scope": "楼层餐品类型"
+      }
+    ]
+  },
+  {
+    "schoolId": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "positionBasis": "configurable schematic",
+    "stalls": [
+      {
+        "name": "零点区"
+      },
+      {
+        "name": "火锅区"
+      },
+      {
+        "name": "快餐区"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.cufe.edu.cn/info/1186/7794.htm",
+        "title": "沙河东区新教工餐厅试运营通知",
+        "scope": "三层功能区；2016年资料"
+      }
+    ]
+  },
+  {
+    "schoolId": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "positionBasis": "configurable schematic; window numbers documented",
+    "stalls": [
+      {
+        "name": "新疆风味 35—38号窗口"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://m.thepaper.cn/newsDetail_forward_33301446",
+        "title": "在天大，品地道新疆味",
+        "scope": "二楼35—38号窗口"
+      }
+    ]
+  },
+  {
+    "schoolId": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "positionBasis": "configurable schematic; food categories from student guide",
+    "stalls": [
+      {
+        "name": "铁板饭"
+      },
+      {
+        "name": "卤肉饭"
+      },
+      {
+        "name": "牛肉板面"
+      },
+      {
+        "name": "排骨拌饭"
+      },
+      {
+        "name": "自选菜"
+      },
+      {
+        "name": "咸水鸡拌饭"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://bjfu-book2.pages.dev/canteen/",
+        "title": "北林信院新生手册",
+        "scope": "食堂楼层与推荐餐品，未提供档口坐标"
+      }
+    ]
+  },
+  {
+    "schoolId": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "positionBasis": "configurable schematic; food categories from student guide",
+    "stalls": [
+      {
+        "name": "鲜肉小馄饨"
+      },
+      {
+        "name": "鸡架拌面"
+      },
+      {
+        "name": "自选菜"
+      },
+      {
+        "name": "减脂餐"
+      },
+      {
+        "name": "肠粉"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://bjfu-book2.pages.dev/canteen/",
+        "title": "北林信院新生手册",
+        "scope": "食堂楼层与推荐餐品，未提供档口坐标"
+      }
+    ]
+  },
+  {
+    "schoolId": "bjfu",
+    "restaurant": "烘焙坊",
+    "floor": "一层",
+    "positionBasis": "configurable schematic; food categories from student guide",
+    "stalls": [
+      {
+        "name": "面包"
+      },
+      {
+        "name": "蛋糕"
+      },
+      {
+        "name": "酥点"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://bjfu-book2.pages.dev/canteen/",
+        "title": "北林信院新生手册",
+        "scope": "食堂楼层与推荐餐品，未提供档口坐标"
+      }
+    ]
+  },
+  {
+    "schoolId": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "positionBasis": "configurable schematic; food categories from student guide",
+    "stalls": [
+      {
+        "name": "牛肉面"
+      },
+      {
+        "name": "新疆烤包子"
+      },
+      {
+        "name": "新疆手抓饭"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://bjfu-book2.pages.dev/canteen/",
+        "title": "北林信院新生手册",
+        "scope": "食堂楼层与推荐餐品，未提供档口坐标"
+      }
+    ]
+  }
+]

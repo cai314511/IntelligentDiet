@@ -1,0 +1,533 @@
+/* CUFE skin is selected from the signed-in school, independently of theme preferences. */
+html[data-campus-skin="cufe"] body {
+  --cufe-blue: #19488f;
+  --cufe-gold: linear-gradient(115deg, #b98620, #e9bd55 28%, #fff2b2 52%, #d7a337 78%, #b98620);
+  --zx-primary: #19488f !important;
+  --zx-primary-ring: #19488f35 !important;
+  --zx-bg: #fff !important;
+  --zx-text: #192b45 !important;
+  --zx-text-soft: #455a73 !important;
+  --zx-muted: #79899c !important;
+  --zx-card: #ffffff !important;
+  --zx-soft-block: #eef4fb !important;
+  --zx-surface: #eef4fb !important;
+  --zx-nav-bg: #ffffffd9 !important;
+  --zx-nav-border: #19488f19 !important;
+  --zx-panel-bg: #fffffff5 !important;
+  --zx-panel-border: #19488f20 !important;
+  --zx-bg-image: none !important;
+  --zx-bg-opacity: 0 !important;
+  --school: #19488f !important;
+  --brand: #19488f;
+  --ink: #192b45;
+  --muted: #79899c;
+  --bg: #fff;
+  --line: #19488f1a;
+  background: #fff !important;
+  color: var(--zx-text);
+  isolation: isolate;
+}
+html[data-campus-skin="cufe"] body::after { display: none; }
+
+html[data-campus-skin="cufe"] #campus-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 90% 8%, #e3b84b16, transparent 36%),
+    radial-gradient(ellipse at 5% 65%, #f5efdf60, transparent 48%),
+    linear-gradient(120deg, #fff, #fdfbf6 60%, #fff);
+}
+html[data-campus-skin="cufe"] #campus-background::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  background: radial-gradient(ellipse at 85% 30%, #f1ca6620, transparent 25%);
+  filter: blur(22px);
+  animation: cufe-light-drift 22s ease-in-out infinite alternate;
+}
+html[data-campus-skin="cufe"] .cufe-landmark {
+  position: absolute;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  user-select: none;
+  filter: blur(.35px);
+  animation: cufe-landmark-drift 18s ease-in-out infinite alternate;
+}
+html[data-campus-skin="cufe"] #campus-background .cufe-library {
+  width: min(620px, 47vw);
+  left: 1%;
+  bottom: 2%;
+  opacity: .32;
+}
+html[data-campus-skin="cufe"] #campus-background .cufe-longma {
+  width: min(480px, 35vw);
+  right: 1%;
+  top: 14%;
+  opacity: .30;
+  animation-delay: -7s;
+}
+@keyframes cufe-landmark-drift {
+  from { transform: translate3d(0, 0, 0); filter: blur(.35px); }
+  to { transform: translate3d(0, -7px, 0); filter: blur(.55px); }
+}
+@keyframes cufe-light-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-2%, 1%, 0); }
+}
+
+html[data-campus-skin="cufe"] .glass-nav {
+  background-image: none !important;
+  box-shadow: 0 2px 24px #19488f08;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #dcb55365 !important;
+}
+html[data-campus-skin="cufe"] .glass-nav > div {
+  min-height: 76px;
+  height: auto;
+  gap: 12px;
+}
+html[data-campus-skin="cufe"] .glass-nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-size: 14px;
+  color: var(--zx-text-soft) !important;
+  white-space: nowrap;
+  transition: background .2s, box-shadow .2s, transform .2s;
+}
+html[data-campus-skin="cufe"] .glass-nav .nav-link + .nav-link { margin-left: 3px; }
+html[data-campus-skin="cufe"] .glass-nav .nav-link:hover {
+  background: #eef4fb;
+  transform: translateY(-1px);
+}
+html[data-campus-skin="cufe"] .glass-nav .nav-link[aria-current="page"] {
+  color: var(--cufe-blue) !important;
+  background: linear-gradient(#fff, #f4f8ff) padding-box, var(--cufe-gold) border-box;
+  border-color: transparent;
+  box-shadow: 0 3px 12px #d7a3371b;
+}
+html[data-campus-skin="cufe"] .cufe-nav-art {
+  display: inline-block;
+  flex: none;
+  width: 32px;
+  height: 43px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  transform-origin: bottom center;
+  transition: transform .22s;
+}
+html[data-campus-skin="cufe"] .cufe-caibao {
+  background-image: url("/assets/schools/cufe/caibao-strip.png");
+  background-size: 400% 100%;
+  background-position: var(--caibao-position) center;
+}
+html[data-campus-skin="cufe"] .cufe-nav-art.cufe-library {
+  background-image: url("/assets/schools/cufe/library.jpg");
+  background-size: contain;
+  background-position: center;
+  mix-blend-mode: multiply;
+}
+html[data-campus-skin="cufe"] .nav-link:hover .cufe-nav-art {
+  transform: translateY(-2px) rotate(-4deg);
+}
+html[data-campus-skin="cufe"] .nav-link:active .cufe-nav-art { transform: scale(.93); }
+html[data-campus-skin="cufe"] .nav-link:focus-visible {
+  outline: 2px solid var(--cufe-blue);
+  outline-offset: 3px;
+}
+
+html[data-campus-skin="cufe"] #app-root .zx-card,
+html[data-campus-skin="cufe"] #agent-screen .zx-card {
+  background: #fffffff5;
+  border-color: #19488f1a;
+  box-shadow: 0 8px 28px #19488f08;
+}
+html[data-campus-skin="cufe"] #app-root .zx-primary,
+html[data-campus-skin="cufe"] #agent-screen .zx-primary,
+html[data-campus-skin="cufe"] .portal-form .btn.primary {
+  background: linear-gradient(125deg, #19488f, #2b61a8);
+  box-shadow: inset 0 1px 0 #ffe49950, 0 4px 14px #19488f20;
+  color: #fff;
+}
+html[data-campus-skin="cufe"] #app-root .zx-primary:hover,
+html[data-campus-skin="cufe"] #agent-screen .zx-primary:hover {
+  box-shadow: inset 0 1px 0 #ffe49980, 0 5px 18px #19488f2b;
+}
+html[data-campus-skin="cufe"] .zx-agent-hero {
+  background: transparent;
+}
+html[data-campus-skin="cufe"] #feature-dialog,
+html[data-campus-skin="cufe"] #dialog {
+  background: #fff;
+  color: var(--zx-text);
+}
+html[data-campus-skin="cufe"] #feature-dialog .zx-field input,
+html[data-campus-skin="cufe"] #feature-dialog .zx-field select,
+html[data-campus-skin="cufe"] #feature-dialog .zx-field textarea {
+  background: var(--zx-soft-block);
+}
+html[data-campus-skin="cufe"] .nutrition-choice {
+  color: var(--zx-text-soft);
+  background: #f7faff;
+  border-color: #19488f25;
+}
+html[data-campus-skin="cufe"] .nutrition-choice.selected {
+  color: var(--cufe-blue);
+  border: 1px solid transparent;
+  background: linear-gradient(#edf4ff, #f7faff) padding-box, var(--cufe-gold) border-box;
+}
+html[data-campus-skin="cufe"] .zx-dialog header {
+  border-bottom: 1px solid #dcb55345;
+}
+
+/* The common entry previews only the currently selected school's skin. */
+html[data-campus-skin="cufe"] .portal { background: transparent; }
+html[data-campus-skin="cufe"] .portal-story {
+  background: linear-gradient(145deg, #edf4ffd9, #ffffffa6 64%, #fff5dcbc);
+  color: var(--ink);
+}
+html[data-campus-skin="cufe"] .portal-story::after {
+  border-color: #19488f0c;
+  box-shadow: 0 0 0 70px #19488f03, 0 0 0 140px #e9bd5505;
+}
+html[data-campus-skin="cufe"] .portal-login { background: #ffffffc7; }
+html[data-campus-skin="cufe"] .role-choice.active {
+  border: 1px solid transparent;
+  background: linear-gradient(#f4f8ff, #fff) padding-box, var(--cufe-gold) border-box;
+  box-shadow: 0 5px 18px #19488f0c;
+}
+html[data-campus-skin="cufe"] .portal-form input,
+html[data-campus-skin="cufe"] .portal-form select { background: #f4f8fc; }
+
+/* Management keeps its existing table layout with quiet campus accents. */
+html[data-campus-skin="cufe"] #navbar {
+  background: #ffffffed;
+  border-bottom: 1px solid #dcb55365;
+  backdrop-filter: blur(16px);
+}
+html[data-campus-skin="cufe"] #navbar .logo-text { color: var(--cufe-blue); }
+html[data-campus-skin="cufe"] #sidebar,
+html[data-campus-skin="cufe"] #footer {
+  background: linear-gradient(150deg, #153969, #19488f);
+}
+html[data-campus-skin="cufe"] #sidebar .menu-item.active {
+  color: #fff0b6;
+  background: #ffffff14;
+  border-left-color: #e9bd55;
+}
+html[data-campus-skin="cufe"] #main-content .zx-card {
+  background: #fffffff5;
+  border-color: #19488f1a;
+  box-shadow: 0 8px 28px #19488f08;
+}
+
+@media (max-width: 1100px) {
+  html[data-campus-skin="cufe"] .glass-nav .hidden.md\:flex { display: none !important; }
+  html[data-campus-skin="cufe"] .glass-nav .zx-mobile-menu { display: block; }
+  html[data-campus-skin="cufe"] .glass-nav .nav-link { gap: 4px; padding: 6px; font-size: 13px; }
+  html[data-campus-skin="cufe"] .cufe-nav-art { width: 25px; height: 34px; }
+}
+@media (max-width: 767px) {
+  html[data-campus-skin="cufe"] .glass-nav > div { min-height: 70px; }
+  html[data-campus-skin="cufe"] #campus-background .cufe-library { width: 72vw; left: 0; }
+  html[data-campus-skin="cufe"] #campus-background .cufe-longma { width: 50vw; right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-campus-skin="cufe"] #campus-background::before,
+  html[data-campus-skin="cufe"] .cufe-landmark { animation: none; }
+  html[data-campus-skin="cufe"] .nav-link,
+  html[data-campus-skin="cufe"] .cufe-nav-art { transition: none; }
+  html[data-campus-skin="cufe"] .nav-link:hover,
+  html[data-campus-skin="cufe"] .nav-link:hover .cufe-nav-art { transform: none; }
+}
+
+html[data-campus-skin="cufe"] #campus-background::after {
+  content: ""; position: absolute; inset: 0; opacity: .055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.76' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpath fill='%23836a42' d='M0 0h180v180H0z' filter='url(%23paper)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* BJFU Forest Academy: school-bound green, warm gold and quiet paper surfaces. */
+html[data-campus-skin="bjfu"] body {
+  --bjfu-green: #16704f;
+  --bjfu-gold: linear-gradient(115deg, #b98620, #e9bd55 28%, #fff2b2 52%, #d7a337 78%, #b98620);
+  --zx-primary: #16704f !important;
+  --zx-primary-ring: #16704f35 !important;
+  --zx-bg: #fff !important;
+  --zx-text: #203d32 !important;
+  --zx-text-soft: #4d6b5e !important;
+  --zx-muted: #7c9287 !important;
+  --zx-card: #ffffff !important;
+  --zx-soft-block: #edf5ef !important;
+  --zx-surface: #edf5ef !important;
+  --zx-nav-bg: #ffffffd9 !important;
+  --zx-nav-border: #16704f19 !important;
+  --zx-panel-bg: #fffffff5 !important;
+  --zx-panel-border: #16704f20 !important;
+  --zx-bg-image: none !important;
+  --zx-bg-opacity: 0 !important;
+  --school: #16704f !important;
+  --brand: #16704f;
+  --ink: #203d32;
+  --muted: #7c9287;
+  --bg: #fff;
+  --line: #16704f1a;
+  background: #fff !important;
+  color: var(--zx-text);
+  isolation: isolate;
+}
+html[data-campus-skin="bjfu"] body::after { display: none; }
+
+html[data-campus-skin="bjfu"] #campus-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 90% 8%, #e3b84b16, transparent 36%),
+    radial-gradient(ellipse at 5% 65%, #f5efdf60, transparent 48%),
+    linear-gradient(120deg, #fff, #fdfbf6 60%, #fff);
+}
+html[data-campus-skin="bjfu"] #campus-background::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  background: radial-gradient(ellipse at 85% 30%, #f1ca6620, transparent 25%);
+  filter: blur(22px);
+  animation: bjfu-light-drift 22s ease-in-out infinite alternate;
+}
+html[data-campus-skin="bjfu"] .bjfu-landmark {
+  position: absolute;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  user-select: none;
+  filter: blur(.35px);
+  animation: bjfu-landmark-drift 18s ease-in-out infinite alternate;
+}
+html[data-campus-skin="bjfu"] #campus-background .bjfu-grove {
+  width: min(620px, 47vw);
+  left: 1%;
+  bottom: 2%;
+  opacity: .32;
+}
+html[data-campus-skin="bjfu"] #campus-background .bjfu-gate {
+  width: min(480px, 35vw);
+  right: 1%;
+  top: 14%;
+  opacity: .30;
+  animation-delay: -7s;
+}
+@keyframes bjfu-landmark-drift {
+  from { transform: translate3d(0, 0, 0); filter: blur(.35px); }
+  to { transform: translate3d(0, -7px, 0); filter: blur(.55px); }
+}
+@keyframes bjfu-light-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-2%, 1%, 0); }
+}
+
+html[data-campus-skin="bjfu"] .glass-nav {
+  background-image: none !important;
+  box-shadow: 0 2px 24px #16704f08;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #c8a35265 !important;
+}
+html[data-campus-skin="bjfu"] .glass-nav > div {
+  min-height: 76px;
+  height: auto;
+  gap: 12px;
+}
+html[data-campus-skin="bjfu"] .glass-nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-size: 14px;
+  color: var(--zx-text-soft) !important;
+  white-space: nowrap;
+  transition: background .2s, box-shadow .2s, transform .2s;
+}
+html[data-campus-skin="bjfu"] .glass-nav .nav-link + .nav-link { margin-left: 3px; }
+html[data-campus-skin="bjfu"] .glass-nav .nav-link:hover {
+  background: #edf5ef;
+  transform: translateY(-1px);
+}
+html[data-campus-skin="bjfu"] .glass-nav .nav-link[aria-current="page"] {
+  color: var(--bjfu-green) !important;
+  background: linear-gradient(#fff, #f4f8ed) padding-box, var(--bjfu-gold) border-box;
+  border-color: transparent;
+  box-shadow: 0 3px 12px #d7a3371b;
+}
+html[data-campus-skin="bjfu"] .bjfu-nav-art {
+  display: inline-block;
+  flex: none;
+  width: 32px;
+  height: 43px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  transform-origin: bottom center;
+  transition: transform .22s;
+}
+html[data-campus-skin="bjfu"] .nav-link:hover .bjfu-nav-art {
+  transform: translateY(-2px) rotate(-4deg);
+}
+html[data-campus-skin="bjfu"] .nav-link:active .bjfu-nav-art { transform: scale(.93); }
+html[data-campus-skin="bjfu"] .nav-link:focus-visible {
+  outline: 2px solid var(--bjfu-green);
+  outline-offset: 3px;
+}
+
+html[data-campus-skin="bjfu"] #app-root .zx-card,
+html[data-campus-skin="bjfu"] #agent-screen .zx-card {
+  background: #fffffff5;
+  border-color: #16704f1a;
+  box-shadow: 0 8px 28px #16704f08;
+}
+html[data-campus-skin="bjfu"] #app-root .zx-primary,
+html[data-campus-skin="bjfu"] #agent-screen .zx-primary,
+html[data-campus-skin="bjfu"] .portal-form .btn.primary {
+  background: linear-gradient(125deg, #16704f, #32865c);
+  box-shadow: inset 0 1px 0 #ffe49950, 0 4px 14px #16704f20;
+  color: #fff;
+}
+html[data-campus-skin="bjfu"] #app-root .zx-primary:hover,
+html[data-campus-skin="bjfu"] #agent-screen .zx-primary:hover {
+  box-shadow: inset 0 1px 0 #ffe49980, 0 5px 18px #16704f2b;
+}
+html[data-campus-skin="bjfu"] .zx-agent-hero {
+  background: transparent;
+}
+html[data-campus-skin="bjfu"] #feature-dialog,
+html[data-campus-skin="bjfu"] #dialog {
+  background: #fff;
+  color: var(--zx-text);
+}
+html[data-campus-skin="bjfu"] #feature-dialog .zx-field input,
+html[data-campus-skin="bjfu"] #feature-dialog .zx-field select,
+html[data-campus-skin="bjfu"] #feature-dialog .zx-field textarea {
+  background: var(--zx-soft-block);
+}
+html[data-campus-skin="bjfu"] .nutrition-choice {
+  color: var(--zx-text-soft);
+  background: #f8faf3;
+  border-color: #16704f25;
+}
+html[data-campus-skin="bjfu"] .nutrition-choice.selected {
+  color: var(--bjfu-green);
+  border: 1px solid transparent;
+  background: linear-gradient(#edf6e9, #f8faf3) padding-box, var(--bjfu-gold) border-box;
+}
+html[data-campus-skin="bjfu"] .zx-dialog header {
+  border-bottom: 1px solid #c8a35245;
+}
+
+/* The common entry previews only the currently selected school's skin. */
+html[data-campus-skin="bjfu"] .portal { background: transparent; }
+html[data-campus-skin="bjfu"] .portal-story {
+  background: linear-gradient(145deg, #edf6e9d9, #ffffffa6 64%, #fff5dcbc);
+  color: var(--ink);
+}
+html[data-campus-skin="bjfu"] .portal-story::after {
+  border-color: #16704f0c;
+  box-shadow: 0 0 0 70px #16704f03, 0 0 0 140px #e9bd5505;
+}
+html[data-campus-skin="bjfu"] .portal-login { background: #ffffffc7; }
+html[data-campus-skin="bjfu"] .role-choice.active {
+  border: 1px solid transparent;
+  background: linear-gradient(#f4f8ed, #fff) padding-box, var(--bjfu-gold) border-box;
+  box-shadow: 0 5px 18px #16704f0c;
+}
+html[data-campus-skin="bjfu"] .portal-form input,
+html[data-campus-skin="bjfu"] .portal-form select { background: #f3f7ef; }
+
+/* Management keeps its existing table layout with quiet campus accents. */
+html[data-campus-skin="bjfu"] #navbar {
+  background: #ffffffed;
+  border-bottom: 1px solid #c8a35265;
+  backdrop-filter: blur(16px);
+}
+html[data-campus-skin="bjfu"] #navbar .logo-text { color: var(--bjfu-green); }
+html[data-campus-skin="bjfu"] #sidebar,
+html[data-campus-skin="bjfu"] #footer {
+  background: linear-gradient(150deg, #124532, #16704f);
+}
+html[data-campus-skin="bjfu"] #sidebar .menu-item.active {
+  color: #fff0b6;
+  background: #ffffff14;
+  border-left-color: #e9bd55;
+}
+html[data-campus-skin="bjfu"] #main-content .zx-card {
+  background: #fffffff5;
+  border-color: #16704f1a;
+  box-shadow: 0 8px 28px #16704f08;
+}
+
+@media (max-width: 1100px) {
+  html[data-campus-skin="bjfu"] .glass-nav .hidden.md\:flex { display: none !important; }
+  html[data-campus-skin="bjfu"] .glass-nav .zx-mobile-menu { display: block; }
+  html[data-campus-skin="bjfu"] .glass-nav .nav-link { gap: 4px; padding: 6px; font-size: 13px; }
+  html[data-campus-skin="bjfu"] .bjfu-nav-art { width: 25px; height: 34px; }
+}
+@media (max-width: 767px) {
+  html[data-campus-skin="bjfu"] .glass-nav > div { min-height: 70px; }
+  html[data-campus-skin="bjfu"] #campus-background .bjfu-grove { width: 72vw; left: 0; }
+  html[data-campus-skin="bjfu"] #campus-background .bjfu-gate { width: 50vw; right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-campus-skin="bjfu"] #campus-background::before,
+  html[data-campus-skin="bjfu"] .bjfu-landmark { animation: none; }
+  html[data-campus-skin="bjfu"] .nav-link,
+  html[data-campus-skin="bjfu"] .bjfu-nav-art { transition: none; }
+  html[data-campus-skin="bjfu"] .nav-link:hover,
+  html[data-campus-skin="bjfu"] .nav-link:hover .bjfu-nav-art { transform: none; }
+}
+
+html[data-campus-skin="bjfu"] #campus-background::after {
+  content: ""; position: absolute; inset: 0; opacity: .055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.76' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpath fill='%23836a42' d='M0 0h180v180H0z' filter='url(%23paper)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* Forest materials and restrained green / warm-gold details. */
+html[data-campus-skin="bjfu"] body { --zx-bg: #fffdf8 !important; --bg: #fffdf8; background: #fffdf8 !important; }
+html[data-campus-skin="bjfu"] #campus-background { background: radial-gradient(ellipse at 88% 10%,#d8bc7724,transparent 45%),radial-gradient(ellipse at 4% 75%,#b6cfb930,transparent 50%),linear-gradient(130deg,#fffefa,#f6f8ef 65%,#fffdf8); }
+html[data-campus-skin="bjfu"] .bjfu-landmark { mask-image:radial-gradient(ellipse,#000 32%,#000a 55%,transparent 74%); -webkit-mask-image:radial-gradient(ellipse,#000 32%,#000a 55%,transparent 74%); }
+html[data-campus-skin="bjfu"] #campus-background .bjfu-grove { width:min(790px,60vw); bottom:-5%; left:-5%; opacity:.29; }
+html[data-campus-skin="bjfu"] #campus-background .bjfu-gate { width:min(670px,48vw); top:10%; right:-3%; opacity:.28; }
+html[data-campus-skin="bjfu"] .bjfu-nav-art { width:30px;height:38px;color:#28855b;filter:drop-shadow(0 2px 2px #bc984322);background:linear-gradient(145deg,#eef7ed,#fff7dc);border-radius:11px; }
+html[data-campus-skin="bjfu"] .bjfu-nav-art svg { width:100%;height:100%;padding:3px; }
+html[data-campus-skin="bjfu"] .bjfu-nav-art[data-motif="nutrition"] { color:#18714d; }
+html[data-campus-skin="bjfu"] .bjfu-nav-art[data-motif="social"] { color:#6f8b43; }
+html[data-campus-skin="bjfu"] .bjfu-nav-art[data-motif="culture"] { color:#a88435; }
+html[data-campus-skin="bjfu"] .glass-nav .nav-link { font-weight:600;background:linear-gradient(135deg,#f4f8ef88,#fff7df77); }
+html[data-campus-skin="bjfu"] .glass-nav .nav-link:hover { background:linear-gradient(115deg,#e8f4e9,#fff0c9);box-shadow:0 5px 16px #b28c3520; }
+html[data-campus-skin="bjfu"] .glass-nav .nav-link[aria-current="page"] { background:linear-gradient(115deg,#e8f5e9,#fff1cc) padding-box,linear-gradient(115deg,#22865d,#d4b368,#f4e0a6,#27885d) border-box;box-shadow:0 4px 14px #527c3c17; }
+html[data-campus-skin="bjfu"] #app-root .zx-primary,
+html[data-campus-skin="bjfu"] #agent-screen .zx-primary,
+html[data-campus-skin="bjfu"] .portal-form .btn.primary { background:linear-gradient(120deg,#145d42,#27865b 57%,#8e873e);border:1px solid #cbb07070;box-shadow:inset 0 1px 0 #fff0ae66,0 5px 16px #19634122; }
+html[data-campus-skin="bjfu"] .zx-button:not(.zx-primary):not(.zx-banner-cta) { background:linear-gradient(115deg,#eff6ec,#fbf3df);border-color:#b6c6a350; }
+html[data-campus-skin="bjfu"] .nutrition-choice { background:linear-gradient(130deg,#f5f9f0,#fffaf0); }
+html[data-campus-skin="bjfu"] .nutrition-choice.selected { background:linear-gradient(120deg,#e3f2e6,#fff1cb) padding-box,linear-gradient(110deg,#20885b,#d5b061) border-box; }
+html[data-campus-skin="bjfu"] .zx-recommendation-banner { background:linear-gradient(120deg,#12533d,#247953 62%,#487d4c);border-color:#d6b77199;box-shadow:0 16px 36px #24583d24; }
+html[data-campus-skin="bjfu"] .zx-liquid::after { background:radial-gradient(ellipse at var(--liquid-x) var(--liquid-y),#aedcb448,transparent 35%),radial-gradient(ellipse at calc(100% - var(--liquid-x)) 90%,#e8c77738,transparent 40%); }
+html[data-campus-skin="bjfu"] .zx-liquid i { background:linear-gradient(150deg,#def1ba30,#8fd8a436,transparent 70%); }
+html[data-campus-skin="bjfu"] .zx-liquid i:nth-child(2) { background:linear-gradient(120deg,#58b47950,#e6c36932,transparent 75%); }
+html[data-campus-skin="bjfu"] .zx-liquid i:nth-child(3) { background:#e8ca7830; }
+html[data-campus-skin="bjfu"] .zx-liquid-ripple { border-color:#f6df9b88; }
+html[data-campus-skin="bjfu"] #app-root .zx-banner-cta { background:linear-gradient(115deg,#ffffff16,#d3b15b23);border-color:#ead39280; }
+html[data-campus-skin="bjfu"] #sidebar,html[data-campus-skin="bjfu"] #footer { background:linear-gradient(150deg,#143f31,#1b6045); }
+@media(max-width:767px) {
+  html[data-campus-skin="bjfu"] #campus-background .bjfu-grove { width:95vw;left:-16%;bottom:0; }
+  html[data-campus-skin="bjfu"] #campus-background .bjfu-gate { width:80vw;right:-12%;top:12%; }
+}

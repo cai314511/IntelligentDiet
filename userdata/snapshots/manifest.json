@@ -1,0 +1,611 @@
+{
+  "capturedAt": "2026-10-05T15:18:34.410219+08:00",
+  "database": {
+    "path": "userdata/snapshots/local-state.db",
+    "sha256": "4fa656af2169d65545561054e02ed22c3a71c60d89db41c0ac96f11b93b9aa91",
+    "tables": {
+      "caipinfenlei": 13,
+      "caipinxinxi": 213,
+      "yonghu": 3,
+      "address": 0,
+      "orders": 8,
+      "cart": 0,
+      "storeup": 0,
+      "discusscaipinxinxi": 0,
+      "messages": 0,
+      "universities": 3,
+      "restaurants": 19,
+      "restaurant_seats": 4472,
+      "activities": 5,
+      "activity_signups": 0,
+      "recipes": 9,
+      "cultural_items": 10,
+      "cultural_orders": 1,
+      "operations_records": 12,
+      "payment_ledger": 5,
+      "nutrition_profiles": 1,
+      "food_records": 55,
+      "agent_tasks": 20,
+      "audit_events": 0,
+      "proposals": 0,
+      "proposal_votes": 0,
+      "point_ledger": 0,
+      "point_redemptions": 0,
+      "workspace_bootstrap": 1,
+      "order_dining": 1,
+      "seat_reservations": 6,
+      "agent_conversations": 11,
+      "nutrition_memberships": 2,
+      "nutrition_membership_payments": 0,
+      "nutrition_diet_plans": 0,
+      "review_likes": 0,
+      "review_comments": 0,
+      "square_posts": 24,
+      "square_post_likes": 0,
+      "square_post_comments": 16,
+      "square_votes": 3,
+      "square_weekly": 0,
+      "square_weeks": 2
+    }
+  },
+  "assets": [
+    {
+      "path": "assets/beilin/剁椒牛肉渣面.png",
+      "bytes": 2421972,
+      "sha256": "ceea0f6680c641eed197d66e52bdbb89434b0855ea46b2bce56ffe78e0dcaac9"
+    },
+    {
+      "path": "assets/beilin/南昌拌粉.png",
+      "bytes": 2596871,
+      "sha256": "78546b5de48777fb8ac5b1a8ba26451ec32fff61d3dbdb0efca4467f6b5a6d9b"
+    },
+    {
+      "path": "assets/beilin/卤肉饭.png",
+      "bytes": 2419243,
+      "sha256": "00d287e4bc72d0c385e42cd5375f54e55281b9e5c47891927566153c9e6bd976"
+    },
+    {
+      "path": "assets/beilin/咖喱土豆肉沫煲仔饭.png",
+      "bytes": 2392805,
+      "sha256": "b6ab36f07887c5bd4d219277eb52cc563985733bc166061c49820557a89d12bf"
+    },
+    {
+      "path": "assets/beilin/咸水鸡拌饭.png",
+      "bytes": 2363868,
+      "sha256": "3d1abd941ad9b036c8360a8d503222d327665fd2896ff5ae13ab400a3a9e290c"
+    },
+    {
+      "path": "assets/beilin/排骨拌饭.png",
+      "bytes": 2505904,
+      "sha256": "b74fbb1edfff845e254dcd723dcc44bc452edd498493ff3f26fcd7fbca0813d4"
+    },
+    {
+      "path": "assets/beilin/牛肉板面.png",
+      "bytes": 2465573,
+      "sha256": "390cd4443edfed9b02c6c10d9f1843ff33443daa938ceb3589d18bce5b8c1dff"
+    },
+    {
+      "path": "assets/beilin/自选菜.png",
+      "bytes": 2477684,
+      "sha256": "1629c9db2222abcb95c6662d548cbcc407f9b9da5561db47086a87809f6f9240"
+    },
+    {
+      "path": "assets/beilin/虾仁鸡胸减脂餐.png",
+      "bytes": 2550671,
+      "sha256": "bbff9f6ea1b18bdd55172b76fad8c9876f70390a47d7eb278d27b523097f7d29"
+    },
+    {
+      "path": "assets/beilin/铁板饭.png",
+      "bytes": 2553720,
+      "sha256": "d54069df464c961af6c0084c832bea965ca86d521dd627b57130351a9378eacd"
+    },
+    {
+      "path": "assets/brand/xiaozhi-actions.png",
+      "bytes": 1564813,
+      "sha256": "d63310c314a4288509e75920b7bb9d564cec947f7c6c9803f35c62024cebd2fa"
+    },
+    {
+      "path": "assets/brand/xiaozhi-avatar.png",
+      "bytes": 977190,
+      "sha256": "da1a3ad434f48503be232afbcd4e123e7e555ae4d9cacefb0b05e4d53e6dcb34"
+    },
+    {
+      "path": "assets/brand/xiaozhi-body.png",
+      "bytes": 903975,
+      "sha256": "d546afd6b3e97c0d90ed73ea570efd3d74e3420dac50de7351f02cdf3a9e9f8e"
+    },
+    {
+      "path": "assets/brand/xiaozhi-character-sheet.png",
+      "bytes": 1750474,
+      "sha256": "00ec5fc243a82bd8eec9d41c939f85d8adc593fdc4f0b2f3bb8daeecc2614b74"
+    },
+    {
+      "path": "assets/brand/xiaozhi-nutrition.png",
+      "bytes": 959406,
+      "sha256": "30fd3db9762fa93914b03bcd5e8ab015b0ba3095075dfe62dca799fba7c5b692"
+    },
+    {
+      "path": "assets/brand/zhixiang-app-icon.png",
+      "bytes": 3648619,
+      "sha256": "1c37ef18c9498004531ab3271c9f303604f48c3c3b689fada7141c2194ef8525"
+    },
+    {
+      "path": "assets/brand/zhixiang-nav-icon.png",
+      "bytes": 1282456,
+      "sha256": "23b79692b80b17a064c652197af6bbb58a1eedf4838244b10a648b1da1cbf333"
+    },
+    {
+      "path": "assets/schools/bjfu/README.md",
+      "bytes": 582,
+      "sha256": "ba3e03209d59c64a68fd093bad63f365edf49797561cc0f040c1c5471a5411bd"
+    },
+    {
+      "path": "assets/schools/bjfu/bamboo-grove.jpg",
+      "bytes": 1468325,
+      "sha256": "2db9fdcfa724483e5c90427e10255f52e114a3076bcadd25ca7a5123835d591b"
+    },
+    {
+      "path": "assets/schools/bjfu/campus-gate.jpg",
+      "bytes": 1030167,
+      "sha256": "df8b828fe8d699b1169db33d14ba60d06e3b1bfe5000dd05704ad15eee2a2a50"
+    },
+    {
+      "path": "assets/schools/bjfu/culture-notebook.png",
+      "bytes": 2682426,
+      "sha256": "875034ac955a1d644eee125c60bb50fc2d0bc5caf53e0da13561ce33c1e66834"
+    },
+    {
+      "path": "assets/schools/bjfu/culture-reference.png",
+      "bytes": 2696512,
+      "sha256": "cbb59536e474628d982294ec7ff39b8666e6ba1bdfc49243b880c94a2c1e4047"
+    },
+    {
+      "path": "assets/schools/bjfu/culture-seasons.png",
+      "bytes": 2905937,
+      "sha256": "f9d455ea75522e7e52c6d7286d565d60e774a0a7d161003090b91c18a9e39e8d"
+    },
+    {
+      "path": "assets/schools/bjfu/culture-stationery.png",
+      "bytes": 2882757,
+      "sha256": "f7dfe635ea6a3b7b0ccb98551e52960990d2fb1810207dd28bc2fffa818a6bd3"
+    },
+    {
+      "path": "assets/schools/cufe/caibao-original.jpg",
+      "bytes": 162475,
+      "sha256": "2e1b9c722f698317003dcdd77059cf7c874aef427dbe46ad2929221ba94663e7"
+    },
+    {
+      "path": "assets/schools/cufe/caibao-strip.png",
+      "bytes": 1048540,
+      "sha256": "0eec6948fa79f23bbe62d86976cec8f02c236227494cbb71e701ffc8eefa5349"
+    },
+    {
+      "path": "assets/schools/cufe/emblem.jpg",
+      "bytes": 132402,
+      "sha256": "da8e0f6448ff7b14b14386fb2fce35f880df3c0c0bfc830be16748a65472f493"
+    },
+    {
+      "path": "assets/schools/cufe/library.jpg",
+      "bytes": 56847,
+      "sha256": "6e39039f5eb6e4b3d4b8908d6b0df8f9fceff635f07f77f1b39f881907e52987"
+    },
+    {
+      "path": "assets/schools/cufe/longma.png",
+      "bytes": 405231,
+      "sha256": "7579a56000545009f25fdf73a870011371f3c8e1061688bdd07fcb3122b9ce9d"
+    },
+    {
+      "path": "assets/tianda/土豆粉条炒回锅肉.png",
+      "bytes": 2532218,
+      "sha256": "63181888171fb8d61f1dd1c3a21dd191bca890b3184f04960a02548677155680"
+    },
+    {
+      "path": "assets/tianda/大白菜红烧肉炒粉条.png",
+      "bytes": 2669438,
+      "sha256": "2b76c7c4b9e82888fdc6a5e5b5ae26d5ca259fce79a3017b19a3a0a0da8907d3"
+    },
+    {
+      "path": "assets/tianda/天津煎饼果子.png",
+      "bytes": 2365187,
+      "sha256": "047fe69bb6ec11dec8f442c7ec86a9b4968ea0486085499019f7e12ccc34d3d1"
+    },
+    {
+      "path": "assets/tianda/宽粉条白菜炖肉.png",
+      "bytes": 2524612,
+      "sha256": "e693f12bd1d540fa084f58961652840175db1d8d9238934e1e60e5c629903999"
+    },
+    {
+      "path": "assets/tianda/木耳炒牛肉.png",
+      "bytes": 2367308,
+      "sha256": "9fbb444783d5a99976e355bfb725a5976592739f795f531f7fc60206841aecde"
+    },
+    {
+      "path": "assets/tianda/清炒木耳.png",
+      "bytes": 2390504,
+      "sha256": "713509741a1e29939cb2ca4df8c82a0ac066417bdd05a879c6fd6d4c71ca9cdd"
+    },
+    {
+      "path": "assets/tianda/老爆三.png",
+      "bytes": 2511419,
+      "sha256": "a96746fbad76adba41b127be8f458242a579b5b783354822600e2a5fa4f2497a"
+    },
+    {
+      "path": "assets/tianda/蚂蚁上树.png",
+      "bytes": 2455854,
+      "sha256": "a00ca96e64835e42f3ad9fc45f7ffcde6d63fbe99974abf3d2a48a2febb8efd6"
+    },
+    {
+      "path": "assets/tianda/酸辣土豆粉.png",
+      "bytes": 2534016,
+      "sha256": "84f3e6e071470d150d985ded120809cd378c9ee6e6c6b511106073fe99713850"
+    },
+    {
+      "path": "assets/tianda/韭菜盒子.png",
+      "bytes": 2448911,
+      "sha256": "52b1c011af0b589db55090e82af16ac5ba0091c636b034e4fcd288a02d50da0b"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_04_32-3.png",
+      "bytes": 2249056,
+      "sha256": "bd8795d5e65b4107c4129beee53340bf6ef987996f15d822827f78e6bc7a4589"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_04_41-4.png",
+      "bytes": 2184748,
+      "sha256": "f4b703844d406314e098aaae83666b5062eb767c7c6d0f6561ee87a7c0329bfd"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_04_49-5.png",
+      "bytes": 1850217,
+      "sha256": "16303041df56097e7499cfa4ea7b5521810e9ae5fd6164f4c7bf81d6122f1830"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_04_51-6.png",
+      "bytes": 2714728,
+      "sha256": "87d857f7f8aed1f76ecb72fb5314a213f90aed72fbe1320e90d77eeeb291a6ba"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_05_01-7.png",
+      "bytes": 2370093,
+      "sha256": "c5595894f65362080a0cf24a2f3659627a0e05ba1f81ab25945d46f716dbee3b"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_05_16-8.png",
+      "bytes": 2926573,
+      "sha256": "c662e87757430dd1f522048afbac6dbe230d0f0b189892ca3f5d7f4f03e95ae9"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_06_10-9.png",
+      "bytes": 2410119,
+      "sha256": "8d554ab12d284b52edadbbbbf3c598a588ca8f3fd90747563fa0af8871dd4e8d"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_06_33-10.png",
+      "bytes": 2448325,
+      "sha256": "850a283169b8b61867d5bd3f3ef1f4231c4b2c56e8631906d4bd38322c9d423c"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_09_46-3.png",
+      "bytes": 2003230,
+      "sha256": "84469c18442c90cfc3f55899d37e0423051998d1068729ede187b34d4f44ac47"
+    },
+    {
+      "path": "assets/zhongcai/ChatGPT 图像 2026年10月5日 13_09_47-4.png",
+      "bytes": 2350977,
+      "sha256": "50c04f468491ea3a6c1e43a1d07254626deebfaa594abb86c9d9186b774826b1"
+    },
+    {
+      "path": "assets/zhongcai/culture-watercolor-lettered.png",
+      "bytes": 2048059,
+      "sha256": "2f50d4b7dacb10673068658d296b33ae7e3adabc4dfc55ad6554a77d240d8377"
+    },
+    {
+      "path": "assets/zhongcai/中财校园风物笔记本.png",
+      "bytes": 2382847,
+      "sha256": "693ac1c80369d9ad8c9cd1240ba849e59498c6aac03fc445d617c1b936b81a5b"
+    },
+    {
+      "path": "assets/zhongcai/冒菜.png",
+      "bytes": 2764399,
+      "sha256": "e5b8a6f2f8794d53f0332b36bd91019246707ddc320c8789c71fa97b922691d3"
+    },
+    {
+      "path": "assets/zhongcai/卤肉饭.png",
+      "bytes": 2557086,
+      "sha256": "5edd43ec4f447aeff1068b20c26b03e4097e749cd901864b546bc3b197547a1e"
+    },
+    {
+      "path": "assets/zhongcai/四季中财·逐光而行.png",
+      "bytes": 2528232,
+      "sha256": "bc5d141452cc029b39b83e14a1558d6cec925719d3e5917b276b9eadda49234f"
+    },
+    {
+      "path": "assets/zhongcai/小笼包.png",
+      "bytes": 2087027,
+      "sha256": "3c2de6388b58b8d55251dc877dcb934f627e0894be9add2da548350436da1371"
+    },
+    {
+      "path": "assets/zhongcai/广式煲仔饭.png",
+      "bytes": 2556267,
+      "sha256": "3de396848f1850808e75e7b70630d6db341704bb4fd5905d82f2a5076178cc48"
+    },
+    {
+      "path": "assets/zhongcai/炸鸡拌饭.png",
+      "bytes": 2406213,
+      "sha256": "54385511d58812815bdd6107ab113421d40e63d7a821ca667bf370c671518d32"
+    },
+    {
+      "path": "assets/zhongcai/烤盘饭.png",
+      "bytes": 2520773,
+      "sha256": "2477b61ddbdcf87cc95765e4e9d4434dc1f0f9a08e7be117d3e958c58f734d8f"
+    },
+    {
+      "path": "assets/zhongcai/牛肉饭.png",
+      "bytes": 2445931,
+      "sha256": "7df5a04c55e0ed4081c38d5d311c5491177ecc8e16303e6c5f12eeed557981e4"
+    },
+    {
+      "path": "assets/zhongcai/界面示意图.png",
+      "bytes": 2220530,
+      "sha256": "e1230e4d21db1c46ffbde1961ce2b2e7587c7fd4fa62ebd16bef1d6bbf754bf4"
+    },
+    {
+      "path": "assets/zhongcai/米粉·米线.png",
+      "bytes": 2485171,
+      "sha256": "5c47de5c89914ea33caf061206ba5f2c79710a9743cfdf8c361651e3186e74b9"
+    },
+    {
+      "path": "assets/zhongcai/胡辣汤.png",
+      "bytes": 2325916,
+      "sha256": "c1dba90d1e0c2893dcc30b60ed8d432f073cae6df81edc946b7c2215fed12b69"
+    },
+    {
+      "path": "assets/zhongcai/自选菜.png",
+      "bytes": 2422913,
+      "sha256": "a8cbd6d0f6d2aa49600aaaa6c097f203abe6901f52b5a4b4146317e0b6212738"
+    },
+    {
+      "path": "assets/zhongcai/芝士焗饭.png",
+      "bytes": 2320548,
+      "sha256": "9ca79eda03f674ea18cde5cd6a12c5731c6855836fd24c10e051717fc3c8c702"
+    },
+    {
+      "path": "assets/zhongcai/菠萝饭.png",
+      "bytes": 2405399,
+      "sha256": "acd47b7ab33a6c81e290f4adcddb5eb8ee73a24438de805a2ca166b9411086c9"
+    },
+    {
+      "path": "assets/zhongcai/葱油拌面.png",
+      "bytes": 2381829,
+      "sha256": "c7d9fc7b37ad9c6a3b76cf59e658b231c483d9fceb384b0a5035195eac032e7b"
+    },
+    {
+      "path": "assets/zhongcai/豆浆.png",
+      "bytes": 1667433,
+      "sha256": "a13b6805918d53e4445cd5fc519dae8f84882f715f2ee339df93b23bd0992268"
+    },
+    {
+      "path": "assets/zhongcai/轻食套餐.png",
+      "bytes": 2458704,
+      "sha256": "61543dd438924e5f4057de9155776930d7f0417cb976087418483d9af77e6bb9"
+    },
+    {
+      "path": "assets/zhongcai/重庆小面.png",
+      "bytes": 2541336,
+      "sha256": "012c840ba17e1d760c80609d32ca9102abfae277a79347fb386e9170dfd98277"
+    },
+    {
+      "path": "assets/zhongcai/饺子.png",
+      "bytes": 2057027,
+      "sha256": "f876405dcaa18c4d6446502bdde085f3d29eb7598bb345df3ce3ff771d24515d"
+    },
+    {
+      "path": "assets/zhongcai/馄饨.png",
+      "bytes": 2295202,
+      "sha256": "300113dd3792f43617dd051bca644a167e80db294d1c40ea8bf1271728e05e30"
+    },
+    {
+      "path": "assets/zhongcai/鸡公煲.png",
+      "bytes": 2569026,
+      "sha256": "7a9c259f66b18e047bd98fe9358704d15b53eba4a53d71a03fb84a3a330104ea"
+    },
+    {
+      "path": "assets/zhongcai/鸡排.png",
+      "bytes": 2567582,
+      "sha256": "7628fa4d7cd9feed47fb9f5e3035ccc62e3f57c90a059f2e0a80ed5ad54413b7"
+    },
+    {
+      "path": "assets/zhongcai/鸡蛋.png",
+      "bytes": 1633957,
+      "sha256": "66eabc90050c825e08db7b7099da8f5643a3b235820bd1639b255ae119c3e1e8"
+    },
+    {
+      "path": "assets/zhongcai/鸭血豆腐.png",
+      "bytes": 2443153,
+      "sha256": "43df4b24b1f2d2378d2134c9be190b2a1df46418ad7e449073f1ec20ef39f953"
+    },
+    {
+      "path": "assets/zhongcai/麻辣烫·.png",
+      "bytes": 2632701,
+      "sha256": "346fabbaf901e2dd79a9642085919075ae38a72495f7a78ca75a76b711b853f2"
+    },
+    {
+      "path": "assets/zhongcai/麻辣香锅.png",
+      "bytes": 2896831,
+      "sha256": "38411b9561ad4167a0ac27bbaf00bce2338fe77f9edced666f096eefa7102588"
+    },
+    {
+      "path": "assets/zhongcai/黄焖鸡.png",
+      "bytes": 2652021,
+      "sha256": "e8f8aa719767246f3b9b5d399da46c67378dc3f3df741c24aa3f13f9b2393f2a"
+    },
+    {
+      "path": "assets/zhongcai/龙马时藏——中财文创文具.png",
+      "bytes": 2468840,
+      "sha256": "afffb001e6589e771cc6b56a7482bd5b6258bc7101572ce91e07156d4d0896c2"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/冬.png",
+      "bytes": 2989077,
+      "sha256": "4c26697e619b92428e5fd39a971e83dbac3f77a5e50ee3a763cc699434a2af18"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/南路.jpg",
+      "bytes": 343501,
+      "sha256": "3e03b50a08783f1f4e2f3a3ad7f3bb394c976f0f90478de7cdf487ee902e0323"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/吞吐大荒龙马雕像.png",
+      "bytes": 405231,
+      "sha256": "7579a56000545009f25fdf73a870011371f3c8e1061688bdd07fcb3122b9ce9d"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/图书馆.jpg",
+      "bytes": 56847,
+      "sha256": "6e39039f5eb6e4b3d4b8908d6b0df8f9fceff635f07f77f1b39f881907e52987"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/夏.png",
+      "bytes": 3028349,
+      "sha256": "f695b753c1c3c36c71b01e789eb8872f5b6df8decda7077ac644d040b4707d0b"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/操场.jpg",
+      "bytes": 2344247,
+      "sha256": "76ba65ea755ae7391586cf5a54ae13b829637440d0156906fa45dc747b94bcf5"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/文字.png",
+      "bytes": 59631,
+      "sha256": "469001fdf8332b44b76b120646600527cba2229734700fae4613d23fce6544bc"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/春.png",
+      "bytes": 2784160,
+      "sha256": "55c54d4dc42ccd8770ea1311cb79775102eba2fce7204e5b048c9c0485365ecb"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/校徽.jpg",
+      "bytes": 132402,
+      "sha256": "da8e0f6448ff7b14b14386fb2fce35f880df3c0c0bfc830be16748a65472f493"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/秋.png",
+      "bytes": 3729749,
+      "sha256": "7818d0139b9165b46453324cbecbb19946a0c535c17f0f2e3702bf0599d52497"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/背景/2022竖版-红.png",
+      "bytes": 328993,
+      "sha256": "d204c7b9b0c6876e98a7b057311964ec1c3358a0016286876673337d50e9b7e8"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/背景/2022竖版-蓝.png",
+      "bytes": 2217720,
+      "sha256": "bf6af4f980409a99332681086d6826f0596490144879653becca218333de1882"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/背景/横版蓝.png",
+      "bytes": 1200412,
+      "sha256": "56a649ecebcf7bd86941b8337952fd441ce2261de5e2c95163ec53c0b6cb45c1"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/背景/横版蓝3.jpg",
+      "bytes": 84727,
+      "sha256": "4a90bc008790d4c6c219a0daaf4389a20d1c2a9291fd3f339972b0c12a82e408"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/背景/龙马红.png",
+      "bytes": 1114999,
+      "sha256": "72a255fecfaf3c132362f383a4fe01e05c2b6923bcc8b547bf507be442123d52"
+    },
+    {
+      "path": "assets/高校主题/中央财经大学/财宝.jpg",
+      "bytes": 162475,
+      "sha256": "2e1b9c722f698317003dcdd77059cf7c874aef427dbe46ad2929221ba94663e7"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/ChatGPT 图像 2026年10月5日 14_45_29-1.png",
+      "bytes": 2682426,
+      "sha256": "875034ac955a1d644eee125c60bb50fc2d0bc5caf53e0da13561ce33c1e66834"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/ChatGPT 图像 2026年10月5日 14_45_31-2.png",
+      "bytes": 2905937,
+      "sha256": "f9d455ea75522e7e52c6d7286d565d60e774a0a7d161003090b91c18a9e39e8d"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/ChatGPT 图像 2026年10月5日 14_45_32-3.png",
+      "bytes": 2882757,
+      "sha256": "f7dfe635ea6a3b7b0ccb98551e52960990d2fb1810207dd28bc2fffa818a6bd3"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/ChatGPT 图像 2026年10月5日 14_45_33-4.png",
+      "bytes": 2696512,
+      "sha256": "cbb59536e474628d982294ec7ff39b8666e6ba1bdfc49243b880c94a2c1e4047"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/VCG211395522545.jpg",
+      "bytes": 1030167,
+      "sha256": "df8b828fe8d699b1169db33d14ba60d06e3b1bfe5000dd05704ad15eee2a2a50"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/VCG211503478691.jpg",
+      "bytes": 853843,
+      "sha256": "323fcbeb650ea0d7ee52a9eed9396c92c6b430b7ed5c604d40c3187419e2cd85"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/VCG211503478694.jpg",
+      "bytes": 1468325,
+      "sha256": "2db9fdcfa724483e5c90427e10255f52e114a3076bcadd25ca7a5123835d591b"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/VCG211503478698.jpg",
+      "bytes": 1050192,
+      "sha256": "737058993ab494228fa2e6ee7e6ace6f4a8ffebf7cdf7e911ee9ebaf34efd030"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/VCG211538188344.jpg",
+      "bytes": 1003125,
+      "sha256": "60693b7105bf29a929cecf400fc08ac5bd765cdd9e988b8316f9ff8ebb50abef"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/VCG211593135157.jpg",
+      "bytes": 536074,
+      "sha256": "dd3445b81e718ebe754a3021aaf9bed423d72f0fd1ded92923c696457cb31e39"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/校徽.jpg",
+      "bytes": 7381,
+      "sha256": "0467814ffb5b30d55226c201889bd48bb15dc93ee9a1ce65adb1e2e8cf7d21af"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/校徽2.png",
+      "bytes": 13285,
+      "sha256": "0bc6ae4a3538d8b7aa0bbee776300ad46d457c8b1d53af5fb7502df9467e797b"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/校徽背景.jpg",
+      "bytes": 16638,
+      "sha256": "0afe8c2b06a51be81b35d51dd9b6ec4baf124b30a61923f8a2f6c3f37266561d"
+    },
+    {
+      "path": "assets/高校主题/北京林业大学/校训背景.png",
+      "bytes": 8300,
+      "sha256": "1e843697db657dcaf96119b650dfdd80d78caa7a83cec8c01c776460930fc5d9"
+    }
+  ],
+  "runtime": {
+    "node": "26.10.0",
+    "frontendPort": 8000,
+    "apiPort": 5010
+  },
+  "excluded": [
+    "server/.env",
+    "userdata/.jwt-secret",
+    "node_modules",
+    "运行日志",
+    "历史数据库备份",
+    "浏览器登录会话"
+  ]
+}

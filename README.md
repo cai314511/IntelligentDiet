@@ -4,16 +4,14 @@
 
 ## 本地启动
 
-需要 Node.js 20+。在仓库根目录执行：
+推荐 Node.js 26.10.0。在仓库根目录执行：
 
 ```sh
-npm --prefix server install
-cp server/.env.example server/.env
-npm run init-db
-npm run api
+npm run setup
+npm start
 ```
 
-另开终端执行 `npm run frontend`，打开 http://localhost:8000。先选学生或校方，再选学校和校区登录。后端默认 5000；如端口被占用，可用 `PORT=5010 npm run api` 和 `API_TARGET=http://127.0.0.1:5010 npm run frontend`。前端代理只负责本地连接，后端可独立运行。
+打开 http://localhost:8000。前端与 API 自动启动（8000 / 5010），首次使用会恢复仓库内的业务数据快照。完整复现、已有数据保留及密钥配置见 [本地复现说明](docs/LOCAL_REPRODUCTION.md)。
 
 开发环境提供“自动填入管理员账号”，只填入账号与密码，提交后按所选学生或校方身份进入对应系统。该功能仅接受本机请求，可通过 `ENABLE_DEV_ENTRY=false` 关闭；生产环境禁用开发入口。正式管理员可通过 `npm --prefix server run create-admin` 创建。
 
@@ -25,17 +23,17 @@ npm run api
 
 ## 模型配置
 
-在 `server/.env` 填 `AI_BASE_URL`、`AI_API_KEY`、`AI_MODEL`、`AI_TIMEOUT_MS`。基础地址不要附加 `/chat/completions`；密钥只保存在后端。模型通过工具调用返回方案条件，服务器查询本校菜单并重新校验约束。未配置时提供本地菜单检索及规则规划；图片识别需要支持图片输入和工具调用的模型。模型不会自动扣款。
+在 `server/.env` 填 `DEEPSEEK_API_KEY` 和可选的 `AI_TIMEOUT_MS`，系统使用 DeepSeek 的 `deepseek-v4-flash`；密钥只保存在后端。模型通过工具调用返回方案条件，服务器查询本校菜单并重新校验约束。未配置时提供本地菜单检索及规则规划；图片识别需要支持图片输入和工具调用的模型。模型不会自动扣款。
 
 ## 数据与维护
 
 - `userdata/schools.json`：学校名称、品牌色和校区配置。
-- `userdata/menu_catalog.csv`：98 条菜品及食材、过敏原、营养、份量、价格和来源字段。
+- `userdata/menu_catalog.csv`：213 条菜品及食材、过敏原、营养、份量、价格和来源字段。
 - `userdata/restaurant_context.json`：初始餐厅运营参数。
 - `userdata/operations_seed.json`：初始运营台账。
 - `userdata/zhixiang.db`：账号及业务记录；初始导入后保留后台维护结果。
 
-`npm run init-db` 幂等建表，不覆盖运营人员维护的菜单。修改 CSV 后，使用 `npm --prefix server run import-menu` 显式刷新菜单字段。数据库、密钥、环境配置和日志不纳入版本控制。前端静态服务器拒绝访问这些目录。
+`npm run init-db` 幂等建表，不覆盖运营人员维护的菜单。修改 CSV 后，使用 `npm --prefix server run import-menu` 显式刷新菜单字段。一致性数据库快照随仓库发布；运行数据库、密钥、环境配置和日志不纳入版本控制。前端静态服务器拒绝访问这些目录。
 
 ## 验证
 

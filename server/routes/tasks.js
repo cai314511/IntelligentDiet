@@ -46,7 +46,10 @@ router.post("/conversation", async (req, res) => {
     const currentTask = req.body?.taskId ? db.prepare("SELECT status,order_id,plan_json FROM agent_tasks WHERE id=? AND user_id=? AND school_id=?").get(String(req.body.taskId), req.user.id, req.user.schoolId) : null;
     const orderState = currentTask?.order_id ? db.prepare("SELECT status FROM orders WHERE orderid=? AND userid=? LIMIT 1").get(currentTask.order_id, req.user.id) : null;
     const executionState = currentTask ? { status: currentTask.status, orderId: currentTask.order_id, orderStatus: orderState?.status || null, plan: parse(currentTask.plan_json, {}) } : null;
-    const turn = await diningTurn({ executionState, message, history: Array.isArray(req.body?.history) ? req.body.history : [], conditions: req.body?.conditions || {}, preferences, data: catalog(req.user.schoolId) });
+    const dialogueCatalog=catalog(req.user.schoolId);
+    const sales=new Map(db.prepare("SELECT caipinxinxiid AS id,SUM(buyshu) AS quantity FROM orders WHERE school_id=? AND status IN ('已支付','制作中','待取餐','已完成') AND julianday(addtime)>=julianday('now','-7 days') GROUP BY caipinxinxiid").all(req.user.schoolId).map(r=>[r.id,Number(r.quantity)]));
+    dialogueCatalog.dishes.sort((a,b)=>(sales.get(a.id)||0)-(sales.get(b.id)||0));
+    const turn = await diningTurn({ executionState, message, history: Array.isArray(req.body?.history) ? req.body.history : [], conditions: req.body?.conditions || {}, preferences, data: dialogueCatalog });
     res.json({ code: 200, data: turn });
   } catch (error) {
     res.status(error.status || 502).json({ message: error.status ? error.message : "小智模型服务暂不可用，请重试。" });

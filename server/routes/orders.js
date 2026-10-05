@@ -82,7 +82,7 @@ const scopedOrder = (orderid, schoolId) =>
 router.get("/", requireAdmin, (req, res) => {
   const rows = db
     .prepare(
-      `SELECT o.*,d.campus,d.window_name,r.id AS restaurant_id
+      `SELECT o.*,d.tupian AS dishImage,d.campus,d.window_name,r.id AS restaurant_id
     FROM orders o LEFT JOIN caipinxinxi d ON d.id=o.caipinxinxiid AND d.school_id=o.school_id LEFT JOIN restaurants r ON r.school_id=d.school_id AND r.campus=d.campus AND r.name=d.restaurant_name WHERE o.school_id=? ORDER BY o.addtime DESC LIMIT 1000`,
     )
     .all(req.user.schoolId);
@@ -107,7 +107,7 @@ router.get("/user/:userid", requireAuth, (req, res) => {
     return fail(res, 403, "无权查看他人订单");
   const rows = db
     .prepare(
-      `SELECT id,orderid,caipinxinxiid,caipinmingcheng,tupian,buyshu,price,total,status,pickup_code,addtime
+      `SELECT id,orderid,caipinxinxiid,caipinmingcheng,tupian,(SELECT d.tupian FROM caipinxinxi d WHERE d.id=orders.caipinxinxiid AND d.school_id=orders.school_id) AS dishImage,buyshu,price,total,status,pickup_code,addtime
     FROM orders WHERE userid=? AND school_id=? ORDER BY addtime DESC LIMIT 500`,
     )
     .all(targetId, req.user.schoolId);
@@ -124,7 +124,7 @@ router.get("/:orderid", requireAuth, (req, res) => {
     return fail(res, 403, "无权查看该订单");
   const rows = db
     .prepare(
-      `SELECT id,orderid,caipinxinxiid,caipinmingcheng,tupian,buyshu,price,total,status,address,phone,remark,pickup_code,addtime
+      `SELECT id,orderid,caipinxinxiid,caipinmingcheng,tupian,(SELECT d.tupian FROM caipinxinxi d WHERE d.id=orders.caipinxinxiid AND d.school_id=orders.school_id) AS dishImage,buyshu,price,total,status,address,phone,remark,pickup_code,addtime
     FROM orders WHERE orderid=? AND school_id=? ORDER BY id`,
     )
     .all(req.params.orderid, req.user.schoolId);

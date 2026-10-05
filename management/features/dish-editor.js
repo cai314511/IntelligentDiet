@@ -1,3 +1,4 @@
+import {dishPhoto} from '../../shared/dish-photo.js';
 import {
   api,
   esc,
@@ -23,7 +24,7 @@ export async function editDish(row, reload) {
   };
   const d = dialog(
     row ? "编辑菜品" : "新增菜品",
-    `<form><div class="zx-grid">${field("name", "菜品名称", `<input required maxlength="80" value="${esc(r.name)}">`)}${field(
+    `<form>${row?dishPhoto(r,{height:180}):""}<div class="zx-grid">${field("name", "菜品名称", `<input required maxlength="80" value="${esc(r.name)}">`)}${field(
       "restaurantId",
       "所属食堂",
       `<select required>${options(

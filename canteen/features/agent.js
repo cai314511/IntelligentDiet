@@ -1,3 +1,4 @@
+import {dishPhoto,dishImage} from '../../shared/dish-photo.js';
 import { streamTask } from "../../shared/core.js";
 import {
   api,
@@ -16,7 +17,7 @@ import {
   formData,
   source,
 } from "../../shared/feature-ui.js";
-let conversationId = null;
+let conversationId = null, choices = [];
 let stage = 0,
   revision = 0;
 export function closeAgent() {
@@ -44,6 +45,7 @@ export async function openAgent(message = "", constraints = {}) {
   conversationId = crypto.randomUUID();
   const run = ++revision;
   catalog = (await api("/workspace/catalog")).data;
+  window.syncLiveCatalog(catalog);
   if (run !== revision) return;
   document.getElementById("cart-drawer")?.classList.add("translate-x-full");
   document.getElementById("agent-screen")?.remove();
@@ -59,6 +61,7 @@ export async function openAgent(message = "", constraints = {}) {
   conditions = { ...constraints };
   if (conditions.dishId) conditions.restaurantId = catalog.dishes.find(d => d.id === Number(conditions.dishId))?.restaurantId;
   transcript = [];
+  choices=[];
   draw();
   await reply(message);
 }
@@ -75,7 +78,7 @@ function saveConversation() {
   if(!conversationId || !transcript.length) return;
   const rows=read("agent-conversations",[]);
   const old=rows.find(r=>r.id===conversationId);
-  const entry={id:conversationId,title:transcript.find(m=>m.role==='user')?.content.slice(0,36) || '与小智的对话',updatedAt:new Date().toISOString(),transcript,conditions,plan,task};
+  const entry={id:conversationId,title:transcript.find(m=>m.role==='user')?.content.slice(0,36) || '与小智的对话',updatedAt:new Date().toISOString(),transcript,conditions,plan,task,choices};
   if(old && JSON.stringify({...old,updatedAt:null})===JSON.stringify({...entry,updatedAt:null}))return;
   store("agent-conversations",[entry,...rows.filter(r=>r.id!==conversationId)]);
   api(`/tasks/conversations/${entry.id}`,{method:"PUT",body:entry}).catch(()=>{});
@@ -94,16 +97,20 @@ async function restoreConversation(b) {
   const saved=read("agent-conversations",[]).find(r=>r.id===b.dataset.id);
   if(!saved)return;
   revision++;conversationId=saved.id;
-  transcript=saved.transcript;conditions=saved.conditions;plan=saved.plan;task=saved.task;
+  choices=saved.choices||[];transcript=saved.transcript;conditions=saved.conditions;plan=saved.plan;task=saved.task;
   if(task) {
     try { const latest=(await api(`/tasks/${task.id}`)).data; if(latest){plan=latest.plan;task={...task,...latest};} else {plan=null;task=null;} }
     catch { plan=null;task=null; }
   }
   phase=task?.status==='confirmed'?'ordered':'chat';draw();
 }
+function choicePhoto(choice) {
+  const dish = (catalog?.dishes || []).filter(d => choice.label.includes(d.name)).sort((a,b)=>b.name.length-a.name.length)[0];
+  return dish && dishImage(dish) ? dishPhoto(dish,{width:'40px',height:40}) : '';
+}
 function draw(prefill = "") {
   saveConversation();
-  host.innerHTML = `<div class="zx-row" style="justify-content:space-between">${button("返回点餐", "close")}<span>${esc(session()?.school?.name)} · 小智</span>${button("查看订单", "orders")}</div><img class="zx-agent-mascot" src="/assets/brand/xiaozhi-body.png" alt="小智"><h1>不知道吃什么？让<em>小智</em>帮您决定！</h1>${card("和小智聊聊", `<div class="zx-chat-tools">${button("新对话", "new")}${button("历史对话", "history")}</div><section id="agent-history" class="zx-history" hidden></section><div class="zx-conversation" aria-live="polite">${transcript.map((m) => `<div class="zx-chat-message ${m.role}"><b>${m.role === "assistant" ? "小智" : m.role === "system" ? "系统" : "我"}</b><p>${esc(m.content)}</p></div>`).join("")}</div><div class="zx-execution" aria-live="polite">${execution()}</div><form id="agent-chat">${field("message", "回复小智", `<button type="button" class="zx-mic" data-action="voice" aria-label="语音输入"><i class="fa-solid fa-microphone" aria-hidden="true"></i></button><textarea maxlength="2000" placeholder="说说你想吃什么…" class="zx-chat-input">${esc(prefill)}</textarea>`)}<div class="zx-row"><button type="submit" class="zx-button zx-primary" ${busy ? "disabled" : ""}>${busy ? "小智处理中…" : "发送"}</button></div></form><div data-status></div>`)}<section id="agent-result">${planHTML()}</section>`;
+  host.innerHTML = `<div class="zx-row" style="justify-content:space-between">${button("返回点餐", "close")}<span>${esc(session()?.school?.name)} · 小智</span>${button("查看订单", "orders")}</div><img class="zx-agent-mascot" src="/assets/brand/xiaozhi-body.png" alt="小智"><h1>不知道吃什么？让<em>小智</em>帮您决定！</h1>${card("和小智聊聊", `<div class="zx-chat-tools">${button("新对话", "new")}${button("历史对话", "history")}</div><section id="agent-history" class="zx-history" hidden></section><div class="zx-conversation" aria-live="polite">${transcript.map((m) => `<div class="zx-chat-message ${m.role}"><b>${m.role === "assistant" ? "小智" : m.role === "system" ? "系统" : "我"}</b><p>${esc(m.content)}</p></div>`).join("")}</div><div class="zx-choice-list">${choices.map((c,i)=>`<button type="button" class="zx-button" data-action="choice" data-index="${i}" ${busy?'disabled':''}>${choicePhoto(c)}${esc(c.label)}</button>`).join('')}</div><div class="zx-execution" aria-live="polite">${execution()}</div><form id="agent-chat">${field("message", "回复小智", `<button type="button" class="zx-mic" data-action="voice" aria-label="语音输入"><i class="fa-solid fa-microphone" aria-hidden="true"></i></button><textarea maxlength="2000" placeholder="说说你想吃什么…" class="zx-chat-input">${esc(prefill)}</textarea>`)}<div class="zx-row"><button type="submit" class="zx-button zx-primary" ${busy ? "disabled" : ""}>${busy ? "小智处理中…" : "发送"}</button></div></form><div data-status></div>`)}<section id="agent-result">${planHTML()}</section>`;
   bind(host, {
     close: () => {
       closeAgent();
@@ -114,6 +121,7 @@ function draw(prefill = "") {
       window.navigate("orders");
     },
     voice,
+    choice: b => {if(!busy)return reply(choices[Number(b.dataset.index)].message);},
     new: () => openAgent(),
     history: showConversations,
     restore: restoreConversation,
@@ -194,6 +202,7 @@ async function reply(message) {
       return;
     }
     if (r.intent !== "answer") conditions = { ...r.constraints };
+    choices=r.choices || [];
     const changed = conditionKey(conditions) !== conditionKey(previousConditions);
     if (r.ready || changed) {
       if (previousTask?.status === "draft") window.removeAgentCart(previousTask.id);
@@ -228,7 +237,7 @@ function planHTML() {
   if (!plan) return "";
   const confirmed = task?.status === "confirmed",
     cancelled = task?.status === "cancelled";
-  return `${card(confirmed ? "订单已创建" : cancelled ? "任务已取消" : "已加入餐盘的就餐方案", `<ul class="zx-plan-items">${plan.items.map((d) => `<li><b>${esc(d.name)} × ${d.quantity}</b><span>${money(d.price * d.quantity)}</span></li>`).join("")}</ul><div class="zx-grid"><p>食堂：${esc(plan.restaurant.name)}<br>窗口：${esc(plan.items[0].window)}<br>距离：${esc(plan.restaurant.distanceM)} 米<br>排队：${esc(plan.restaurant.queueMinutes)} 分钟</p><p>座位：${plan.seats.map((s) => esc(s.label || s.seat_label || s.id)).join("、") || "不预约"}<br>就餐时间：${esc(dateTime(plan.startsAt))}<br>预计完成：${esc(plan.estimatedMinutes)} 分钟<br>费用：<b>${money(plan.total)}</b></p></div><p class="zx-source">采用偏好：${esc(plan.preferences?.goal || "均衡饮食")} · 忌口 ${esc((plan.constraints.exclusions || []).join("、") || "无")} · 口味 ${esc((plan.constraints.tastes || []).join("、") || "不限")}</p>${plan.items.map((d) => `<p class="zx-source">口碑：${d.reviewCount ? esc(d.rating) + "分 · " + d.reviewCount + "条评价" : "暂无评价"}${(d.recentCriticism || []).map((r) => "<br>近期反馈：" + esc(r.content) + (r.reply ? " · 校方回复：" + esc(r.reply) : "")).join("")}</p>`).join("")}${source(plan.sourceName, plan.updatedAt)}<div class="zx-row">${confirmed ? `${button("前往支付", "pay", true)}${button("查看取餐状态", "orders")}` : cancelled ? "" : `${button("查看餐盘 · " + money(plan.total), "confirm", true)}${button("修改方案", "modify")}${button("选择食堂座位", "seats")}${button("取消任务", "cancel")}`}</div><div data-status>${confirmed ? notice("订单已保留为未支付，请核对费用后另行确认支付。", "success") : ""}</div>`)} `;
+  return `${card(confirmed ? "订单已创建" : cancelled ? "任务已取消" : "已加入餐盘的就餐方案", `<ul class="zx-plan-items">${plan.items.map((d) => `<li>${dishPhoto(d,{catalog:catalog?.dishes||[],width:"64px",height:64})}<b style="flex:1;margin-left:12px">${esc(d.name)} × ${d.quantity}</b><span>${money(d.price * d.quantity)}</span></li>`).join("")}</ul><div class="zx-grid"><p>食堂：${esc(plan.restaurant.name)}<br>窗口：${esc(plan.items[0].window)}<br>距离：${esc(plan.restaurant.distanceM)} 米<br>排队：${esc(plan.restaurant.queueMinutes)} 分钟</p><p>座位：${plan.seats.map((s) => esc(s.label || s.seat_label || s.id)).join("、") || "不预约"}<br>就餐时间：${esc(dateTime(plan.startsAt))}<br>预计完成：${esc(plan.estimatedMinutes)} 分钟<br>费用：<b>${money(plan.total)}</b></p></div><p class="zx-source">采用偏好：${esc(plan.preferences?.goal || "均衡饮食")} · 忌口 ${esc((plan.constraints.exclusions || []).join("、") || "无")} · 口味 ${esc((plan.constraints.tastes || []).join("、") || "不限")}</p>${plan.items.map((d) => `<p class="zx-source">口碑：${d.reviewCount ? esc(d.rating) + "分 · " + d.reviewCount + "条评价" : "暂无评价"}${(d.recentCriticism || []).map((r) => "<br>近期反馈：" + esc(r.content) + (r.reply ? " · 校方回复：" + esc(r.reply) : "")).join("")}</p>`).join("")}${source(plan.sourceName, plan.updatedAt)}<div class="zx-row">${confirmed ? `${button("前往支付", "pay", true)}${button("查看取餐状态", "orders")}` : cancelled ? "" : `${button("查看餐盘 · " + money(plan.total), "confirm", true)}${button("修改方案", "modify")}${button("选择食堂座位", "seats")}${button("取消任务", "cancel")}`}</div><div data-status>${confirmed ? notice("订单已保留为未支付，请核对费用后另行确认支付。", "success") : ""}</div>`)} `;
 }
 async function generate() {
   if (busy) return;

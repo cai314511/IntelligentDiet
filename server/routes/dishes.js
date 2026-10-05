@@ -9,7 +9,7 @@ const stringList = (value, limit) => Array.isArray(value) && value.length <= lim
 const selectDish = `SELECT d.id,d.school_id AS schoolId,d.caipinmingcheng AS name,d.caipinfenlei AS category,d.tupian AS image,
   d.cailiao AS ingredientsText,d.guige AS portionLabel,d.portion_g AS portionG,d.jiage AS price,d.yingyang AS nutritionText,
   d.nutrition_json AS nutritionJson,d.ingredients_json AS ingredientsJson,d.allergens_json AS allergensJson,
-  d.window_name AS window,d.campus,d.restaurant_name AS restaurant,d.price_unit AS priceUnit,d.taste_tags_json AS tasteTagsJson,d.dietary_tags_json AS dietaryTagsJson,
+  d.floor,d.location_basis AS locationBasis,d.window_name AS window,d.campus,d.restaurant_name AS restaurant,d.price_unit AS priceUnit,d.taste_tags_json AS tasteTagsJson,d.dietary_tags_json AS dietaryTagsJson,
   d.spice_level AS spiceLevel,d.source_date AS sourceDate,d.source_kind AS sourceKind,d.price_basis AS priceBasis,d.nutrition_basis AS nutritionBasis,
   COALESCE((SELECT SUM(o.buyshu) FROM orders o WHERE o.caipinxinxiid=d.id AND o.status IN ('已支付','制作中','待取餐','已完成') AND o.addtime>=datetime('now','-30 days')),0) AS monthlySales,
   COALESCE((SELECT ROUND(AVG(r.rating),1) FROM discusscaipinxinxi r WHERE r.caipinxinxiid=d.id),0) AS rating,d.kucun AS stock,d.shangjia AS forSale,d.data_source AS sourceName,d.source_url AS sourceUrl

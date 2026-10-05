@@ -1,3 +1,6 @@
+import { bjfuCulturePage, isBjfuCultureAccount } from "./bjfu-culture.js";
+import { cufeCulturePage, isCufeCultureAccount } from "./cufe-culture.js";
+import { renderSocial } from "./social.js";
 import {
   api,
   esc,
@@ -20,21 +23,7 @@ export async function renderCampus(kind) {
   root.innerHTML = notice("正在加载校园内容…");
   try {
     if (kind === "social") {
-      const messages = (await api("/social/messages")).data,
-        proposals = (await api("/community/proposals")).data;
-      if (location.hash !== "#" + kind) return;
-      root.innerHTML = `<h1 class="text-4xl font-bold mb-6">食话广场</h1><div class="zx-row" style="margin-bottom:18px">${button("提出建议或反馈", "feedback", true)}${button("发起菜品共创", "proposal")}</div>${card("菜品共创", proposals.map((p) => `<div style="margin:14px 0"><b>${esc(p.title)}</b><p>${esc(p.description)} · ${p.support || 0}人支持</p>${button(p.myVote ? "已投票" : "支持", "vote").replace('data-action="vote"', `data-action="vote" data-id="${p.id}" ${p.myVote ? "disabled" : ""}`)}</div>`).join("") || "<p>暂未发布提案。</p>")}${card("校园反馈与校方回复", messages.map((m) => `<div style="padding:14px 0;border-bottom:1px solid #eee"><b>${esc(m.category || "建议")} · ${esc(m.workflow || "待处理")}</b><p>${esc(m.content)}</p><p>${m.replycontent ? "校方回复：" + esc(m.replycontent) : "等待校方处理"}</p></div>`).join("") || "<p>暂无反馈。</p>")}`;
-      bind(root, {
-        feedback: () => feedback(),
-        proposal: () => proposal(),
-        vote: async (b) => {
-          await api("/community/proposals/" + b.dataset.id + "/vote", {
-            method: "POST",
-            body: { choice: "支持" },
-          });
-          await renderCampus(kind);
-        },
-      });
+      await renderSocial(root);
     } else {
       const [a, c, p] = await Promise.all([
         api("/activities"),
@@ -47,6 +36,12 @@ export async function renderCampus(kind) {
       ]);
       if (location.hash !== "#" + kind) return;
       root.innerHTML = `<h1 class="text-4xl font-bold mb-6">文创活动</h1>${card("校园积分", `<p class="zx-stat">${p.data.balance}</p><p>活动参与和菜品共创获得积分，可兑换校园文创。</p>${p.data.redemptions.map((r) => `<p>${esc(r.title)} · ${esc(r.status)}</p>`).join("")}`)}${card("我的参与与文创订单", `<div>${signups.data.map((x) => `<p>${esc(x.title)} · ${esc(x.signupStatus)} · ${esc(dateTime(x.startsAt))}</p>`).join("")}${mine.data.map((x) => `<p>${esc(x.title)} × ${x.quantity} · ${money(x.total)} · ${esc(x.status)}</p>`).join("") || "<p>暂无文创订单。</p>"}</div>`)}${card("校园活动", `<div class="zx-grid">${a.data.map((x) => card(x.title, `<p>${esc(x.description)}</p><p>${esc(x.campus)} · ${esc(x.location)}<br>${esc(dateTime(x.startsAt))}—${esc(dateTime(x.endsAt))}</p>${source(x.sourceName, x.startsAt)}${button("报名参加", "join", true).replace('data-action="join"', `data-action="join" data-id="${x.id}"`)}`)).join("") || "<p>暂无活动。</p>"}</div>`)}${card("校园文创与积分兑换", `<div class="zx-grid">${c.data.map((x) => card(x.title, `<p>${esc(x.description)}</p><p>${money(x.price)} · 库存 ${x.stock}</p>${source(x.sourceName)}<div class="zx-row">${button("确认购买", "buy", true).replace('data-action="buy"', `data-action="buy" data-id="${x.id}"`)}${button("积分兑换", "redeem").replace('data-action="redeem"', `data-action="redeem" data-id="${x.id}"`)}</div>`)).join("")}</div>`)}<div data-status></div>`;
+      if (isCufeCultureAccount(session())) {
+        root.innerHTML = cufeCulturePage({activities:a.data,items:c.data,points:p.data,orders:mine.data,signups:signups.data});
+      }
+      if (isBjfuCultureAccount(session())) {
+        root.innerHTML = bjfuCulturePage({activities:a.data,items:c.data,points:p.data,orders:mine.data,signups:signups.data});
+      }
       bind(root, {
         join: async (b) => {
           await api("/activities/" + b.dataset.id + "/join", {

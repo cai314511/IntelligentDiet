@@ -1,3 +1,4 @@
+import {displaySeat} from "./floorLayout.js";
 import { randomUUID } from "crypto";
 import { db } from "../database.js";
 export function createOrder(user, body) {
@@ -76,6 +77,7 @@ export function createOrder(user, body) {
         ? [...new Set(input.seatIds.map(Number))]
         : [];
       if (ids.length > 6) fail("请核对预约座位数量");
+      if(ids.length && restaurant.has_seating===0) fail("该餐厅不提供座位预约",409);
       const people=Number(input.people ?? 1);
       if(!Number.isInteger(people) || people<1 || people>6) fail("请核对用餐人数");
       let capacity=0;
@@ -151,7 +153,7 @@ export function createOrder(user, body) {
         plan.startsAt=dining.start.toISOString();
         plan.constraints={...plan.constraints,startsAt:plan.startsAt,restaurantId:dining.restaurant.id,people:Number(body.dining.people ?? 1),reserve:Boolean(body.dining.seatIds?.length)};
         plan.estimatedMinutes=Math.ceil(dining.restaurant.distance_m/75)+dining.restaurant.queue_minutes+5;
-        plan.seats=[...new Set(body.dining.seatIds || [])].map(id=>{const seat=db.prepare("SELECT * FROM restaurant_seats WHERE id=?").get(Number(id));return {id:seat.id,label:seat.seat_label,type:seat.seat_type};});
+        plan.seats=[...new Set(body.dining.seatIds || [])].map(id=>{const seat=db.prepare("SELECT * FROM restaurant_seats WHERE id=?").get(Number(id));return {id:seat.id,label:displaySeat({label:seat.seat_label,floor:seat.floor,seat_number:seat.seat_number},dining.restaurant).label,floor:displaySeat({label:seat.seat_label,floor:seat.floor,seat_number:seat.seat_number},dining.restaurant).floor,type:seat.seat_type};});
       }
       plan.items=lines.map(({dish,quantity})=>({id:dish.id,name:dish.caipinmingcheng,price:Number(dish.jiage),quantity,window:dish.window_name}));
       plan.total=cents/100;

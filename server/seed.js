@@ -1,3 +1,4 @@
+import {buildings} from "./services/restaurantTopology.js";
 import fs from "fs";
 import path from "path";
 import { config } from "./config.js";
@@ -208,7 +209,9 @@ const recipeTemplates = [
   ],
 ];
 
-export function seedReferenceData(database, { refreshMenu = false } = {}) {
+export function seedReferenceData(database, { refreshMenu = false, preserveCommerce = false } = {}) {
+  const normalized=database.prepare("PRAGMA table_info(restaurants)").all().some(c=>c.name==='canonical_id');
+  const building=(school,name)=>normalized?buildings[school]?.find(g=>g.aliases.includes(name)):null;
   const insertRestaurant = database.prepare(`INSERT OR IGNORE INTO restaurants
     (school_id,campus,name,category,description,opening_hours,queue_minutes,queue_count,total_seats,available_seats)
     VALUES(?,?,?,?,?,'06:50-21:30',?,?,?,?)`);
@@ -216,7 +219,8 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
     "INSERT OR IGNORE INTO restaurant_seats(restaurant_id,seat_label,seat_type) VALUES(?,?,?)",
   );
   const addRestaurant = database.transaction(() => {
-    for (const [schoolId, campus, name, category, description] of restaurants) {
+    for (let [schoolId, campus, name, category, description] of restaurants) {
+      const g=building(schoolId,name);if(g){name=g.name;campus=g.campus;}
       insertRestaurant.run(
         schoolId,
         campus,
@@ -322,6 +326,8 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
     ? parseCsv(fs.readFileSync(menuPath, "utf8"))
     : [];
   for (const item of rows) {
+    item.sourceIdentity=item.source_identity ? JSON.parse(item.source_identity) : [item.school_id,item.campus,item.restaurant,item.dish_name];
+    const g=building(item.school_id,item.restaurant);if(g){item.restaurant=g.name;item.campus=g.campus;}
     insertRestaurant.run(
       item.school_id,
       item.campus,
@@ -350,7 +356,7 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
     "INSERT OR IGNORE INTO caipinfenlei(caipinfenlei) VALUES(?)",
   );
   const findDish = database.prepare(
-    "SELECT id,source_key FROM caipinxinxi WHERE source_key=? OR (source_key IS NULL AND school_id=? AND caipinmingcheng=? AND campus=? AND restaurant_name=?) LIMIT 1",
+    "SELECT id,source_key,jiage,shangjia FROM caipinxinxi WHERE source_key=? OR (source_key IS NULL AND school_id=? AND caipinmingcheng=? AND campus=? AND restaurant_name=?) LIMIT 1",
   );
   const insertDish = database.prepare(`INSERT INTO caipinxinxi
     (caipinmingcheng,caipinfenlei,tupian,cailiao,guige,jiage,yingyang,yueshuxiao,pinfen,kucun,shangjia,school_id,
@@ -371,14 +377,20 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
   };
   const seedMenu = database.transaction(() => {
     for (const item of rows) {
+    const g=building(item.school_id,item.restaurant);if(g){item.restaurant=g.name;item.campus=g.campus;}
       addCategory.run(item.category);
       const nutrition = {
         calories: Number(item.calories_kcal),
         protein: Number(item.protein_g),
         carbs: Number(item.carbs_g),
         fat: Number(item.fat_g),
-        fiber: Number(item.fiber_g),
-        sodium: Number(item.sodium_mg),
+        fiber: item.fiber_g === "" ? null : Number(item.fiber_g),
+        sodium: item.sodium_mg === "" ? null : Number(item.sodium_mg),
+        status: item.nutrition_status || "unknown",
+        confidence: /代理|未知|不明|自选|波动/.test(item.nutrition_recipe ? JSON.parse(item.nutrition_recipe).notes || "" : "未知") ? "low" : "estimate",
+        per100g: { calories: Number(item.calories_per_100g), protein: Number(item.protein_per_100g), carbs: Number(item.carbs_per_100g), fat: Number(item.fat_per_100g) },
+        recipe: item.nutrition_recipe ? JSON.parse(item.nutrition_recipe) : null,
+        sourceUrl: item.nutrition_source_url || "",
         basis: item.nutrition_basis,
       };
       const ingredients = parseList(item.ingredients_json || item.ingredients);
@@ -416,12 +428,7 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
         image,
         image,
       ];
-      const sourceKey = JSON.stringify([
-        item.school_id,
-        item.campus,
-        item.restaurant,
-        item.dish_name,
-      ]);
+      const sourceKey = JSON.stringify(item.sourceIdentity || [item.school_id,item.campus,item.restaurant,item.dish_name]);
       const existing = findDish.get(
         sourceKey,
         item.school_id,
@@ -430,7 +437,10 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
         item.restaurant,
       );
       if (existing) {
-        if (refreshMenu) updateDish.run(...values, existing.id);
+        if (refreshMenu) {
+          if (preserveCommerce) { values[3]=existing.jiage; values[5]=existing.shangjia; }
+          updateDish.run(...values, existing.id);
+        }
         database
           .prepare("UPDATE caipinxinxi SET source_key=? WHERE id=?")
           .run(sourceKey, existing.id);
@@ -469,6 +479,7 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
           .prepare("UPDATE caipinxinxi SET source_key=? WHERE id=?")
           .run(sourceKey, added.lastInsertRowid);
       }
+      if (!existing || refreshMenu) database.prepare("UPDATE caipinxinxi SET floor=?,window_name=?,location_basis=? WHERE source_key=?").run(item.floor || "", item.window_name || "未核实窗口", item.location_basis || "未核实", sourceKey);
     }
   });
   if (rows.length) seedMenu();
@@ -520,10 +531,12 @@ export function seedReferenceData(database, { refreshMenu = false } = {}) {
         );
     }
   }
+  if(!normalized) {
   database.prepare("UPDATE restaurant_seats SET seat_type='单人座',floor=CASE WHEN CAST(substr(seat_label,3) AS INTEGER)<=8 THEN '一层' WHEN CAST(substr(seat_label,3) AS INTEGER)<=16 THEN '二层' ELSE '三层' END").run();
   const seatInsert=database.prepare("INSERT OR IGNORE INTO restaurant_seats(restaurant_id,seat_label,seat_type,floor) VALUES(?,?,'单人座',?)");
   for(const restaurant of database.prepare("SELECT id FROM restaurants").all()) {
     for(const zone of ['A','B','C','D']) for(let n=1;n<=24;n++) seatInsert.run(restaurant.id,`${zone}-${String(n).padStart(2,'0')}`,['一层','二层','三层'][Math.floor((n-1)/8)]);
   }
 
+  }
 }

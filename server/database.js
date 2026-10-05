@@ -1,3 +1,6 @@
+import {ensureBjfuCulture} from "./services/bjfuCulture.js";
+import {syncDishImages} from "./services/dishImages.js";
+import {normalizeRestaurants,ensureSeatCapacity} from "./services/restaurantTopology.js";
 import Database from "better-sqlite3";
 import bcrypt from "bcryptjs";
 import path from "path";
@@ -170,6 +173,9 @@ export function initDatabase() {
   addColumn("yonghu", "role", "role TEXT DEFAULT 'user'");
   addColumn("yonghu", "school_id", "school_id TEXT NOT NULL DEFAULT 'cufe'");
   addColumn("caipinxinxi", "source_key", "source_key TEXT");
+  addColumn("caipinxinxi", "window_name", "window_name TEXT NOT NULL DEFAULT ''");
+  addColumn("caipinxinxi", "floor", "floor TEXT NOT NULL DEFAULT ''");
+  addColumn("caipinxinxi", "location_basis", "location_basis TEXT NOT NULL DEFAULT ''");
   addColumn("caipinxinxi", "shangjia", "shangjia TEXT DEFAULT '是'");
   addColumn(
     "caipinxinxi",
@@ -521,10 +527,15 @@ export function initDatabase() {
 
   if (!db.prepare("PRAGMA table_info(restaurant_seats)").all().some(c=>c.name==='floor')) db.exec("ALTER TABLE restaurant_seats ADD COLUMN floor TEXT NOT NULL DEFAULT '一层'");
   db.prepare("UPDATE restaurant_seats SET seat_type='单人座'").run();
-  if (config.seedReferenceData) seedReferenceData(db);
+  const topologyReady=db.prepare("PRAGMA table_info(restaurants)").all().some(c=>c.name==='canonical_id');
+  if (config.seedReferenceData && !topologyReady) seedReferenceData(db);
   db.exec("CREATE TABLE IF NOT EXISTS agent_conversations(id TEXT NOT NULL,user_id INTEGER NOT NULL,school_id TEXT NOT NULL,payload TEXT NOT NULL,updated_at TEXT NOT NULL,PRIMARY KEY(id,user_id,school_id))");
   initWorkspace(db);
+  for(const [table,name,definition] of [['restaurants','canonical_id','INTEGER'],['restaurants','floors_json',"TEXT DEFAULT '[]'"],['restaurants','has_seating','INTEGER DEFAULT 1'],['restaurant_seats','seat_number','INTEGER']])if(!db.prepare(`PRAGMA table_info(${table})`).all().some(c=>c.name===name))db.exec(`ALTER TABLE ${table} ADD COLUMN ${name} ${definition}`);
+  db.transaction(()=>{normalizeRestaurants(db);ensureSeatCapacity(db);})();
 
+  ensureBjfuCulture(db);
+  syncDishImages(db);
   console.log("✓ 数据库表创建成功");
 }
 

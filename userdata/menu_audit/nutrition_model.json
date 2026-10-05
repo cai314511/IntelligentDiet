@@ -1,0 +1,2067 @@
+{
+  "version": "2026-10-05",
+  "source": {
+    "title": "国家卫生健康委《成人肥胖食养指南（2024年版）》附录2",
+    "url": "https://wjw.baoji.gov.cn/col2223/col2269/202403/P020241228641521653546.pdf",
+    "pages": "印刷页15—19，PDF页17—21"
+  },
+  "exchangeFields": [
+    "grams",
+    "protein",
+    "carbs",
+    "fat"
+  ],
+  "exchanges": {
+    "grain": [
+      25,
+      2.5,
+      19,
+      0.5
+    ],
+    "rice": [
+      75,
+      2,
+      19.4,
+      0.2
+    ],
+    "noodle": [
+      35,
+      2.5,
+      18,
+      0.4
+    ],
+    "bean": [
+      25,
+      5.5,
+      15,
+      0.5
+    ],
+    "starch": [
+      25,
+      0.3,
+      21.2,
+      0
+    ],
+    "pastry": [
+      20,
+      1.4,
+      13,
+      2.6
+    ],
+    "potato": [
+      100,
+      1.9,
+      20,
+      0.2
+    ],
+    "veg": [
+      250,
+      4.5,
+      16,
+      0.7
+    ],
+    "mushroom": [
+      275,
+      7.6,
+      14,
+      0.6
+    ],
+    "fruit": [
+      150,
+      1,
+      20,
+      0.6
+    ],
+    "lean": [
+      80,
+      16,
+      1.3,
+      2.1
+    ],
+    "pork": [
+      60,
+      11.5,
+      0.3,
+      5.3
+    ],
+    "fatty": [
+      30,
+      4.5,
+      0.7,
+      7.7
+    ],
+    "poultry": [
+      50,
+      8.8,
+      0.7,
+      6
+    ],
+    "egg": [
+      60,
+      7.6,
+      1.6,
+      6.6
+    ],
+    "fish": [
+      75,
+      13.7,
+      1,
+      3.2
+    ],
+    "shrimp": [
+      115,
+      15.8,
+      3.1,
+      1.5
+    ],
+    "nuts": [
+      15,
+      3.2,
+      2.9,
+      7.7
+    ],
+    "tofu": [
+      90,
+      11,
+      1.8,
+      4.3
+    ],
+    "softtofu": [
+      150,
+      9.3,
+      3.9,
+      3.8
+    ],
+    "beancurd": [
+      50,
+      8.5,
+      3.8,
+      4.6
+    ],
+    "soymilk": [
+      330,
+      8,
+      8,
+      3.1
+    ],
+    "milk": [
+      150,
+      5,
+      7.4,
+      5.4
+    ],
+    "yogurt": [
+      100,
+      2.8,
+      12.9,
+      2.6
+    ],
+    "cheese": [
+      25,
+      5.6,
+      1.9,
+      7
+    ],
+    "oil": [
+      1,
+      0,
+      0,
+      1
+    ],
+    "sugar": [
+      1,
+      0,
+      1,
+      0
+    ],
+    "water": [
+      1,
+      0,
+      0,
+      0
+    ]
+  },
+  "recipes": {
+    "麻辣香锅": {
+      "components": {
+        "poultry": 100,
+        "potato": 150,
+        "veg": 150,
+        "beancurd": 40,
+        "oil": 40,
+        "sugar": 8
+      },
+      "portionG": 450,
+      "notes": "不含米饭；40g为估计实际入口的烹调用油，食材自选导致很大波动"
+    },
+    "麻辣烫": {
+      "components": {
+        "starch": 50,
+        "poultry": 80,
+        "tofu": 100,
+        "veg": 150,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "干粉50g；含汤，不按整锅汤底用油全部入口计算"
+    },
+    "冒菜": {
+      "components": {
+        "lean": 100,
+        "beancurd": 60,
+        "veg": 200,
+        "oil": 28,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "不含额外米饭"
+    },
+    "重庆小面": {
+      "components": {
+        "grain": 100,
+        "lean": 35,
+        "veg": 80,
+        "nuts": 10,
+        "oil": 22,
+        "sugar": 4
+      },
+      "portionG": 450,
+      "notes": "面粉/米粉按干重100g，成品面条含水；豌杂面另以杂豆替代20g主食"
+    },
+    "南昌拌粉": {
+      "components": {
+        "grain": 100,
+        "lean": 35,
+        "veg": 80,
+        "nuts": 10,
+        "oil": 22,
+        "sugar": 4
+      },
+      "portionG": 450,
+      "notes": "面粉/米粉按干重100g，成品面条含水；豌杂面另以杂豆替代20g主食"
+    },
+    "油泼面": {
+      "components": {
+        "grain": 100,
+        "lean": 35,
+        "veg": 80,
+        "nuts": 10,
+        "oil": 22,
+        "sugar": 4
+      },
+      "portionG": 450,
+      "notes": "面粉/米粉按干重100g，成品面条含水；豌杂面另以杂豆替代20g主食"
+    },
+    "豌杂面": {
+      "components": {
+        "grain": 80,
+        "lean": 35,
+        "veg": 80,
+        "nuts": 10,
+        "oil": 22,
+        "sugar": 4,
+        "bean": 20
+      },
+      "portionG": 450,
+      "notes": "面粉/米粉按干重100g，成品面条含水；豌杂面另以杂豆替代20g主食"
+    },
+    "黄焖鸡": {
+      "components": {
+        "rice": 220,
+        "poultry": 150,
+        "veg": 100,
+        "potato": 50,
+        "oil": 18,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "有米饭的菜按熟米饭220g；禽肉为可食部生重，包含一般带皮肉脂肪"
+    },
+    "鸡公煲": {
+      "components": {
+        "rice": 220,
+        "poultry": 150,
+        "veg": 100,
+        "potato": 50,
+        "oil": 18,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "有米饭的菜按熟米饭220g；禽肉为可食部生重，包含一般带皮肉脂肪"
+    },
+    "瓦香鸡": {
+      "components": {
+        "rice": 220,
+        "poultry": 150,
+        "veg": 100,
+        "potato": 50,
+        "oil": 18,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "有米饭的菜按熟米饭220g；禽肉为可食部生重，包含一般带皮肉脂肪"
+    },
+    "咸水鸡拌饭": {
+      "components": {
+        "rice": 220,
+        "poultry": 150,
+        "veg": 100,
+        "potato": 50,
+        "oil": 18,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "有米饭的菜按熟米饭220g；禽肉为可食部生重，包含一般带皮肉脂肪"
+    },
+    "白切鸡饭": {
+      "components": {
+        "rice": 220,
+        "poultry": 150,
+        "veg": 100,
+        "potato": 50,
+        "oil": 18,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "有米饭的菜按熟米饭220g；禽肉为可食部生重，包含一般带皮肉脂肪"
+    },
+    "鸡架拌面": {
+      "components": {
+        "poultry": 150,
+        "veg": 100,
+        "potato": 50,
+        "oil": 18,
+        "sugar": 8,
+        "grain": 100
+      },
+      "portionG": 500,
+      "notes": "有米饭的菜按熟米饭220g；禽肉为可食部生重，包含一般带皮肉脂肪"
+    },
+    "鸡架拌饭": {
+      "components": {
+        "rice": 220,
+        "poultry": 150,
+        "veg": 100,
+        "potato": 50,
+        "oil": 18,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "有米饭的菜按熟米饭220g；禽肉为可食部生重，包含一般带皮肉脂肪"
+    },
+    "米粉米线": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "牛肉板面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "红烧牛肉面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "大同刀削面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "鲜虾阳春面": {
+      "components": {
+        "grain": 90,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4,
+        "shrimp": 100
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "牛肉面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "牛肉拉面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "粗粮面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "河南烩面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "安徽板面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "刀削面": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "米线": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "砂锅米线": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "鸡丝米线": {
+      "components": {
+        "grain": 90,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4,
+        "poultry": 90
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "半只鸡米线": {
+      "components": {
+        "grain": 90,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4,
+        "poultry": 220
+      },
+      "portionG": 700,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "牛肉汤饼": {
+      "components": {
+        "grain": 90,
+        "lean": 80,
+        "veg": 100,
+        "oil": 12,
+        "sugar": 4
+      },
+      "portionG": 500,
+      "notes": "粉/面按干重90g，含汤；主食干重按相近谷物交换份估算"
+    },
+    "广式煲仔饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "卤肉饭": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "fatty": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "牛肉饭": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "lean": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "烤盘饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "铁板饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "铁板牛肉饭": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "lean": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "排骨拌饭": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "fatty": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "排骨饭": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "fatty": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "瓦香肥牛": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "fatty": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "酸豆角肉沫盖饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "咖喱土豆肉末煲仔饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "新疆手抓饭": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "lean": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "烧鸭饭": {
+      "components": {
+        "rice": 250,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "fatty": 120
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "石锅饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "韩式石锅拌饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "老妈烫饭": {
+      "components": {
+        "rice": 250,
+        "pork": 120,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": "熟米饭250g，肉类可食部生重120g，油为估计入口量"
+    },
+    "馄饨": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "鲜肉小馄饨": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "荠菜大馄饨": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "小笼包": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "新疆烤包子": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "饺子": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "韭菜盒子": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "烧麦": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "饭团": {
+      "components": {
+        "grain": 80,
+        "pork": 80,
+        "veg": 100,
+        "oil": 8,
+        "sugar": 3
+      },
+      "portionG": 350,
+      "notes": "粉按干重；小笼包约6只/份，其他饺/馄饨为一份示例，不含额外蘸料"
+    },
+    "葱油拌面": {
+      "components": {
+        "grain": 110,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 450,
+      "notes": "面粉干重110g，烹调用油25g，肉酱会有波动"
+    },
+    "香菇牛肉酱拌面": {
+      "components": {
+        "grain": 110,
+        "lean": 80,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 450,
+      "notes": "面粉干重110g，烹调用油25g，肉酱会有波动"
+    },
+    "剁椒牛肉渣面": {
+      "components": {
+        "grain": 110,
+        "lean": 80,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 450,
+      "notes": "面粉干重110g，烹调用油25g，肉酱会有波动"
+    },
+    "三合一拌面": {
+      "components": {
+        "grain": 110,
+        "lean": 80,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 450,
+      "notes": "面粉干重110g，烹调用油25g，肉酱会有波动"
+    },
+    "牛肉炒拉条": {
+      "components": {
+        "grain": 110,
+        "lean": 80,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 450,
+      "notes": "面粉干重110g，烹调用油25g，肉酱会有波动"
+    },
+    "牛肉焖面": {
+      "components": {
+        "grain": 110,
+        "lean": 80,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 450,
+      "notes": "面粉干重110g，烹调用油25g，肉酱会有波动"
+    },
+    "芝士焗饭": {
+      "components": {
+        "rice": 250,
+        "poultry": 100,
+        "veg": 80,
+        "cheese": 40,
+        "oil": 15,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "炸鸡拌饭": {
+      "components": {
+        "rice": 250,
+        "grain": 25,
+        "veg": 80,
+        "oil": 30,
+        "sugar": 10,
+        "poultry": 130
+      },
+      "portionG": 500,
+      "notes": "炸制吸油30g为场景估计，不是炸锅全部油量"
+    },
+    "咖喱猪排饭": {
+      "components": {
+        "rice": 250,
+        "pork": 130,
+        "grain": 25,
+        "veg": 80,
+        "oil": 30,
+        "sugar": 10
+      },
+      "portionG": 500,
+      "notes": "炸制吸油30g为场景估计，不是炸锅全部油量"
+    },
+    "鸡排": {
+      "components": {
+        "grain": 25,
+        "veg": 80,
+        "oil": 30,
+        "sugar": 10,
+        "poultry": 130
+      },
+      "portionG": 200,
+      "notes": "炸制吸油30g为场景估计，不是炸锅全部油量"
+    },
+    "轻食套餐": {
+      "components": {
+        "rice": 150,
+        "lean": 130,
+        "veg": 220,
+        "oil": 6,
+        "sugar": 2
+      },
+      "portionG": 450,
+      "notes": "少油场景；去皮鸡胸按瘦肉交换份代理估算，酱汁另计，名称不能保证低脂"
+    },
+    "虾仁鸡胸减脂餐": {
+      "components": {
+        "rice": 150,
+        "lean": 100,
+        "veg": 220,
+        "oil": 6,
+        "sugar": 2,
+        "shrimp": 70
+      },
+      "portionG": 450,
+      "notes": "少油场景；去皮鸡胸按瘦肉交换份代理估算，酱汁另计，名称不能保证低脂"
+    },
+    "鸡胸肉健身餐": {
+      "components": {
+        "rice": 150,
+        "lean": 130,
+        "veg": 220,
+        "oil": 6,
+        "sugar": 2
+      },
+      "portionG": 450,
+      "notes": "少油场景；去皮鸡胸按瘦肉交换份代理估算，酱汁另计，名称不能保证低脂"
+    },
+    "卤牛肉健身餐": {
+      "components": {
+        "rice": 150,
+        "lean": 130,
+        "veg": 220,
+        "oil": 6,
+        "sugar": 2
+      },
+      "portionG": 450,
+      "notes": "少油场景；去皮鸡胸按瘦肉交换份代理估算，酱汁另计，名称不能保证低脂"
+    },
+    "时蔬鱼肉健身餐": {
+      "components": {
+        "rice": 150,
+        "veg": 220,
+        "oil": 6,
+        "sugar": 2,
+        "fish": 140
+      },
+      "portionG": 450,
+      "notes": "少油场景；去皮鸡胸按瘦肉交换份代理估算，酱汁另计，名称不能保证低脂"
+    },
+    "减脂餐": {
+      "components": {
+        "rice": 150,
+        "lean": 130,
+        "veg": 220,
+        "oil": 6,
+        "sugar": 2
+      },
+      "portionG": 450,
+      "notes": "少油场景；去皮鸡胸按瘦肉交换份代理估算，酱汁另计，名称不能保证低脂"
+    },
+    "小份时蔬套餐": {
+      "components": {
+        "rice": 150,
+        "tofu": 100,
+        "veg": 200,
+        "oil": 8
+      },
+      "portionG": 400,
+      "notes": ""
+    },
+    "胡辣汤": {
+      "components": {
+        "starch": 40,
+        "lean": 60,
+        "beancurd": 40,
+        "veg": 80,
+        "oil": 10
+      },
+      "portionG": 400,
+      "notes": "淀粉干重40g；鸭血使用瘦肉营养交换代理，有额外不确定性"
+    },
+    "鸭血粉丝汤": {
+      "components": {
+        "starch": 40,
+        "lean": 60,
+        "beancurd": 40,
+        "veg": 80,
+        "oil": 10
+      },
+      "portionG": 400,
+      "notes": "淀粉干重40g；鸭血使用瘦肉营养交换代理，有额外不确定性"
+    },
+    "菠萝饭": {
+      "components": {
+        "rice": 250,
+        "egg": 60,
+        "fruit": 100,
+        "nuts": 15,
+        "oil": 18,
+        "sugar": 10
+      },
+      "portionG": 450,
+      "notes": ""
+    },
+    "自选菜": {
+      "components": {
+        "rice": 220,
+        "pork": 100,
+        "tofu": 50,
+        "veg": 150,
+        "oil": 20,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "自选配菜示例，非固定配方；不凭本值推荐为低脂"
+    },
+    "川菜盖饭": {
+      "components": {
+        "rice": 220,
+        "pork": 100,
+        "tofu": 50,
+        "veg": 150,
+        "oil": 20,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "自选配菜示例，非固定配方；不凭本值推荐为低脂"
+    },
+    "清炒木耳": {
+      "components": {
+        "mushroom": 220,
+        "oil": 12
+      },
+      "portionG": 220,
+      "notes": ""
+    },
+    "酸辣土豆丝": {
+      "components": {
+        "potato": 220,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 220,
+      "notes": ""
+    },
+    "椒麻土豆片": {
+      "components": {
+        "potato": 220,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 220,
+      "notes": ""
+    },
+    "糖醋洋芋": {
+      "components": {
+        "potato": 220,
+        "oil": 28,
+        "sugar": 20
+      },
+      "portionG": 220,
+      "notes": ""
+    },
+    "大白菜红烧肉炒粉条": {
+      "components": {
+        "starch": 45,
+        "fatty": 80,
+        "veg": 150,
+        "oil": 15,
+        "sugar": 5
+      },
+      "portionG": 300,
+      "notes": "粉条按干重45g，不含额外米饭"
+    },
+    "土豆粉条炒回锅肉": {
+      "components": {
+        "starch": 45,
+        "fatty": 80,
+        "veg": 70,
+        "oil": 15,
+        "sugar": 5,
+        "potato": 100
+      },
+      "portionG": 300,
+      "notes": "粉条按干重45g，不含额外米饭"
+    },
+    "宽粉条白菜炖肉": {
+      "components": {
+        "starch": 45,
+        "fatty": 80,
+        "veg": 150,
+        "oil": 15,
+        "sugar": 5
+      },
+      "portionG": 300,
+      "notes": "粉条按干重45g，不含额外米饭"
+    },
+    "蚂蚁上树": {
+      "components": {
+        "starch": 45,
+        "fatty": 80,
+        "veg": 150,
+        "oil": 15,
+        "sugar": 5
+      },
+      "portionG": 300,
+      "notes": "粉条按干重45g，不含额外米饭"
+    },
+    "木耳炒牛肉": {
+      "components": {
+        "lean": 150,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 5
+      },
+      "portionG": 250,
+      "notes": "肉为可食部生重；内脏未核实具体配方，老爆三/肝尖用瘦肉代理不用于高蛋白推荐"
+    },
+    "老爆三": {
+      "components": {
+        "lean": 150,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 5
+      },
+      "portionG": 250,
+      "notes": "肉为可食部生重；内脏未核实具体配方，老爆三/肝尖用瘦肉代理不用于高蛋白推荐"
+    },
+    "溜肝尖": {
+      "components": {
+        "lean": 150,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 5
+      },
+      "portionG": 250,
+      "notes": "肉为可食部生重；内脏未核实具体配方，老爆三/肝尖用瘦肉代理不用于高蛋白推荐"
+    },
+    "辣椒炒肉": {
+      "components": {
+        "veg": 100,
+        "oil": 20,
+        "sugar": 5,
+        "fatty": 140
+      },
+      "portionG": 250,
+      "notes": "肉为可食部生重；内脏未核实具体配方，老爆三/肝尖用瘦肉代理不用于高蛋白推荐"
+    },
+    "酸辣土豆粉": {
+      "components": {
+        "starch": 80,
+        "fish": 100,
+        "veg": 100,
+        "nuts": 10,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "粉按干重80g，不含额外米饭"
+    },
+    "砂锅土豆粉": {
+      "components": {
+        "starch": 80,
+        "fish": 100,
+        "veg": 100,
+        "nuts": 10,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "粉按干重80g，不含额外米饭"
+    },
+    "金汤鱼粉": {
+      "components": {
+        "starch": 80,
+        "fish": 100,
+        "veg": 100,
+        "nuts": 10,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "粉按干重80g，不含额外米饭"
+    },
+    "五谷鱼粉": {
+      "components": {
+        "starch": 80,
+        "fish": 100,
+        "veg": 100,
+        "nuts": 10,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 500,
+      "notes": "粉按干重80g，不含额外米饭"
+    },
+    "天津煎饼果子": {
+      "components": {
+        "grain": 90,
+        "egg": 60,
+        "oil": 22,
+        "sugar": 6
+      },
+      "portionG": 220,
+      "notes": "油含炸物吸油/烙饼实际入口量的场景估计"
+    },
+    "酱香饼": {
+      "components": {
+        "grain": 90,
+        "egg": 60,
+        "oil": 22,
+        "sugar": 6
+      },
+      "portionG": 220,
+      "notes": "油含炸物吸油/烙饼实际入口量的场景估计"
+    },
+    "葱油饼": {
+      "components": {
+        "grain": 90,
+        "egg": 60,
+        "oil": 22,
+        "sugar": 6
+      },
+      "portionG": 220,
+      "notes": "油含炸物吸油/烙饼实际入口量的场景估计"
+    },
+    "武大烧饼": {
+      "components": {
+        "grain": 90,
+        "egg": 60,
+        "oil": 22,
+        "sugar": 6
+      },
+      "portionG": 220,
+      "notes": "油含炸物吸油/烙饼实际入口量的场景估计"
+    },
+    "烧饼": {
+      "components": {
+        "grain": 90,
+        "egg": 60,
+        "oil": 22,
+        "sugar": 6
+      },
+      "portionG": 220,
+      "notes": "油含炸物吸油/烙饼实际入口量的场景估计"
+    },
+    "沙威玛卷饼": {
+      "components": {
+        "grain": 90,
+        "egg": 60,
+        "oil": 22,
+        "sugar": 6,
+        "lean": 80,
+        "potato": 60,
+        "veg": 80
+      },
+      "portionG": 400,
+      "notes": "油含炸物吸油/烙饼实际入口量的场景估计"
+    },
+    "五仁月饼": {
+      "components": {
+        "pastry": 80
+      },
+      "portionG": 80,
+      "notes": "糕点交换份代理；馅料品牌配方未公开，需营养标签替换，估算误差较大"
+    },
+    "黑芝麻月饼": {
+      "components": {
+        "pastry": 80
+      },
+      "portionG": 80,
+      "notes": "糕点交换份代理；馅料品牌配方未公开，需营养标签替换，估算误差较大"
+    },
+    "莲蓉蛋黄月饼": {
+      "components": {
+        "pastry": 80
+      },
+      "portionG": 80,
+      "notes": "糕点交换份代理；馅料品牌配方未公开，需营养标签替换，估算误差较大"
+    },
+    "牛油果风味月饼": {
+      "components": {
+        "pastry": 80
+      },
+      "portionG": 80,
+      "notes": "糕点交换份代理；馅料品牌配方未公开，需营养标签替换，估算误差较大"
+    },
+    "水蜜桃风味月饼": {
+      "components": {
+        "pastry": 80
+      },
+      "portionG": 80,
+      "notes": "糕点交换份代理；馅料品牌配方未公开，需营养标签替换，估算误差较大"
+    },
+    "板栗月饼": {
+      "components": {
+        "pastry": 80
+      },
+      "portionG": 80,
+      "notes": "糕点交换份代理；馅料品牌配方未公开，需营养标签替换，估算误差较大"
+    },
+    "铜锣烧": {
+      "components": {
+        "pastry": 80
+      },
+      "portionG": 80,
+      "notes": "糕点交换份代理；馅料品牌配方未公开，需营养标签替换，估算误差较大"
+    },
+    "辣子鸡": {
+      "components": {
+        "poultry": 200,
+        "veg": 60,
+        "nuts": 10,
+        "oil": 30,
+        "sugar": 6
+      },
+      "portionG": 250,
+      "notes": "禽肉为可食部生重，不含额外米饭"
+    },
+    "椒麻鸡": {
+      "components": {
+        "poultry": 200,
+        "veg": 60,
+        "nuts": 10,
+        "oil": 30,
+        "sugar": 6
+      },
+      "portionG": 250,
+      "notes": "禽肉为可食部生重，不含额外米饭"
+    },
+    "口水鸡": {
+      "components": {
+        "poultry": 200,
+        "veg": 60,
+        "nuts": 10,
+        "oil": 30,
+        "sugar": 6
+      },
+      "portionG": 250,
+      "notes": "禽肉为可食部生重，不含额外米饭"
+    },
+    "金汤鱼片": {
+      "components": {
+        "fish": 220,
+        "veg": 180,
+        "oil": 25,
+        "sugar": 5
+      },
+      "portionG": 400,
+      "notes": "鱼肉可食部，不含骨和额外米饭"
+    },
+    "烤鱼": {
+      "components": {
+        "fish": 220,
+        "veg": 180,
+        "oil": 25,
+        "sugar": 5
+      },
+      "portionG": 400,
+      "notes": "鱼肉可食部，不含骨和额外米饭"
+    },
+    "椰子鸡": {
+      "components": {
+        "poultry": 180,
+        "mushroom": 100,
+        "fruit": 50,
+        "oil": 5
+      },
+      "portionG": 500,
+      "notes": "含汤；椰汁暂按水果交换代理，不是含骨整鸡重量"
+    },
+    "菌菇虫草花鸡汤": {
+      "components": {
+        "poultry": 180,
+        "mushroom": 100,
+        "fruit": 50,
+        "oil": 5
+      },
+      "portionG": 500,
+      "notes": "含汤；椰汁暂按水果交换代理，不是含骨整鸡重量"
+    },
+    "肠粉": {
+      "components": {
+        "starch": 70,
+        "pork": 60,
+        "egg": 50,
+        "veg": 60,
+        "oil": 15,
+        "sugar": 5
+      },
+      "portionG": 350,
+      "notes": ""
+    },
+    "蓝莓山药": {
+      "components": {
+        "potato": 200,
+        "fruit": 40,
+        "sugar": 15
+      },
+      "portionG": 250,
+      "notes": ""
+    },
+    "土豆泥拌面": {
+      "components": {
+        "grain": 80,
+        "potato": 150,
+        "poultry": 100,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 450,
+      "notes": ""
+    },
+    "土豆泥拌饭": {
+      "components": {
+        "potato": 150,
+        "poultry": 100,
+        "oil": 18,
+        "sugar": 5,
+        "rice": 220
+      },
+      "portionG": 450,
+      "notes": ""
+    },
+    "土豆糊糊鸡": {
+      "components": {
+        "grain": 80,
+        "potato": 150,
+        "poultry": 100,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 450,
+      "notes": ""
+    },
+    "土豆泥糊糊排骨": {
+      "components": {
+        "grain": 80,
+        "potato": 150,
+        "poultry": 100,
+        "oil": 18,
+        "sugar": 5
+      },
+      "portionG": 450,
+      "notes": ""
+    },
+    "淀粉肠": {
+      "components": {
+        "starch": 25,
+        "pork": 25,
+        "oil": 8
+      },
+      "portionG": 80,
+      "notes": "未获得包装标签，配方不可确定；此代理值仅供参考"
+    },
+    "清补凉": {
+      "components": {
+        "bean": 20,
+        "fruit": 80,
+        "sugar": 30
+      },
+      "portionG": 350,
+      "notes": "杂豆按干重，含糖30g为场景估计"
+    },
+    "女王冰粉": {
+      "components": {
+        "bean": 20,
+        "fruit": 80,
+        "sugar": 30
+      },
+      "portionG": 350,
+      "notes": "杂豆按干重，含糖30g为场景估计"
+    },
+    "银耳汤": {
+      "components": {
+        "bean": 20,
+        "fruit": 80,
+        "sugar": 30
+      },
+      "portionG": 350,
+      "notes": "杂豆按干重，含糖30g为场景估计"
+    },
+    "绿豆百合粥": {
+      "components": {
+        "grain": 25,
+        "bean": 15,
+        "sugar": 5
+      },
+      "portionG": 300,
+      "notes": "谷物杂豆均为干重；粥不含默认糖"
+    },
+    "粥": {
+      "components": {
+        "grain": 35
+      },
+      "portionG": 300,
+      "notes": "谷物杂豆均为干重；粥不含默认糖"
+    },
+    "牛奶燕麦粥": {
+      "components": {
+        "grain": 35,
+        "milk": 150,
+        "sugar": 5
+      },
+      "portionG": 300,
+      "notes": "谷物杂豆均为干重；粥不含默认糖"
+    },
+    "豆花烤鱼饭": {
+      "components": {
+        "rice": 220,
+        "fish": 150,
+        "softtofu": 100,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "烤鱼饭": {
+      "components": {
+        "rice": 220,
+        "fish": 150,
+        "softtofu": 100,
+        "veg": 100,
+        "oil": 25,
+        "sugar": 6
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "鱼豆腐焖锅": {
+      "components": {
+        "fish": 80,
+        "softtofu": 180,
+        "veg": 150,
+        "starch": 25,
+        "oil": 22,
+        "sugar": 5
+      },
+      "portionG": 450,
+      "notes": "鱼豆腐缺少品牌标签，按鱼肉+豆腐+淀粉代理估算"
+    },
+    "冰淇淋西多士": {
+      "components": {
+        "pastry": 120,
+        "milk": 80,
+        "sugar": 15
+      },
+      "portionG": 220,
+      "notes": "糕点/油炸交换份代理，品牌配方未知"
+    },
+    "蛋糕卷": {
+      "components": {
+        "pastry": 120,
+        "milk": 80,
+        "sugar": 15
+      },
+      "portionG": 220,
+      "notes": "糕点/油炸交换份代理，品牌配方未知"
+    },
+    "黄油年糕": {
+      "components": {
+        "pastry": 120,
+        "milk": 80,
+        "sugar": 15
+      },
+      "portionG": 220,
+      "notes": "糕点/油炸交换份代理，品牌配方未知"
+    },
+    "西瓜汁": {
+      "components": {
+        "fruit": 300,
+        "sugar": 10
+      },
+      "portionG": 350,
+      "notes": "有糖场景，鲜榨西瓜以综合水果值代理"
+    },
+    "奶皮子酸奶": {
+      "components": {
+        "yogurt": 200,
+        "milk": 40,
+        "sugar": 10
+      },
+      "portionG": 250,
+      "notes": ""
+    },
+    "鸡蛋": {
+      "components": {
+        "egg": 50
+      },
+      "portionG": 50,
+      "notes": ""
+    },
+    "豆浆": {
+      "components": {
+        "soymilk": 300
+      },
+      "portionG": 300,
+      "notes": "无额外加糖场景"
+    },
+    "油条": {
+      "components": {
+        "pastry": 100
+      },
+      "portionG": 100,
+      "notes": "油炸交换份，不重复额外计算炸油"
+    },
+    "咸豆腐脑": {
+      "components": {
+        "softtofu": 180,
+        "starch": 10,
+        "oil": 5
+      },
+      "portionG": 250,
+      "notes": ""
+    },
+    "玉米饼": {
+      "components": {
+        "grain": 60,
+        "oil": 3
+      },
+      "portionG": 100,
+      "notes": ""
+    },
+    "馒头": {
+      "components": {
+        "grain": 60
+      },
+      "portionG": 100,
+      "notes": ""
+    },
+    "咸菜": {
+      "components": {
+        "veg": 30,
+        "sugar": 2
+      },
+      "portionG": 30,
+      "notes": "仅宏量估算，盐/钠未测定，不推荐为低脂完整餐"
+    },
+    "鸭血豆腐": {
+      "components": {
+        "lean": 80,
+        "softtofu": 150,
+        "oil": 12
+      },
+      "portionG": 250,
+      "notes": "鸭血以瘦肉交换代理，仅宏量参考"
+    },
+    "羊肉泡馍": {
+      "components": {
+        "grain": 90,
+        "lean": 100,
+        "veg": 80,
+        "oil": 15
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "三明治": {
+      "components": {
+        "noodle": 80,
+        "egg": 50,
+        "pork": 40,
+        "veg": 40,
+        "oil": 8
+      },
+      "portionG": 220,
+      "notes": ""
+    },
+    "擂椒饭": {
+      "components": {
+        "rice": 250,
+        "egg": 60,
+        "poultry": 100,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "分米鸡": {
+      "components": {
+        "rice": 250,
+        "egg": 60,
+        "poultry": 100,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "炒饭": {
+      "components": {
+        "rice": 250,
+        "egg": 60,
+        "poultry": 100,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "蛋包饭": {
+      "components": {
+        "rice": 250,
+        "egg": 60,
+        "poultry": 100,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "铁板意面": {
+      "components": {
+        "egg": 60,
+        "poultry": 100,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "grain": 100
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "冷面": {
+      "components": {
+        "egg": 60,
+        "poultry": 100,
+        "veg": 100,
+        "oil": 20,
+        "sugar": 8,
+        "grain": 100
+      },
+      "portionG": 500,
+      "notes": ""
+    },
+    "小火锅": {
+      "components": {
+        "poultry": 100,
+        "tofu": 100,
+        "veg": 150,
+        "starch": 50,
+        "oil": 25,
+        "sugar": 5
+      },
+      "portionG": 550,
+      "notes": "不含额外米饭，实际食材组合未知"
+    },
+    "红烧肉": {
+      "components": {
+        "fatty": 160,
+        "veg": 50,
+        "oil": 10,
+        "sugar": 15
+      },
+      "portionG": 250,
+      "notes": "可食部生重160g，不含额外米饭"
+    },
+    "鱼籽拌饭": {
+      "components": {
+        "rice": 250,
+        "fish": 70,
+        "veg": 80,
+        "oil": 15,
+        "sugar": 6
+      },
+      "portionG": 400,
+      "notes": "鱼籽成分未知，以鱼肉交换份代理，不用于高蛋白推荐"
+    },
+    "番茄肥牛小火锅": {
+      "components": {
+        "fatty": 100,
+        "veg": 180,
+        "starch": 40,
+        "oil": 15
+      },
+      "portionG": 500,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "炒酸奶": {
+      "components": {
+        "yogurt": 180,
+        "fruit": 60,
+        "nuts": 10,
+        "sugar": 15
+      },
+      "portionG": 250,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "紫色糯米饭": {
+      "components": {
+        "grain": 70,
+        "sugar": 10
+      },
+      "portionG": 230,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "豆沙芝麻馅饼": {
+      "components": {
+        "grain": 60,
+        "bean": 20,
+        "nuts": 5,
+        "sugar": 12,
+        "oil": 12
+      },
+      "portionG": 160,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "经典珍珠奶茶": {
+      "components": {
+        "milk": 200,
+        "starch": 25,
+        "sugar": 35
+      },
+      "portionG": 500,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "麻辣牛肉滑饭": {
+      "components": {
+        "rice": 220,
+        "lean": 100,
+        "veg": 100,
+        "oil": 18
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "汉堡": {
+      "components": {
+        "grain": 65,
+        "poultry": 80,
+        "veg": 30,
+        "oil": 15,
+        "sugar": 8
+      },
+      "portionG": 230,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "回锅肉炒面": {
+      "components": {
+        "noodle": 110,
+        "fatty": 80,
+        "veg": 120,
+        "oil": 20
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "菠萝溜溜鸡": {
+      "components": {
+        "poultry": 140,
+        "fruit": 80,
+        "starch": 20,
+        "oil": 20,
+        "sugar": 15
+      },
+      "portionG": 300,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "香辣跳跳虾": {
+      "components": {
+        "shrimp": 130,
+        "veg": 80,
+        "starch": 15,
+        "oil": 20
+      },
+      "portionG": 250,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "肉骨茶": {
+      "components": {
+        "pork": 140,
+        "veg": 150,
+        "oil": 8
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "烤鸡沙拉": {
+      "components": {
+        "poultry": 120,
+        "veg": 220,
+        "oil": 10
+      },
+      "portionG": 350,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "椒麻香肉饭": {
+      "components": {
+        "rice": 220,
+        "pork": 100,
+        "veg": 130,
+        "oil": 20
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "茶树菇牛肉": {
+      "components": {
+        "lean": 150,
+        "mushroom": 120,
+        "oil": 18
+      },
+      "portionG": 280,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "一品脆皮豆腐": {
+      "components": {
+        "tofu": 180,
+        "veg": 80,
+        "starch": 15,
+        "oil": 25
+      },
+      "portionG": 280,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "鲜虾套餐": {
+      "components": {
+        "shrimp": 130,
+        "rice": 200,
+        "veg": 150,
+        "oil": 8
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "金瓜蒸饭系列之老干妈排骨蒸饭": {
+      "components": {
+        "rice": 220,
+        "pork": 120,
+        "veg": 120,
+        "oil": 15
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "驴肉火烧": {
+      "components": {
+        "grain": 65,
+        "lean": 90,
+        "oil": 10
+      },
+      "portionG": 200,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "鸡排拌饭": {
+      "components": {
+        "rice": 220,
+        "poultry": 130,
+        "starch": 20,
+        "veg": 100,
+        "oil": 25
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "陕西臊子面": {
+      "components": {
+        "noodle": 100,
+        "pork": 60,
+        "veg": 150,
+        "oil": 15
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "麻辣涮": {
+      "components": {
+        "lean": 80,
+        "starch": 40,
+        "veg": 180,
+        "oil": 25
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；自选内容未知，不作为减脂推荐。"
+    },
+    "奶油鸡茸汤": {
+      "components": {
+        "poultry": 70,
+        "milk": 150,
+        "grain": 15,
+        "oil": 10
+      },
+      "portionG": 350,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "焗鸡腿饭": {
+      "components": {
+        "rice": 220,
+        "poultry": 150,
+        "cheese": 25,
+        "veg": 80,
+        "oil": 15
+      },
+      "portionG": 450,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "轻食沙拉": {
+      "components": {
+        "veg": 220,
+        "poultry": 100,
+        "oil": 10
+      },
+      "portionG": 350,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "杨枝甘露": {
+      "components": {
+        "fruit": 150,
+        "milk": 100,
+        "starch": 20,
+        "sugar": 25
+      },
+      "portionG": 350,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "地锅鸡": {
+      "components": {
+        "poultry": 180,
+        "grain": 60,
+        "veg": 120,
+        "oil": 25
+      },
+      "portionG": 500,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    },
+    "香菇青菜小笼包": {
+      "components": {
+        "grain": 70,
+        "mushroom": 50,
+        "veg": 80,
+        "oil": 8
+      },
+      "portionG": 250,
+      "notes": "假设常见份量、可食部和入口油量，不代表食堂实测配方；"
+    }
+  },
+  "method": "食物交换份+明确假设食材克数；能量按蛋白质4/碳水4/脂肪9 kcal/g；熟米饭直接按熟重，其余谷物干重，肉类为可食部生重；成品份量为估计。纤维、钠未知，不填零伪装已知。"
+}

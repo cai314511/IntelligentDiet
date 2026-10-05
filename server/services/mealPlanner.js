@@ -1,3 +1,5 @@
+import {acceptsProfile, acceptsNutritionGoal} from "./preferenceFilter.js";
+import {displaySeat} from "./floorLayout.js";
 import { modelRequest } from "./modelClient.js";
 import { randomUUID } from "crypto";
 import { db } from "../database.js";
@@ -184,6 +186,8 @@ export function planMeal(
   let candidates = data.dishes.filter(
     (d) =>
       d.forSale &&
+      acceptsProfile(d,profile) &&
+      acceptsNutritionGoal(d,constraints.goal) &&
       d.stock >= constraints.people &&
       d.price * constraints.people <= constraints.budget &&
       d.restaurantId &&
@@ -203,8 +207,10 @@ export function planMeal(
           : [d.name, ...d.ingredients, ...d.allergens].join(" ").includes(x),
       ),
   );
+  const recentSales=new Map(db.prepare("SELECT caipinxinxiid AS id,SUM(buyshu) AS quantity FROM orders WHERE school_id=? AND status IN ('已支付','制作中','待取餐','已完成') AND julianday(addtime)>=julianday('now','-7 days') GROUP BY caipinxinxiid").all(user.schoolId).map(r=>[r.id,Number(r.quantity)]));
   onProgress(3);
-  if (constraints.goal === "低脂")
+  if(!input.sort) candidates.sort((a,b)=>(recentSales.get(a.id)||0)-(recentSales.get(b.id)||0));
+  if (/低脂|减脂|减重/.test(constraints.goal || ""))
     candidates.sort(
       (a, b) => Number(a.nutrition.fat) - Number(b.nutrition.fat),
     );
@@ -220,7 +226,7 @@ export function planMeal(
         : constraints.sort === "sales" ? b.sales - a.sales
         : a.distanceM - b.distanceM;
       const mealRank = dish => ["套餐", "面食", "轻食", "自选"].includes(dish.category) ? 1 : 0;
-      return primary || mealRank(b) - mealRank(a);
+      return (input.sort ? primary : (recentSales.get(a.id)||0)-(recentSales.get(b.id)||0)) || mealRank(b) - mealRank(a) || primary;
     });
   if (constraints.tastes.length)
     candidates.sort(
@@ -257,6 +263,7 @@ export function planMeal(
     .all(restaurant.id, endsAt.toISOString(), startsAt.toISOString());
   const seats = [];
   let capacity = 0;
+  if (constraints.reserve && restaurant.hasSeating===false) throw Object.assign(new Error("该餐厅不提供座位预约，请调整条件"),{status:409});
   if (constraints.reserve) {
     for (const row of seatRows) {
       if (
@@ -266,7 +273,7 @@ export function planMeal(
       )
         continue;
       if (capacity >= constraints.people) break;
-      seats.push({ id: row.id, label: row.seat_label, type: row.seat_type });
+      seats.push({ id: row.id, label: displaySeat({label:row.seat_label,floor:row.floor,seat_number:row.seat_number},restaurant).label, floor:displaySeat({label:row.seat_label,floor:row.floor,seat_number:row.seat_number},restaurant).floor, type: row.seat_type });
       capacity += 1;
     }
     if (capacity < constraints.people)

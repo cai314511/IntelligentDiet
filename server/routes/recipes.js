@@ -1,3 +1,4 @@
+import { acceptsNutritionGoal } from "../services/preferenceFilter.js";
 import express from 'express';
 import { db } from '../database.js';
 import { requireAdmin } from '../middleware/auth.js';
@@ -8,10 +9,10 @@ function recipesFor(schoolId) {
   return db.prepare(`SELECT id,school_id AS schoolId,title,goal,description,dish_ids_json AS rawDishIds,tips_json AS rawTips
     FROM recipes WHERE school_id IN ('all',?) ORDER BY id`).all(schoolId).map(row=>{
       const ids=parse(row.rawDishIds);
-      const meals=ids.map(id=>db.prepare(`SELECT id,caipinmingcheng AS name,jiage AS price,ingredients_json AS rawIngredients,nutrition_json AS rawNutrition
+      const meals=ids.map(id=>db.prepare(`SELECT id,caipinmingcheng AS name,jiage AS price,ingredients_json AS rawIngredients,portion_g AS portionG,nutrition_json AS rawNutrition
         FROM caipinxinxi WHERE id=? AND school_id IN ('all',?)`).get(id,schoolId)).filter(Boolean).map(d=>({...d,price:Number(d.price),ingredients:parse(d.rawIngredients),nutrition:parse(d.rawNutrition)}));
       return {id:row.id,schoolId:row.schoolId,title:row.title,goal:row.goal,description:row.description,dishIds:ids,tips:parse(row.rawTips),meals};
-    });
+    }).filter(recipe => recipe.meals.length && recipe.meals.every(d => acceptsNutritionGoal(d,recipe.goal)));
 }
 function validSchool(id){return Boolean(db.prepare('SELECT 1 FROM universities WHERE id=?').get(id));}
 

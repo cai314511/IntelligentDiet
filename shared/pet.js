@@ -2,13 +2,12 @@ import { read, store, api, modal, session } from "./core.js";
 const avatar = "/assets/brand/xiaozhi-body.png";
 const pet = document.createElement("aside");
 pet.className = "xiaozhi-pet";
-if(location.pathname.startsWith("/canteen")){pet.classList.add("zx-pet-circle");}
 pet.setAttribute("aria-label", "小智互动精灵");
-let state = read("pet", { look: "sprite", x: null, y: null }),
+let state = read("pet", { x: null, y: null }),
   drag = null,
   moved = false,
   timer;
-pet.innerHTML = `<div class="pet-bubble" role="status" hidden></div><div class="pet-tools" hidden><button type="button" data-pet="chat">和小智聊聊</button><button type="button" data-pet="pat">摸摸头</button><button type="button" data-pet="feed">喂一餐</button><button type="button" data-pet="look">切换形象</button><button type="button" data-pet="close">收起</button></div><button type="button" class="pet-body" aria-label="小智：点击互动，拖动移动" aria-expanded="false"><span class="pet-sprite" aria-hidden="true"></span><img class="pet-avatar" src="${avatar}" alt="小智精灵"><span class="pet-name">小智 ✦</span></button>`;
+pet.innerHTML = `<div class="pet-bubble" role="status" hidden></div><div class="pet-tools" hidden><button type="button" data-pet="chat">和小智聊聊</button><button type="button" data-pet="pat">摸摸头</button><button type="button" data-pet="feed">喂一餐</button><button type="button" data-pet="close">收起</button></div><button type="button" class="pet-body" aria-label="小智：点击互动，拖动移动" aria-expanded="false"><span class="pet-sprite" aria-hidden="true"></span></button>`;
 document.body.append(pet);
 const body = pet.querySelector(".pet-body"),
   tools = pet.querySelector(".pet-tools"),
@@ -55,12 +54,8 @@ function position() {
     ) + "px";
   bubble.style.right = "auto";
 }
-function look() {
-  pet.classList.toggle("avatar-look", state.look === "avatar");
-  position();
-}
-if(location.pathname.startsWith("/canteen"))state.look="avatar";
-look();
+delete state.look;
+position();
 window.addEventListener("resize", position);
 window.addEventListener("xiaozhi-chat-toggle", (event) => {
   chatDocked = event.detail.open;
@@ -148,12 +143,6 @@ pet.addEventListener("click", (e) => {
   if (action === "close") toggle(false);
   if (action === "pat") say("收到你的鼓励，能量满满！", "wave");
   if (action === "feed") say("开饭啦！也记得照顾好自己。", "success");
-  if (action === "look") {
-    state.look = state.look === "avatar" ? "sprite" : "avatar";
-    store("pet", state);
-    look();
-    say("换个形象，继续陪你。");
-  }
   if (action === "chat") {
     toggle(false);
     if (location.pathname.startsWith("/canteen")) {
@@ -166,7 +155,7 @@ pet.addEventListener("click", (e) => {
 function adminChat() {
   const dialog = modal(
       "小智 · 校园餐饮助手",
-      `<div class="pet-chat-log" aria-live="polite"><div class="pet-chat-greeting"><img src="${avatar}" alt="小智"><p>你好！可以问我菜单、食堂排队、订单与校园活动。</p></div></div><form class="pet-chat-form"><input name="message" maxlength="2000" aria-label="向小智提问" placeholder="输入你想了解的校园餐饮信息" required><button class="btn">发送</button></form>`,
+      `<div class="pet-chat-log" aria-live="polite"><div class="pet-chat-greeting"><img src="${avatar}" alt="小智"><p>${location.pathname.startsWith("/management") ? "你好！可以查询供应商资质、库存采购、食品安全、运营、订单和学生反馈。" : "你好！可以问我菜单、食堂排队、订单与校园活动。"}</p></div></div><form class="pet-chat-form"><input name="message" maxlength="2000" aria-label="向小智提问" placeholder="输入你想了解的校园餐饮信息" required><button class="btn">发送</button></form>`,
     ),
     log = dialog.querySelector(".pet-chat-log"),
     form = dialog.querySelector("form"),
@@ -193,6 +182,8 @@ function adminChat() {
           message,
           history: history.slice(-8),
           schoolId: session()?.user.school_id,
+          surface: location.pathname.startsWith("/management") ? "management" : "student",
+          context: location.pathname.startsWith("/management") ? read("admin-context", {}) : {},
         },
       });
       reply.textContent = r.reply;
@@ -209,3 +200,4 @@ function adminChat() {
     }
   });
 }
+window.addEventListener('nutrition-membership-unlocked',()=>{pet.classList.add('nutrition-cheering');bubble.textContent='太棒了！一起开启营养之旅！';bubble.hidden=false;setTimeout(()=>{pet.classList.remove('nutrition-cheering');bubble.hidden=true;},3200);});

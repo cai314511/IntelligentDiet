@@ -1,5 +1,5 @@
 import { preflight, scenario } from "../../shared/scenario.js";
-import { applySchool, safeUrl } from "../../shared/core.js";
+import { applySchool } from "../../shared/core.js";
 import {
   api,
   esc,
@@ -82,14 +82,6 @@ if (saved?.school) {
   const brand = document.querySelector("nav [onclick=\"navigate('order')\"]");
   if (brand) {
     brand.title = saved.school.name;
-    if (saved.school.logo) {
-      const img = document.createElement("img");
-      img.src = safeUrl(saved.school.logo);
-      img.alt = saved.school.name + "校徽";
-      img.style.cssText =
-        "display:inline-block;width:22px;height:22px;object-fit:contain;margin-right:6px";
-      brand.querySelector("i")?.replaceWith(img);
-    }
     brand.insertAdjacentHTML(
       "beforeend",
       `<span style="display:block;font-size:10px;font-weight:400;color:#86868b">${esc(saved.school.shortName || saved.school.name)}</span>`,
@@ -97,13 +89,14 @@ if (saved?.school) {
   }
 }
 async function boot() {
+  window.hideCart();
   try {
     window.syncLiveCatalog((await api("/workspace/catalog")).data);
     if (location.hash === "#agent") {
       originalNavigate("order");
       await openAgent();
     } else
-      window.navigate(location.hash.slice(1) || read("current-view", "order"));
+      window.navigate(location.hash.slice(1) || "order");
   } catch (e) {
     document.getElementById("app-root").innerHTML =
       notice(e.message, "error") + button("重新加载", "retry");

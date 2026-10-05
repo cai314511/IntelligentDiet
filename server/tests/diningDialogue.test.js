@@ -59,3 +59,9 @@ test("多种明确菜品需求不静默丢弃其中一种",async()=>{
     assert.equal(r.ready,false);assert.equal(r.constraints.dishId,undefined);
   }finally{globalThis.fetch=old;}
 });
+
+test('单问题选项由模型返回，限制数量并允许自由输入',async()=>{
+ const old=globalThis.fetch;
+ globalThis.fetch=async()=>({ok:true,json:async()=>({output:[{type:'function_call',call_id:'t',name:'dining_turn',arguments:JSON.stringify({intent:'continue',reply:'几个人用餐？',ready:false,constraints:{},choices:[{label:'1人',message:'一个人用餐'},{label:'2人',message:'两个人用餐'},{label:1,message:'无效'}]})}]})});
+ try {const turn=await diningTurn({message:'想吃鸡肉',data},settings);assert.equal(turn.choices.length,2);assert.equal(turn.choices[0].message,'一个人用餐');assert.match(diningSystemPrompt,/只问一个必要问题/);} finally {globalThis.fetch=old;}
+});

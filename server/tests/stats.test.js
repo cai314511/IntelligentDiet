@@ -54,6 +54,6 @@ test('餐厅信息按中央财经大学校区隔离', async () => {
   const res = await request(target).get('/api/restaurants');
   const names = res.body.data.map(r => r.name);
   assert.ok(names.includes('沙河校区·东区三层食堂'));
-  assert.equal(names.length, 1);
+  assert.ok(names.length >= 3);
   assert.ok(names.every(name => !name.includes('卫津路') && !name.includes('北洋园')));
 });

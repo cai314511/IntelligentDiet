@@ -17,6 +17,8 @@ function navigate(view) {
   state.currentView = view;
   document.querySelectorAll(".nav-link").forEach((link) => {
     link.style.color = link.dataset.target === view ? "#0071E3" : "#424245";
+    if (link.dataset.target === view) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
   });
   if (view === "orders") startOrderPolling();
   else stopOrderPolling();
@@ -27,7 +29,7 @@ function navigate(view) {
 document.querySelectorAll(".nav-link").forEach((link) => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
-    navigate(e.target.dataset.target);
+    navigate(e.currentTarget.dataset.target);
   });
 });
 
@@ -43,6 +45,7 @@ function render() {
 
 // ================= 风格宇宙：主题选择器 =================
 function renderThemeUniverse() {
+  if (["cufe", "bjfu"].includes(document.documentElement.dataset.campusSkin)) return "";
   const cur = currentTheme();
   return `
                 <div class="mb-10 fade-in">
@@ -101,6 +104,9 @@ function saveCart() {
 function addToCart(id) {
   const dish = DB.menu.find((m) => m.id === id);
   if (!dish) return;
+  if (window.canDirectOrderDish && !window.canDirectOrderDish(dish)) {
+    return toast('该菜品当前不在供餐时段，可通过小智提前预约', 'warning');
+  }
   if (dish.stock !== undefined && dish.stock <= 0) {
     return toast(`「${dish.name}」今日已售罄`, "warning");
   }
@@ -126,6 +132,10 @@ function removeFromCart(id, agentTaskId = null) {
   updateCartUI();
 }
 
+function cartDishPhoto(item, size) {
+  const image = DB.menu.find(d=>d.id===item.id)?.image || item.img;
+  return image && !image.includes('placeholder') ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" style="width:${size}px;height:${size}px;border-radius:10px;object-fit:cover" onerror="this.style.visibility='hidden'">` : `<span style="width:${size}px;height:${size}px;border-radius:10px;background:var(--zx-soft,#f5f5f7);display:block"></span>`;
+}
 function updateCartUI() {
   const drawer = document.getElementById("cart-items");
   const totalEl = document.getElementById("cart-total");
@@ -145,7 +155,7 @@ function updateCartUI() {
       drawer.innerHTML += `
                         <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
                             <div class="flex items-center space-x-3">
-                                <img src="${escapeHtml(item.img)}" class="w-12 h-12 rounded-lg object-cover">
+                                ${cartDishPhoto(item,48)}
                                 <div>
                                     <p class="font-semibold text-sm">${escapeHtml(item.name)}</p>
                                     <p class="text-appleBlue text-sm font-bold">¥${item.price.toFixed(1)}</p>
@@ -159,7 +169,7 @@ function updateCartUI() {
                     `;
     });
   }
-  if(state.dining) drawer.innerHTML += `<div class="text-sm p-3 rounded-xl bg-appleGray"><b>用餐安排</b><p>${escapeHtml(DB.restaurants.find(r=>r.id===state.dining.restaurantId)?.name || "")} · ${escapeHtml(new Date(state.dining.startsAt).toLocaleString('zh-CN'))}</p><p>座位：${escapeHtml((state.dining.seats || []).map(s=>s.label).join('、') || (state.dining.seatIds?.length ? '已选择' : '未选座'))}</p><button onclick="openSeatPicker()" class="text-appleBlue mt-2">选择食堂与座位</button></div>`;
+  if(state.dining) drawer.innerHTML += `<div class="text-sm p-3 rounded-xl bg-appleGray"><b>用餐安排</b><p>${escapeHtml(DB.restaurants.find(r=>r.id===state.dining.restaurantId)?.name || "")} · ${escapeHtml(new Date(state.dining.startsAt).toLocaleString('zh-CN'))}</p><p>座位：${escapeHtml((state.dining.seats || []).map(s=>[s.floor,s.label].filter(Boolean).join(" ")).join('、') || (state.dining.seatIds?.length ? '已选择' : '未选座'))}</p><button onclick="openSeatPicker()" class="text-appleBlue mt-2">选择食堂与座位</button></div>`;
   totalEl.innerText = `¥${total.toFixed(2)}`;
   qtyTotal > 0
     ? ((badge.innerText = qtyTotal), badge.classList.remove("hidden"))
@@ -214,7 +224,7 @@ function openCheckout() {
                                 (i) => `
                                 <div class="flex justify-between items-center bg-appleGray rounded-xl p-3">
                                     <div class="flex items-center space-x-3">
-                                        <img src="${escapeHtml(i.img)}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='dish-placeholder.svg'">
+                                        ${cartDishPhoto(i,40)}
                                         <span class="font-medium text-sm">${escapeHtml(i.name)} <span class="text-appleLightGray">x${i.qty}</span></span>
                                     </div>
                                     <span class="font-bold text-sm">¥${(i.price * i.qty).toFixed(2)}</span>
@@ -295,6 +305,8 @@ async function confirmOrder() {
     document.getElementById("checkout-submit")?.disabled
   )
     return;
+  const unavailable = state.cart.find(i => !i.agentTaskId && window.canDirectOrderDish && !window.canDirectOrderDish(DB.menu.find(d => d.id === i.id) || {}));
+  if (unavailable) return toast(`「${unavailable.name}」当前不在供餐时段，请移出餐盘或通过小智预约`, 'warning');
   const items = state.cart.map((i) => ({ dishId: i.id, quantity: i.qty }));
   const restaurantId = Number(
     document.getElementById("checkout-address").value,
@@ -427,6 +439,8 @@ function stopOrderPolling() {
 }
 
 // --- 启动引导 ---
+hideCart();
+window.addEventListener("pageshow", () => hideCart());
 loadCart();
 applyTheme(currentTheme());
 renderUserEntry();
@@ -490,6 +504,7 @@ function syncLiveCatalog(catalog) {
 let seatPickerRevision = 0;
 async function openSeatPicker(initialRestaurantId = null) {
   if (checkoutSubmitting) return;
+  if(DB.restaurants.find(r=>r.id===Number(initialRestaurantId))?.hasSeating===false)return toast("该餐厅不提供座位预约","warning");
   const fromCheckout = Boolean(document.getElementById('checkout-time'));
   if (fromCheckout) state.dining = {...state.dining,
     restaurantId:Number(document.getElementById('checkout-address').value),
@@ -497,15 +512,29 @@ async function openSeatPicker(initialRestaurantId = null) {
     seatIds:[...document.querySelectorAll('input[name="checkout-seat"]:checked')].map(x=>Number(x.value))};
   const dining = {...(state.dining || {restaurantId:DB.restaurants[0]?.id,startsAt:new Date(Date.now()+1800000).toISOString(),seatIds:[]})};
   if(initialRestaurantId && Number(initialRestaurantId)!==dining.restaurantId) {dining.restaurantId=Number(initialRestaurantId);dining.seatIds=[];}
-  let selected = new Set(dining.seatIds || []), seatRows = [];
+  const loginCampus = (()=>{try{return JSON.parse(localStorage.getItem('zx_session'))?.campus||'';}catch{return '';}})();
+  const scopeCampus = window.currentDiningCampus !== undefined ? window.currentDiningCampus : loginCampus;
+  const seatPlaces = DB.restaurants.filter(r=>r.hasSeating!==false&&(!scopeCampus||r.campus===scopeCampus));
+  if(!seatPlaces.length)return toast('当前校区暂无可预约座位','warning');
+  if(!seatPlaces.some(r=>r.id===dining.restaurantId)){dining.restaurantId=seatPlaces[0].id;dining.seatIds=[];}
+  let selected = new Set(dining.seatIds || []), seatRows = [], layouts = [], zoomed = false;
   hideCart();
-  modalRoot.innerHTML = `<div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal"><section class="zx-seat-page bg-white rounded-[28px] p-6 w-[94%] max-w-[760px] max-h-[90vh] overflow-y-auto"><h2 id="seat-title" class="text-2xl font-bold mb-5">食堂座位</h2><div class="zx-grid"><label>就餐食堂<select id="seat-place" class="w-full bg-appleGray rounded-xl p-3">${DB.restaurants.map(r=>`<option value="${r.id}" ${r.id===dining.restaurantId?'selected':''}>${escapeHtml(r.campus)} · ${escapeHtml(r.name)}</option>`).join('')}</select></label><label>就餐时间<input id="seat-time" type="datetime-local" class="w-full bg-appleGray rounded-xl p-3" value="${new Date(new Date(dining.startsAt).getTime()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)}"></label></div><p class="text-sm my-4">点击座位选择或取消选择</p><div class="zx-seat-legend"><span class="available">可选</span><span class="selected">已选</span><span class="occupied">已占用</span></div><div class="zx-row my-4"><label>楼层<select id="seat-floor" class="zx-button"></select></label><label>区域<select id="seat-zone" class="zx-button"><option value="">全部区域</option>${["A","B","C","D"].map(z=>`<option value="${z}">${z} 区</option>`).join('')}</select></label></div><div class="zx-seat-window">取餐 / 打饭窗口</div><div id="seat-map" class="zx-seat-map" aria-label="食堂座位图"></div><p id="seat-feedback" role="status" class="my-4"></p><div class="zx-row"><button id="seat-apply" class="zx-button zx-primary">保存座位</button><button id="seat-back" class="zx-button">返回</button></div></section></div>`;
+  modalRoot.innerHTML = `<div class="fixed inset-0 z-[100] flex items-center justify-center glass-modal"><section class="zx-seat-page bg-white rounded-[28px] p-6 w-[94%] max-w-[760px] max-h-[90vh] overflow-y-auto"><h2 id="seat-title" class="text-2xl font-bold mb-5">食堂座位</h2><div class="zx-grid"><label>就餐食堂<select id="seat-place" class="w-full bg-appleGray rounded-xl p-3">${seatPlaces.map(r=>`<option value="${r.id}" ${r.id===dining.restaurantId?'selected':''}>${escapeHtml(r.campus)} · ${escapeHtml(r.name)}</option>`).join('')}</select></label><label>就餐时间<input id="seat-time" type="datetime-local" class="w-full bg-appleGray rounded-xl p-3" value="${new Date(new Date(dining.startsAt).getTime()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)}"></label></div><p class="text-sm my-4">点击座位选择或取消选择</p><div class="zx-seat-legend"><span class="available">可选</span><span class="selected">已选</span><span class="occupied">已占用</span></div><div class="zx-row my-4"><label>楼层<select id="seat-floor" class="zx-button"></select></label><label>区域<select id="seat-zone" class="zx-button"><option value="">全部区域</option>${["A","B","C","D"].map(z=>`<option value="${z}">${z} 区</option>`).join('')}</select></label></div><div id="seat-map" class="zx-seat-map" aria-label="食堂座位图"></div><p id="seat-feedback" role="status" class="my-4"></p><div class="zx-row"><button id="seat-apply" class="zx-button zx-primary">保存座位</button><button id="seat-back" class="zx-button">返回</button></div></section></div>`;
   const place=document.getElementById('seat-place'), time=document.getElementById('seat-time');
   const apply=document.getElementById('seat-apply'), map=document.getElementById('seat-map');
   const floor=document.getElementById('seat-floor'),zone=document.getElementById('seat-zone');
   function renderSeats() {
     document.getElementById("seat-title").textContent=`${DB.restaurants.find(r=>r.id===Number(place.value))?.name || "食堂"} · ${floor.value} · ${zone.value?zone.value+"区":"全部区域"}`;
     const rows=seatRows.filter(s=>(!floor.value||s.floor===floor.value)&&(!zone.value||s.zone===zone.value));
+    map.classList.toggle('zx-floor-overview',!zone.value);
+    if(!zone.value) {
+      const layout=layouts.find(l=>l.floor===floor.value);
+      map.innerHTML=`<div class="zx-floor-landmark zx-floor-entrance"><i class="fa-solid fa-door-open"></i> 入口</div><div class="zx-floor-landmark zx-floor-stairs"><i class="fa-solid fa-stairs"></i> 楼梯</div>${['A','B','C','D'].map(z=>{const seats=rows.filter(s=>s.zone===z);return `<button type="button" class="zx-floor-zone zone-${z}" data-zone="${z}"><b>${z} 区</b><span>${seats.filter(s=>s.available).length} / ${seats.length} 可选</span><div class="zx-mini-seats">${seats.map(s=>`<i class="fa-solid fa-chair ${selected.has(s.id)?'selected':s.available?'available':'occupied'}"></i>`).join('')}</div></button>`;}).join('')}<button type="button" id="stall-zoom" class="zx-floor-stalls ${zoomed?'expanded':''}" aria-label="放大查看档口"><b>档口分布 <i class="fa-solid fa-magnifying-glass-plus"></i></b><div>${(layout?.stalls||[]).map((s,i)=>`<span>${escapeHtml(s.name)}</span>`).join('')||'<span>取餐窗口</span>'}</div></button>`;
+      map.querySelectorAll('[data-zone]').forEach(b=>b.onclick=()=>{zone.value=b.dataset.zone;zoomed=false;renderSeats();});
+      document.getElementById('stall-zoom').onclick=()=>{zoomed=!zoomed;renderSeats();};
+      document.getElementById('seat-feedback').textContent=`已选择 ${selected.size} 个座位`;
+      return;
+    }
     map.innerHTML=rows.map(s=>`<button type="button" class="zx-seat ${selected.has(s.id)?'selected':''}" data-seat="${s.id}" aria-label="座位 ${escapeHtml(s.label)}" aria-pressed="${selected.has(s.id)}" ${s.available?'':'disabled'}><i class="fa-solid fa-chair" aria-hidden="true"></i><b>${escapeHtml(s.label)}</b><small>${selected.has(s.id)?'已选':s.available?'可选':'已占用'}</small></button>`).join('');
     map.querySelectorAll('[data-seat]').forEach(button=>button.onclick=()=>{
       const id=Number(button.dataset.seat);
@@ -514,7 +543,7 @@ async function openSeatPicker(initialRestaurantId = null) {
     });
     document.getElementById('seat-feedback').textContent=`已选择 ${selected.size} 个座位`;
   }
-  floor.onchange=renderSeats;zone.onchange=renderSeats;
+  floor.onchange=()=>{zone.value="";zoomed=false;renderSeats();};zone.onchange=renderSeats;
   async function load(reset=false) {
     if(reset)selected.clear();
     const run=++seatPickerRevision;
@@ -524,6 +553,8 @@ async function openSeatPicker(initialRestaurantId = null) {
     if(run!==seatPickerRevision || !map.isConnected)return;
     if(r.status!==200){map.innerHTML=escapeHtml(r.json.message || '座位加载失败');return;}
     seatRows=r.json.data.seats;
+    layouts=r.json.data.layouts || [];
+    zone.value="";zoomed=false;
     selected=new Set([...selected].filter(id=>r.json.data.seats.some(s=>s.id===id&&s.available)));
     apply.disabled=false;
     const oldFloor=floor.value;

@@ -52,7 +52,7 @@ before(async () => {
     await client.get("/api/workspace/catalog").set(auth(user))
   ).body.data.dishes.find((d) => d.forSale && d.stock > 0 && d.restaurantId);
 });
-test("登录身份由服务端核验，营养高级权限按角色隔离", async () => {
+test("登录身份由服务端核验，营养高级权限包含试用与管理员", async () => {
   assert.equal(
     (
       await client.post("/api/users/login").send({
@@ -67,7 +67,7 @@ test("登录身份由服务端核验，营养高级权限按角色隔离", async
   assert.equal(
     (await client.get("/api/nutrition/entitlements").set(auth(user))).body.data
       .advanced,
-    false,
+    true,
   );
   assert.equal(
     (await client.get("/api/nutrition/entitlements").set(auth(admin))).body.data
@@ -76,8 +76,9 @@ test("登录身份由服务端核验，营养高级权限按角色隔离", async
   );
   assert.equal(
     (await client.get("/api/nutrition/trend").set(auth(user))).status,
-    403,
+    200,
   );
+  db.prepare("UPDATE nutrition_memberships SET trial_started_at='2020-01-01T00:00:00Z' WHERE user_id=(SELECT id FROM yonghu WHERE zhanghao='workspace_test')").run();
   assert.equal(
     (
       await client
@@ -672,7 +673,7 @@ test("小智菜品与手动菜品通过同一订单入口结算，关联任务�
 
 test("座位容量不足时回滚预约和订单",async()=>{
   const dish=db.prepare("SELECT id FROM caipinxinxi WHERE school_id='cufe' AND shangjia='是' AND kucun>0 LIMIT 1").get();
-  const restaurant=db.prepare("SELECT id FROM restaurants WHERE school_id='cufe' LIMIT 1").get();
+  const restaurant=db.prepare("SELECT id FROM restaurants WHERE school_id='cufe' AND (canonical_id IS NULL OR canonical_id=id) AND EXISTS(SELECT 1 FROM restaurant_seats s WHERE s.restaurant_id=restaurants.id AND s.status='available') LIMIT 1").get();
   const seat=db.prepare("SELECT id FROM restaurant_seats WHERE restaurant_id=? AND seat_type='单人座' AND status='available' LIMIT 1").get(restaurant.id);
   const before=db.prepare('SELECT count(*) n FROM seat_reservations').get().n;
   const ordersBefore=db.prepare('SELECT count(*) n FROM orders').get().n;
@@ -683,10 +684,10 @@ test("座位容量不足时回滚预约和订单",async()=>{
 });
 
 test("座位目录包含三层和ABCD区域，每个座位只容纳一人",async()=>{
-  const restaurant=db.prepare("SELECT id FROM restaurants WHERE school_id='cufe' LIMIT 1").get();
+  const restaurant=db.prepare("SELECT id FROM restaurants WHERE school_id='cufe' AND name='东区食堂' LIMIT 1").get();
   const response=await client.get(`/api/restaurants/${restaurant.id}/seats`).set(auth(user));
   const seats=response.body.data.seats;
-  assert.equal(seats.length,96);
+  assert.ok(seats.length>=96);
   assert.deepEqual([...new Set(seats.map(s=>s.zone))].sort(),['A','B','C','D']);
   assert.deepEqual([...new Set(seats.map(s=>s.floor))].sort(),['一层','三层','二层']);
   assert.ok(seats.every(s=>s.type==='单人座'));
@@ -699,4 +700,93 @@ test("历史对话保存并按账号隔离",async()=>{
   assert.equal(rows.find(r=>r.id==='history-test').transcript[0].content,'午餐');
   assert.equal((await client.get('/api/tasks/conversations')).status,401);
   assert.equal((await client.put('/api/tasks/conversations/other').set(auth(user)).send(value)).status,400);
+});
+
+test('后勤小智查询供应商且阻止学生和未登录冒用入口',async()=>{
+ const result=await client.post('/api/ai/chat').set(auth(admin)).send({surface:'management',message:'供应商资质',schoolId:'tju',context:{from:'2000-01-01',to:'2000-01-01'}});
+ assert.equal(result.status,200);
+ assert.ok(result.body.reply.includes('cufe'));assert.ok(result.body.reply.includes('supplier'));
+ assert.equal((await client.post('/api/ai/chat').set(auth(user)).send({surface:'management',message:'供应商'})).status,403);
+ assert.equal((await client.post('/api/ai/chat').send({surface:'management',message:'供应商'})).status,401);
+});
+
+test('后勤查询工具覆盖所有台账与两端业务数据并保持学校隔离',async()=>{
+ const {managementQuery}=await import('../services/managementAssistant.js');
+ const adminUser={role:'admin',schoolId:'cufe'};
+ db.prepare('INSERT INTO operations_records(school_id,type,title,payload_json,status) VALUES(?,?,?,?,?)').run('tju','supplier','隔离供应商','{}','正常');
+ for(const type of ['supplier','inventory','procurement','safety','canteen','conservation','service','orders','feedback','reviews','forecast']) {
+  const data=managementQuery({type},adminUser,{});
+  assert.equal(data.schoolId,'cufe');assert.ok(Array.isArray(data.rows));assert.ok(!JSON.stringify(data.rows).includes('隔离供应商'));
+ }
+ assert.ok(managementQuery({type:'supplier'},{role:'user',schoolId:'cufe'}).error);
+});
+
+test('默认推荐使用实时低销量优先，指定菜品不被替换',async()=>{
+ const {planMeal}=await import('../services/mealPlanner.js');
+ const owner={id:db.prepare("SELECT id FROM yonghu WHERE zhanghao='workspace_test'").get().id,schoolId:'cufe'};
+ const c={people:1,budget:60,reserve:false,exclusions:[],goal:'均衡饮食'};
+ const first=planMeal(owner,c,'');
+ const orderid='SALES-RANK-TEST';
+ db.prepare("INSERT INTO orders(orderid,userid,caipinxinxiid,caipinmingcheng,buyshu,price,total,status,school_id) VALUES(?,?,?,?,100,1,100,'已支付','cufe')").run(orderid,owner.id,first.items[0].id,first.items[0].name);
+ try {
+  assert.notEqual(planMeal(owner,c,'').items[0].id,first.items[0].id);
+  assert.equal(planMeal(owner,{...c,dishId:first.items[0].id},'').items[0].id,first.items[0].id);
+ } finally {db.prepare('DELETE FROM orders WHERE orderid=?').run(orderid);}
+});
+
+test('食堂按整体建筑归并，楼层齐全，烘焙坊不提供选座',async()=>{
+ const c=(await client.get('/api/workspace/catalog').set(auth(admin))).body.data.restaurants;
+ assert.deepEqual(c.map(r=>r.name).sort(),['东区食堂','子衿食园','西区食堂']);
+ assert.equal(c.find(r=>r.name==='子衿食园').floors.length,4);
+ const {catalog}=await import('../services/catalog.js');
+ const b=catalog('bjfu').restaurants;
+ assert.deepEqual(b.map(r=>r.name).sort(),['东区教职工食堂','东区食堂','烘焙坊','西区食堂'].sort());
+ assert.equal(b.find(r=>r.name==='烘焙坊').hasSeating,false);
+ assert.equal(b.find(r=>r.name==='烘焙坊').availableSeats,0);
+});
+
+test('试用到期后高级权限锁定，自定义方案免费且按账号隔离',async()=>{
+ assert.equal((await client.get('/api/nutrition/trend').set(auth(user))).status,403);
+ const created=await client.post('/api/nutrition/plans').set(auth(user)).send({title:'规律三餐',content:'早餐：鸡蛋；午餐：米饭配蔬菜；晚餐：面食'});
+ assert.equal(created.status,200);const id=created.body.data.id;
+ assert.ok((await client.get('/api/nutrition/plans').set(auth(user))).body.data.some(p=>p.id===id));
+ assert.equal((await client.get('/api/nutrition/plans').set(auth(other))).body.data.some(p=>p.id===id),false);
+ await client.delete('/api/nutrition/plans/'+id).set(auth(other));
+ assert.ok((await client.get('/api/nutrition/plans').set(auth(user))).body.data.some(p=>p.id===id));
+ await client.delete('/api/nutrition/plans/'+id).set(auth(user));
+ assert.equal((await client.get('/api/nutrition/plans').set(auth(user))).body.data.some(p=>p.id===id),false);
+});
+
+test('social feed supports persistent idempotent likes and comments scoped to school', async () => {
+  const created = await client.post('/api/social/reviews').set(auth(user)).send({dishId:dish.id,content:'口味清淡，份量合适',rating:4});
+  assert.equal(created.status,201);
+  const id=created.body.data.id;
+  for(let i=0;i<2;i++)assert.equal((await client.post(`/api/social/reviews/${id}/like`).set(auth(other)).send({liked:true})).status,200);
+  let feed=await client.get('/api/social/feed').set(auth(other));
+  assert.equal(feed.body.data.find(x=>x.id===id).likes,1);
+  assert.equal(feed.body.data.find(x=>x.id===id).liked,1);
+  assert.equal((await client.post(`/api/social/reviews/${id}/comments`).set(auth(other)).send({content:'下次试试这道菜'})).status,201);
+  const comments=await client.get(`/api/social/reviews/${id}/comments`).set(auth(user));
+  assert.equal(comments.body.data[0].content,'下次试试这道菜');
+  await client.post(`/api/social/reviews/${id}/like`).set(auth(other)).send({liked:false});
+  feed=await client.get('/api/social/feed').set(auth(other));assert.equal(feed.body.data.find(x=>x.id===id).likes,0);
+  assert.equal((await client.post(`/api/social/reviews/${id}/comments`).set(auth(user)).send({content:' '})).status,400);
+  const foreign=(await client.post('/api/users/development-session').send({schoolId:'tju'})).body.data.token;
+  assert.equal((await client.post(`/api/social/reviews/${id}/like`).set(auth(foreign)).send({liked:true})).status,404);
+  assert.equal((await client.get(`/api/social/reviews/${id}/comments`).set(auth(foreign))).status,404);
+  assert.equal((await client.get('/api/social/feed').set(auth(foreign))).body.data.some(x=>x.id===id),false);
+});
+
+test('分组口味画像保存到数据库并供营养推荐过滤', async()=>{
+ const original=(await client.get('/api/workspace/preferences').set(auth(admin))).body.data;
+ const body={goal:'均衡饮食',calorieTarget:2000,macros:{carbs:50,protein:20,fat:30},tastes:['清淡'],exclusions:['香菜'],profileEstablished:true,portrait:{goal:['均衡饮食'],tastes:['清淡'],allergies:[],dislikes:['香菜'],habits:['少油']}};
+ const saved=await client.put('/api/workspace/preferences').set(auth(admin)).send(body);
+ assert.equal(saved.status,200);
+ const fetched=(await client.get('/api/workspace/preferences').set(auth(admin))).body.data;
+ assert.deepEqual(fetched.portrait,body.portrait);
+ const stored=db.prepare('SELECT profile_json FROM nutrition_profiles WHERE user_id=(SELECT id FROM yonghu WHERE role=\'admin\' AND school_id=\'cufe\' LIMIT 1)').get();
+ assert.deepEqual(JSON.parse(stored.profile_json).portrait,body.portrait);
+ const report=(await client.get('/api/nutrition/report').set(auth(admin))).body.data;
+ assert.ok(report.recommendations.every(d=>![d.name,...d.ingredients,...d.allergens].join(' ').includes('香菜')));
+ await client.put('/api/workspace/preferences').set(auth(admin)).send(original);
 });

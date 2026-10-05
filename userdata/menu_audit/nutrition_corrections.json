@@ -1,0 +1,3197 @@
+[
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "麻辣香锅",
+    "oldCalories": "324",
+    "calories": 836,
+    "fat": 56.4,
+    "per100g": {
+      "calories_per_100g": "185.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "11.6",
+      "fat_per_100g": "12.5"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "麻辣烫",
+    "oldCalories": "201",
+    "calories": 654,
+    "fat": 32.8,
+    "per100g": {
+      "calories_per_100g": "130.8",
+      "protein_per_100g": "5.9",
+      "carbs_per_100g": "12.0",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "冒菜",
+    "oldCalories": "227",
+    "calories": 562,
+    "fat": 36.7,
+    "per100g": {
+      "calories_per_100g": "112.4",
+      "protein_per_100g": "6.8",
+      "carbs_per_100g": "4.8",
+      "fat_per_100g": "7.3"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "重庆小面",
+    "oldCalories": "504",
+    "calories": 706,
+    "fat": 30.3,
+    "per100g": {
+      "calories_per_100g": "156.9",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "19.5",
+      "fat_per_100g": "6.7"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "黄焖鸡",
+    "oldCalories": "591",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "鸡公煲",
+    "oldCalories": "591",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "米粉米线",
+    "oldCalories": "504",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "广式煲仔饭",
+    "oldCalories": "617",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "卤肉饭",
+    "oldCalories": "591",
+    "calories": 899,
+    "fat": 51.7,
+    "per100g": {
+      "calories_per_100g": "179.8",
+      "protein_per_100g": "5.3",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "10.3"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "牛肉饭",
+    "oldCalories": "591",
+    "calories": 671,
+    "fat": 24.1,
+    "per100g": {
+      "calories_per_100g": "134.2",
+      "protein_per_100g": "6.5",
+      "carbs_per_100g": "16.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "烤盘饭",
+    "oldCalories": "591",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "馄饨",
+    "oldCalories": "517",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "小笼包",
+    "oldCalories": "311",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "葱油拌面",
+    "oldCalories": "504",
+    "calories": 683,
+    "fat": 27.5,
+    "per100g": {
+      "calories_per_100g": "151.8",
+      "protein_per_100g": "2.8",
+      "carbs_per_100g": "21.3",
+      "fat_per_100g": "6.1"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "芝士焗饭",
+    "oldCalories": "604",
+    "calories": 820,
+    "fat": 39.1,
+    "per100g": {
+      "calories_per_100g": "164.0",
+      "protein_per_100g": "6.9",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "7.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "炸鸡拌饭",
+    "oldCalories": "604",
+    "calories": 959,
+    "fat": 47.0,
+    "per100g": {
+      "calories_per_100g": "191.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "20.1",
+      "fat_per_100g": "9.4"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "轻食套餐",
+    "oldCalories": "384",
+    "calories": 458,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "101.8",
+      "protein_per_100g": "7.6",
+      "carbs_per_100g": "12.7",
+      "fat_per_100g": "2.3"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "胡辣汤",
+    "oldCalories": "201",
+    "calories": 395,
+    "fat": 15.5,
+    "per100g": {
+      "calories_per_100g": "98.8",
+      "protein_per_100g": "5.2",
+      "carbs_per_100g": "10.8",
+      "fat_per_100g": "3.9"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "菠萝饭",
+    "oldCalories": "591",
+    "calories": 743,
+    "fat": 33.4,
+    "per100g": {
+      "calories_per_100g": "165.1",
+      "protein_per_100g": "4.0",
+      "carbs_per_100g": "20.6",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "自选菜",
+    "oldCalories": "451",
+    "calories": 717,
+    "fat": 32.2,
+    "per100g": {
+      "calories_per_100g": "143.4",
+      "protein_per_100g": "6.8",
+      "carbs_per_100g": "14.6",
+      "fat_per_100g": "6.4"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "清炒木耳",
+    "oldCalories": "324",
+    "calories": 182,
+    "fat": 12.5,
+    "per100g": {
+      "calories_per_100g": "82.7",
+      "protein_per_100g": "2.8",
+      "carbs_per_100g": "5.1",
+      "fat_per_100g": "5.7"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "大白菜红烧肉炒粉条",
+    "oldCalories": "311",
+    "calories": 603,
+    "fat": 36.0,
+    "per100g": {
+      "calories_per_100g": "201.0",
+      "protein_per_100g": "5.1",
+      "carbs_per_100g": "18.2",
+      "fat_per_100g": "12.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "土豆粉条炒回锅肉",
+    "oldCalories": "337",
+    "calories": 664,
+    "fat": 35.9,
+    "per100g": {
+      "calories_per_100g": "221.3",
+      "protein_per_100g": "5.2",
+      "carbs_per_100g": "23.2",
+      "fat_per_100g": "12.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "宽粉条白菜炖肉",
+    "oldCalories": "324",
+    "calories": 603,
+    "fat": 36.0,
+    "per100g": {
+      "calories_per_100g": "201.0",
+      "protein_per_100g": "5.1",
+      "carbs_per_100g": "18.2",
+      "fat_per_100g": "12.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "",
+    "name": "蚂蚁上树",
+    "oldCalories": "324",
+    "calories": 603,
+    "fat": 36.0,
+    "per100g": {
+      "calories_per_100g": "201.0",
+      "protein_per_100g": "5.1",
+      "carbs_per_100g": "18.2",
+      "fat_per_100g": "12.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "",
+    "name": "木耳炒牛肉",
+    "oldCalories": "337",
+    "calories": 400,
+    "fat": 24.2,
+    "per100g": {
+      "calories_per_100g": "160.0",
+      "protein_per_100g": "12.7",
+      "carbs_per_100g": "5.5",
+      "fat_per_100g": "9.7"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "",
+    "name": "酸辣土豆粉",
+    "oldCalories": "517",
+    "calories": 672,
+    "fat": 27.7,
+    "per100g": {
+      "calories_per_100g": "134.4",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "16.5",
+      "fat_per_100g": "5.5"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "天津煎饼果子",
+    "oldCalories": "311",
+    "calories": 644,
+    "fat": 30.4,
+    "per100g": {
+      "calories_per_100g": "292.7",
+      "protein_per_100g": "7.5",
+      "carbs_per_100g": "34.5",
+      "fat_per_100g": "13.8"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "",
+    "name": "韭菜盒子",
+    "oldCalories": "324",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "",
+    "name": "老爆三",
+    "oldCalories": "311",
+    "calories": 400,
+    "fat": 24.2,
+    "per100g": {
+      "calories_per_100g": "160.0",
+      "protein_per_100g": "12.7",
+      "carbs_per_100g": "5.5",
+      "fat_per_100g": "9.7"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "",
+    "name": "溜肝尖",
+    "oldCalories": "311",
+    "calories": 400,
+    "fat": 24.2,
+    "per100g": {
+      "calories_per_100g": "160.0",
+      "protein_per_100g": "12.7",
+      "carbs_per_100g": "5.5",
+      "fat_per_100g": "9.7"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "菊园餐厅",
+    "floor": "",
+    "name": "鸡胸肉健身餐",
+    "oldCalories": "371",
+    "calories": 458,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "101.8",
+      "protein_per_100g": "7.6",
+      "carbs_per_100g": "12.7",
+      "fat_per_100g": "2.3"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "菊园餐厅",
+    "floor": "",
+    "name": "卤牛肉健身餐",
+    "oldCalories": "371",
+    "calories": 458,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "101.8",
+      "protein_per_100g": "7.6",
+      "carbs_per_100g": "12.7",
+      "fat_per_100g": "2.3"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "菊园餐厅",
+    "floor": "",
+    "name": "时蔬鱼肉健身餐",
+    "oldCalories": "384",
+    "calories": 478,
+    "fat": 13.0,
+    "per100g": {
+      "calories_per_100g": "106.2",
+      "protein_per_100g": "7.4",
+      "carbs_per_100g": "12.6",
+      "fat_per_100g": "2.9"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "菊园餐厅",
+    "floor": "",
+    "name": "小份时蔬套餐",
+    "oldCalories": "371",
+    "calories": 417,
+    "fat": 13.7,
+    "per100g": {
+      "calories_per_100g": "104.2",
+      "protein_per_100g": "5.0",
+      "carbs_per_100g": "13.4",
+      "fat_per_100g": "3.4"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "食堂西饼屋",
+    "floor": "",
+    "name": "五仁月饼",
+    "oldCalories": "344",
+    "calories": 324,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "食堂西饼屋",
+    "floor": "",
+    "name": "黑芝麻月饼",
+    "oldCalories": "357",
+    "calories": 324,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "食堂西饼屋",
+    "floor": "",
+    "name": "莲蓉蛋黄月饼",
+    "oldCalories": "331",
+    "calories": 324,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "食堂西饼屋",
+    "floor": "",
+    "name": "牛油果风味月饼",
+    "oldCalories": "344",
+    "calories": 324,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "食堂西饼屋",
+    "floor": "",
+    "name": "水蜜桃风味月饼",
+    "oldCalories": "344",
+    "calories": 324,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "食堂西饼屋",
+    "floor": "",
+    "name": "板栗月饼",
+    "oldCalories": "344",
+    "calories": 324,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "铁板饭",
+    "oldCalories": "591",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "卤肉饭",
+    "oldCalories": "591",
+    "calories": 899,
+    "fat": 51.7,
+    "per100g": {
+      "calories_per_100g": "179.8",
+      "protein_per_100g": "5.3",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "10.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "牛肉板面",
+    "oldCalories": "504",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "排骨拌饭",
+    "oldCalories": "604",
+    "calories": 899,
+    "fat": 51.7,
+    "per100g": {
+      "calories_per_100g": "179.8",
+      "protein_per_100g": "5.3",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "10.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "自选菜",
+    "oldCalories": "451",
+    "calories": 717,
+    "fat": 32.2,
+    "per100g": {
+      "calories_per_100g": "143.4",
+      "protein_per_100g": "6.8",
+      "carbs_per_100g": "14.6",
+      "fat_per_100g": "6.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "咸水鸡拌饭",
+    "oldCalories": "617",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "咖喱土豆肉末煲仔饭",
+    "oldCalories": "591",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "虾仁鸡胸减脂餐",
+    "oldCalories": "384",
+    "calories": 479,
+    "fat": 10.6,
+    "per100g": {
+      "calories_per_100g": "106.4",
+      "protein_per_100g": "8.4",
+      "carbs_per_100g": "13.0",
+      "fat_per_100g": "2.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "南昌拌粉",
+    "oldCalories": "504",
+    "calories": 706,
+    "fat": 30.3,
+    "per100g": {
+      "calories_per_100g": "156.9",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "19.5",
+      "fat_per_100g": "6.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "剁椒牛肉渣面",
+    "oldCalories": "491",
+    "calories": 771,
+    "fat": 29.6,
+    "per100g": {
+      "calories_per_100g": "171.3",
+      "protein_per_100g": "6.4",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "香菇牛肉酱拌面",
+    "oldCalories": "504",
+    "calories": 771,
+    "fat": 29.6,
+    "per100g": {
+      "calories_per_100g": "171.3",
+      "protein_per_100g": "6.4",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "红烧牛肉面",
+    "oldCalories": "517",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "白切鸡饭",
+    "oldCalories": "604",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "新疆烤包子",
+    "oldCalories": "337",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "辣子鸡",
+    "oldCalories": "311",
+    "calories": 746,
+    "fat": 59.3,
+    "per100g": {
+      "calories_per_100g": "298.4",
+      "protein_per_100g": "15.4",
+      "carbs_per_100g": "5.8",
+      "fat_per_100g": "23.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "新疆手抓饭",
+    "oldCalories": "617",
+    "calories": 671,
+    "fat": 24.1,
+    "per100g": {
+      "calories_per_100g": "134.2",
+      "protein_per_100g": "6.5",
+      "carbs_per_100g": "16.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "鲜肉小馄饨",
+    "oldCalories": "517",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "鸡架拌面",
+    "oldCalories": "504",
+    "calories": 912,
+    "fat": 38.4,
+    "per100g": {
+      "calories_per_100g": "182.4",
+      "protein_per_100g": "7.8",
+      "carbs_per_100g": "20.5",
+      "fat_per_100g": "7.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "金汤鱼片",
+    "oldCalories": "324",
+    "calories": 566,
+    "fat": 34.9,
+    "per100g": {
+      "calories_per_100g": "141.5",
+      "protein_per_100g": "10.8",
+      "carbs_per_100g": "4.9",
+      "fat_per_100g": "8.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "荠菜大馄饨",
+    "oldCalories": "517",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "土豆泥拌面",
+    "oldCalories": "517",
+    "calories": 790,
+    "fat": 31.9,
+    "per100g": {
+      "calories_per_100g": "175.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "7.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "椰子鸡",
+    "oldCalories": "311",
+    "calories": 439,
+    "fat": 27.0,
+    "per100g": {
+      "calories_per_100g": "87.8",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "2.9",
+      "fat_per_100g": "5.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "肠粉",
+    "oldCalories": "337",
+    "calories": 592,
+    "fat": 26.0,
+    "per100g": {
+      "calories_per_100g": "169.1",
+      "protein_per_100g": "5.7",
+      "carbs_per_100g": "19.9",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "蓝莓山药",
+    "oldCalories": "264",
+    "calories": 263,
+    "fat": 0.6,
+    "per100g": {
+      "calories_per_100g": "105.2",
+      "protein_per_100g": "1.6",
+      "carbs_per_100g": "24.1",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "鲜虾阳春面",
+    "oldCalories": "517",
+    "calories": 563,
+    "fat": 15.4,
+    "per100g": {
+      "calories_per_100g": "112.6",
+      "protein_per_100g": "4.9",
+      "carbs_per_100g": "16.3",
+      "fat_per_100g": "3.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "烧鸭饭",
+    "oldCalories": "591",
+    "calories": 899,
+    "fat": 51.7,
+    "per100g": {
+      "calories_per_100g": "179.8",
+      "protein_per_100g": "5.3",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "10.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "大同刀削面",
+    "oldCalories": "517",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "铁板牛肉饭",
+    "oldCalories": "617",
+    "calories": 671,
+    "fat": 24.1,
+    "per100g": {
+      "calories_per_100g": "134.2",
+      "protein_per_100g": "6.5",
+      "carbs_per_100g": "16.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "椒麻鸡",
+    "oldCalories": "311",
+    "calories": 746,
+    "fat": 59.3,
+    "per100g": {
+      "calories_per_100g": "298.4",
+      "protein_per_100g": "15.4",
+      "carbs_per_100g": "5.8",
+      "fat_per_100g": "23.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "口水鸡",
+    "oldCalories": "311",
+    "calories": 746,
+    "fat": 59.3,
+    "per100g": {
+      "calories_per_100g": "298.4",
+      "protein_per_100g": "15.4",
+      "carbs_per_100g": "5.8",
+      "fat_per_100g": "23.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "椒麻土豆片",
+    "oldCalories": "337",
+    "calories": 378,
+    "fat": 18.4,
+    "per100g": {
+      "calories_per_100g": "171.8",
+      "protein_per_100g": "1.9",
+      "carbs_per_100g": "22.3",
+      "fat_per_100g": "8.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "三合一拌面",
+    "oldCalories": "517",
+    "calories": 771,
+    "fat": 29.6,
+    "per100g": {
+      "calories_per_100g": "171.3",
+      "protein_per_100g": "6.4",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "瓦香鸡",
+    "oldCalories": "311",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "瓦香肥牛",
+    "oldCalories": "324",
+    "calories": 899,
+    "fat": 51.7,
+    "per100g": {
+      "calories_per_100g": "179.8",
+      "protein_per_100g": "5.3",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "10.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "酸豆角肉沫盖饭",
+    "oldCalories": "604",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "金汤鱼粉",
+    "oldCalories": "504",
+    "calories": 672,
+    "fat": 27.7,
+    "per100g": {
+      "calories_per_100g": "134.4",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "16.5",
+      "fat_per_100g": "5.5"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "饺子",
+    "oldCalories": "337",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "淀粉肠",
+    "oldCalories": "311",
+    "calories": 197,
+    "fat": 10.2,
+    "per100g": {
+      "calories_per_100g": "246.2",
+      "protein_per_100g": "6.4",
+      "carbs_per_100g": "26.6",
+      "fat_per_100g": "12.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "清补凉",
+    "oldCalories": "141",
+    "calories": 237,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "67.7",
+      "protein_per_100g": "1.4",
+      "carbs_per_100g": "15.1",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "酱香饼",
+    "oldCalories": "311",
+    "calories": 644,
+    "fat": 30.4,
+    "per100g": {
+      "calories_per_100g": "292.7",
+      "protein_per_100g": "7.5",
+      "carbs_per_100g": "34.5",
+      "fat_per_100g": "13.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "绿豆百合粥",
+    "oldCalories": "257",
+    "calories": 162,
+    "fat": 0.8,
+    "per100g": {
+      "calories_per_100g": "54.0",
+      "protein_per_100g": "1.9",
+      "carbs_per_100g": "11.0",
+      "fat_per_100g": "0.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "砂锅土豆粉",
+    "oldCalories": "517",
+    "calories": 672,
+    "fat": 27.7,
+    "per100g": {
+      "calories_per_100g": "134.4",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "16.5",
+      "fat_per_100g": "5.5"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "豆花烤鱼饭",
+    "oldCalories": "617",
+    "calories": 774,
+    "fat": 34.8,
+    "per100g": {
+      "calories_per_100g": "154.8",
+      "protein_per_100g": "8.3",
+      "carbs_per_100g": "14.8",
+      "fat_per_100g": "7.0"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "鱼豆腐焖锅",
+    "oldCalories": "337",
+    "calories": 555,
+    "fat": 30.4,
+    "per100g": {
+      "calories_per_100g": "123.3",
+      "protein_per_100g": "6.4",
+      "carbs_per_100g": "9.2",
+      "fat_per_100g": "6.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "酸辣土豆丝",
+    "oldCalories": "337",
+    "calories": 378,
+    "fat": 18.4,
+    "per100g": {
+      "calories_per_100g": "171.8",
+      "protein_per_100g": "1.9",
+      "carbs_per_100g": "22.3",
+      "fat_per_100g": "8.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "女王冰粉",
+    "oldCalories": "264",
+    "calories": 237,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "67.7",
+      "protein_per_100g": "1.4",
+      "carbs_per_100g": "15.1",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "三层",
+    "name": "辣椒炒肉",
+    "oldCalories": "324",
+    "calories": 656,
+    "fat": 56.2,
+    "per100g": {
+      "calories_per_100g": "262.4",
+      "protein_per_100g": "9.1",
+      "carbs_per_100g": "5.9",
+      "fat_per_100g": "22.5"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "咖喱猪排饭",
+    "oldCalories": "617",
+    "calories": 926,
+    "fat": 42.9,
+    "per100g": {
+      "calories_per_100g": "185.2",
+      "protein_per_100g": "7.1",
+      "carbs_per_100g": "19.9",
+      "fat_per_100g": "8.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "菌菇虫草花鸡汤",
+    "oldCalories": "214",
+    "calories": 439,
+    "fat": 27.0,
+    "per100g": {
+      "calories_per_100g": "87.8",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "2.9",
+      "fat_per_100g": "5.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "冰淇淋西多士",
+    "oldCalories": "251",
+    "calories": 598,
+    "fat": 18.5,
+    "per100g": {
+      "calories_per_100g": "271.8",
+      "protein_per_100g": "5.0",
+      "carbs_per_100g": "44.0",
+      "fat_per_100g": "8.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "西瓜汁",
+    "oldCalories": "141",
+    "calories": 219,
+    "fat": 1.2,
+    "per100g": {
+      "calories_per_100g": "62.6",
+      "protein_per_100g": "0.6",
+      "carbs_per_100g": "14.3",
+      "fat_per_100g": "0.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "奶皮子酸奶",
+    "oldCalories": "167",
+    "calories": 238,
+    "fat": 6.6,
+    "per100g": {
+      "calories_per_100g": "95.2",
+      "protein_per_100g": "2.8",
+      "carbs_per_100g": "15.1",
+      "fat_per_100g": "2.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "牛肉炒拉条",
+    "oldCalories": "517",
+    "calories": 771,
+    "fat": 29.6,
+    "per100g": {
+      "calories_per_100g": "171.3",
+      "protein_per_100g": "6.4",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "油泼面",
+    "oldCalories": "491",
+    "calories": 706,
+    "fat": 30.3,
+    "per100g": {
+      "calories_per_100g": "156.9",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "19.5",
+      "fat_per_100g": "6.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "牛肉面",
+    "oldCalories": "491",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "牛肉焖面",
+    "oldCalories": "504",
+    "calories": 771,
+    "fat": 29.6,
+    "per100g": {
+      "calories_per_100g": "171.3",
+      "protein_per_100g": "6.4",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "牛肉汤饼",
+    "oldCalories": "324",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "鸡蛋",
+    "oldCalories": "",
+    "calories": 80,
+    "fat": 5.5,
+    "per100g": {
+      "calories_per_100g": "160.0",
+      "protein_per_100g": "12.6",
+      "carbs_per_100g": "2.6",
+      "fat_per_100g": "11.0"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "豆浆",
+    "oldCalories": "",
+    "calories": 84,
+    "fat": 2.8,
+    "per100g": {
+      "calories_per_100g": "28.0",
+      "protein_per_100g": "2.4",
+      "carbs_per_100g": "2.4",
+      "fat_per_100g": "0.9"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "油条",
+    "oldCalories": "",
+    "calories": 405,
+    "fat": 13.0,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "咸豆腐脑",
+    "oldCalories": "",
+    "calories": 184,
+    "fat": 9.6,
+    "per100g": {
+      "calories_per_100g": "73.6",
+      "protein_per_100g": "4.5",
+      "carbs_per_100g": "5.3",
+      "fat_per_100g": "3.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "粥",
+    "oldCalories": "",
+    "calories": 127,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "42.3",
+      "protein_per_100g": "1.2",
+      "carbs_per_100g": "8.9",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "酱香饼",
+    "oldCalories": "",
+    "calories": 644,
+    "fat": 30.4,
+    "per100g": {
+      "calories_per_100g": "292.7",
+      "protein_per_100g": "7.5",
+      "carbs_per_100g": "34.5",
+      "fat_per_100g": "13.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "玉米饼",
+    "oldCalories": "",
+    "calories": 244,
+    "fat": 4.2,
+    "per100g": {
+      "calories_per_100g": "244.0",
+      "protein_per_100g": "6.0",
+      "carbs_per_100g": "45.6",
+      "fat_per_100g": "4.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "烤鱼",
+    "oldCalories": "",
+    "calories": 566,
+    "fat": 34.9,
+    "per100g": {
+      "calories_per_100g": "141.5",
+      "protein_per_100g": "10.8",
+      "carbs_per_100g": "4.9",
+      "fat_per_100g": "8.7"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "羊肉泡馍",
+    "oldCalories": "",
+    "calories": 598,
+    "fat": 19.6,
+    "per100g": {
+      "calories_per_100g": "119.6",
+      "protein_per_100g": "6.1",
+      "carbs_per_100g": "15.0",
+      "fat_per_100g": "3.9"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "负一层",
+    "name": "砂锅米线",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "鸡蛋",
+    "oldCalories": "",
+    "calories": 80,
+    "fat": 5.5,
+    "per100g": {
+      "calories_per_100g": "160.0",
+      "protein_per_100g": "12.6",
+      "carbs_per_100g": "2.6",
+      "fat_per_100g": "11.0"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "油条",
+    "oldCalories": "",
+    "calories": 405,
+    "fat": 13.0,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "馒头",
+    "oldCalories": "",
+    "calories": 217,
+    "fat": 1.2,
+    "per100g": {
+      "calories_per_100g": "217.0",
+      "protein_per_100g": "6.0",
+      "carbs_per_100g": "45.6",
+      "fat_per_100g": "1.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "咸菜",
+    "oldCalories": "",
+    "calories": 18,
+    "fat": 0.1,
+    "per100g": {
+      "calories_per_100g": "60.0",
+      "protein_per_100g": "1.7",
+      "carbs_per_100g": "13.0",
+      "fat_per_100g": "0.3"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "粥",
+    "oldCalories": "",
+    "calories": 127,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "42.3",
+      "protein_per_100g": "1.2",
+      "carbs_per_100g": "8.9",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "鸭血豆腐",
+    "oldCalories": "",
+    "calories": 283,
+    "fat": 17.9,
+    "per100g": {
+      "calories_per_100g": "113.2",
+      "protein_per_100g": "10.1",
+      "carbs_per_100g": "2.1",
+      "fat_per_100g": "7.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "鸡排",
+    "oldCalories": "",
+    "calories": 668,
+    "fat": 46.3,
+    "per100g": {
+      "calories_per_100g": "334.0",
+      "protein_per_100g": "13.4",
+      "carbs_per_100g": "17.9",
+      "fat_per_100g": "23.1"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "麻辣香锅",
+    "oldCalories": "",
+    "calories": 836,
+    "fat": 56.4,
+    "per100g": {
+      "calories_per_100g": "185.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "11.6",
+      "fat_per_100g": "12.5"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "一层",
+    "name": "饺子",
+    "oldCalories": "",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "豆浆",
+    "oldCalories": "",
+    "calories": 84,
+    "fat": 2.8,
+    "per100g": {
+      "calories_per_100g": "28.0",
+      "protein_per_100g": "2.4",
+      "carbs_per_100g": "2.4",
+      "fat_per_100g": "0.9"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "牛奶燕麦粥",
+    "oldCalories": "",
+    "calories": 245,
+    "fat": 6.1,
+    "per100g": {
+      "calories_per_100g": "81.7",
+      "protein_per_100g": "2.8",
+      "carbs_per_100g": "13.0",
+      "fat_per_100g": "2.0"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "三明治",
+    "oldCalories": "",
+    "calories": 425,
+    "fat": 18.1,
+    "per100g": {
+      "calories_per_100g": "193.2",
+      "protein_per_100g": "9.3",
+      "carbs_per_100g": "20.5",
+      "fat_per_100g": "8.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "铜锣烧",
+    "oldCalories": "",
+    "calories": 324,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "405.0",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "65.0",
+      "fat_per_100g": "13.0"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "馄饨",
+    "oldCalories": "",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "米粉米线",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "麻辣烫",
+    "oldCalories": "",
+    "calories": 654,
+    "fat": 32.8,
+    "per100g": {
+      "calories_per_100g": "130.8",
+      "protein_per_100g": "5.9",
+      "carbs_per_100g": "12.0",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "麻辣香锅",
+    "oldCalories": "",
+    "calories": 836,
+    "fat": 56.4,
+    "per100g": {
+      "calories_per_100g": "185.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "11.6",
+      "fat_per_100g": "12.5"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "黄焖鸡",
+    "oldCalories": "",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "二层",
+    "name": "烤鱼饭",
+    "oldCalories": "",
+    "calories": 774,
+    "fat": 34.8,
+    "per100g": {
+      "calories_per_100g": "154.8",
+      "protein_per_100g": "8.3",
+      "carbs_per_100g": "14.8",
+      "fat_per_100g": "7.0"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "自选菜",
+    "oldCalories": "",
+    "calories": 717,
+    "fat": 32.2,
+    "per100g": {
+      "calories_per_100g": "143.4",
+      "protein_per_100g": "6.8",
+      "carbs_per_100g": "14.6",
+      "fat_per_100g": "6.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "减脂餐",
+    "oldCalories": "",
+    "calories": 458,
+    "fat": 10.4,
+    "per100g": {
+      "calories_per_100g": "101.8",
+      "protein_per_100g": "7.6",
+      "carbs_per_100g": "12.7",
+      "fat_per_100g": "2.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "红烧肉",
+    "oldCalories": "",
+    "calories": 648,
+    "fat": 51.2,
+    "per100g": {
+      "calories_per_100g": "259.2",
+      "protein_per_100g": "10.0",
+      "carbs_per_100g": "8.8",
+      "fat_per_100g": "20.5"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "粥",
+    "oldCalories": "",
+    "calories": 127,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "42.3",
+      "protein_per_100g": "1.2",
+      "carbs_per_100g": "8.9",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "半只鸡米线",
+    "oldCalories": "",
+    "calories": 890,
+    "fat": 40.5,
+    "per100g": {
+      "calories_per_100g": "127.1",
+      "protein_per_100g": "7.1",
+      "carbs_per_100g": "11.7",
+      "fat_per_100g": "5.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "银耳汤",
+    "oldCalories": "",
+    "calories": 237,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "67.7",
+      "protein_per_100g": "1.4",
+      "carbs_per_100g": "15.1",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "沙威玛卷饼",
+    "oldCalories": "",
+    "calories": 814,
+    "fat": 32.8,
+    "per100g": {
+      "calories_per_100g": "203.5",
+      "protein_per_100g": "8.8",
+      "carbs_per_100g": "23.6",
+      "fat_per_100g": "8.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "椰子鸡",
+    "oldCalories": "",
+    "calories": 439,
+    "fat": 27.0,
+    "per100g": {
+      "calories_per_100g": "87.8",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "2.9",
+      "fat_per_100g": "5.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "土豆糊糊鸡",
+    "oldCalories": "",
+    "calories": 790,
+    "fat": 31.9,
+    "per100g": {
+      "calories_per_100g": "175.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "7.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "土豆泥糊糊排骨",
+    "oldCalories": "",
+    "calories": 790,
+    "fat": 31.9,
+    "per100g": {
+      "calories_per_100g": "175.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "21.6",
+      "fat_per_100g": "7.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "擂椒饭",
+    "oldCalories": "",
+    "calories": 819,
+    "fat": 39.5,
+    "per100g": {
+      "calories_per_100g": "163.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "7.9"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "葱油饼",
+    "oldCalories": "",
+    "calories": 644,
+    "fat": 30.4,
+    "per100g": {
+      "calories_per_100g": "292.7",
+      "protein_per_100g": "7.5",
+      "carbs_per_100g": "34.5",
+      "fat_per_100g": "13.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "烤盘饭",
+    "oldCalories": "",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "麻辣烫",
+    "oldCalories": "",
+    "calories": 654,
+    "fat": 32.8,
+    "per100g": {
+      "calories_per_100g": "130.8",
+      "protein_per_100g": "5.9",
+      "carbs_per_100g": "12.0",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "糖醋洋芋",
+    "oldCalories": "",
+    "calories": 528,
+    "fat": 28.4,
+    "per100g": {
+      "calories_per_100g": "240.0",
+      "protein_per_100g": "1.9",
+      "carbs_per_100g": "29.1",
+      "fat_per_100g": "12.9"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "重庆小面",
+    "oldCalories": "",
+    "calories": 706,
+    "fat": 30.3,
+    "per100g": {
+      "calories_per_100g": "156.9",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "19.5",
+      "fat_per_100g": "6.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "川菜盖饭",
+    "oldCalories": "",
+    "calories": 717,
+    "fat": 32.2,
+    "per100g": {
+      "calories_per_100g": "143.4",
+      "protein_per_100g": "6.8",
+      "carbs_per_100g": "14.6",
+      "fat_per_100g": "6.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "分米鸡",
+    "oldCalories": "",
+    "calories": 819,
+    "fat": 39.5,
+    "per100g": {
+      "calories_per_100g": "163.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "7.9"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "豌杂面",
+    "oldCalories": "",
+    "calories": 702,
+    "fat": 30.3,
+    "per100g": {
+      "calories_per_100g": "156.0",
+      "protein_per_100g": "5.1",
+      "carbs_per_100g": "18.8",
+      "fat_per_100g": "6.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "鱼籽拌饭",
+    "oldCalories": "",
+    "calories": 560,
+    "fat": 18.9,
+    "per100g": {
+      "calories_per_100g": "140.0",
+      "protein_per_100g": "5.2",
+      "carbs_per_100g": "19.2",
+      "fat_per_100g": "4.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "烘焙坊",
+    "floor": "一层",
+    "name": "黄油年糕",
+    "oldCalories": "",
+    "calories": 598,
+    "fat": 18.5,
+    "per100g": {
+      "calories_per_100g": "271.8",
+      "protein_per_100g": "5.0",
+      "carbs_per_100g": "44.0",
+      "fat_per_100g": "8.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "烘焙坊",
+    "floor": "一层",
+    "name": "蛋糕卷",
+    "oldCalories": "",
+    "calories": 598,
+    "fat": 18.5,
+    "per100g": {
+      "calories_per_100g": "271.8",
+      "protein_per_100g": "5.0",
+      "carbs_per_100g": "44.0",
+      "fat_per_100g": "8.4"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "粥",
+    "oldCalories": "",
+    "calories": 127,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "42.3",
+      "protein_per_100g": "1.2",
+      "carbs_per_100g": "8.9",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "烧饼",
+    "oldCalories": "",
+    "calories": 644,
+    "fat": 30.4,
+    "per100g": {
+      "calories_per_100g": "292.7",
+      "protein_per_100g": "7.5",
+      "carbs_per_100g": "34.5",
+      "fat_per_100g": "13.8"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "馒头",
+    "oldCalories": "",
+    "calories": 217,
+    "fat": 1.2,
+    "per100g": {
+      "calories_per_100g": "217.0",
+      "protein_per_100g": "6.0",
+      "carbs_per_100g": "45.6",
+      "fat_per_100g": "1.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "小笼包",
+    "oldCalories": "",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "一层",
+    "name": "烧麦",
+    "oldCalories": "",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "牛肉拉面",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "肠粉",
+    "oldCalories": "",
+    "calories": 592,
+    "fat": 26.0,
+    "per100g": {
+      "calories_per_100g": "169.1",
+      "protein_per_100g": "5.7",
+      "carbs_per_100g": "19.9",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "麻辣烫",
+    "oldCalories": "",
+    "calories": 654,
+    "fat": 32.8,
+    "per100g": {
+      "calories_per_100g": "130.8",
+      "protein_per_100g": "5.9",
+      "carbs_per_100g": "12.0",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "麻辣香锅",
+    "oldCalories": "",
+    "calories": 836,
+    "fat": 56.4,
+    "per100g": {
+      "calories_per_100g": "185.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "11.6",
+      "fat_per_100g": "12.5"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "五谷鱼粉",
+    "oldCalories": "",
+    "calories": 672,
+    "fat": 27.7,
+    "per100g": {
+      "calories_per_100g": "134.4",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "16.5",
+      "fat_per_100g": "5.5"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "炒饭",
+    "oldCalories": "",
+    "calories": 819,
+    "fat": 39.5,
+    "per100g": {
+      "calories_per_100g": "163.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "7.9"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "石锅饭",
+    "oldCalories": "",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "蛋包饭",
+    "oldCalories": "",
+    "calories": 819,
+    "fat": 39.5,
+    "per100g": {
+      "calories_per_100g": "163.8",
+      "protein_per_100g": "6.7",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "7.9"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "鸭血粉丝汤",
+    "oldCalories": "",
+    "calories": 395,
+    "fat": 15.5,
+    "per100g": {
+      "calories_per_100g": "98.8",
+      "protein_per_100g": "5.2",
+      "carbs_per_100g": "10.8",
+      "fat_per_100g": "3.9"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "梅园餐厅",
+    "floor": "二层",
+    "name": "粗粮面",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "粥",
+    "oldCalories": "",
+    "calories": 127,
+    "fat": 0.7,
+    "per100g": {
+      "calories_per_100g": "42.3",
+      "protein_per_100g": "1.2",
+      "carbs_per_100g": "8.9",
+      "fat_per_100g": "0.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "豆浆",
+    "oldCalories": "",
+    "calories": 84,
+    "fat": 2.8,
+    "per100g": {
+      "calories_per_100g": "28.0",
+      "protein_per_100g": "2.4",
+      "carbs_per_100g": "2.4",
+      "fat_per_100g": "0.9"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "武大烧饼",
+    "oldCalories": "",
+    "calories": 644,
+    "fat": 30.4,
+    "per100g": {
+      "calories_per_100g": "292.7",
+      "protein_per_100g": "7.5",
+      "carbs_per_100g": "34.5",
+      "fat_per_100g": "13.8"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "河南烩面",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "安徽板面",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "刀削面",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "米粉米线",
+    "oldCalories": "",
+    "calories": 573,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "114.6",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "16.0",
+      "fat_per_100g": "3.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "一层",
+    "name": "麻辣烫",
+    "oldCalories": "",
+    "calories": 654,
+    "fat": 32.8,
+    "per100g": {
+      "calories_per_100g": "130.8",
+      "protein_per_100g": "5.9",
+      "carbs_per_100g": "12.0",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "重庆小面",
+    "oldCalories": "",
+    "calories": 706,
+    "fat": 30.3,
+    "per100g": {
+      "calories_per_100g": "156.9",
+      "protein_per_100g": "4.6",
+      "carbs_per_100g": "19.5",
+      "fat_per_100g": "6.7"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "鸡架拌饭",
+    "oldCalories": "",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "土豆泥拌饭",
+    "oldCalories": "",
+    "calories": 756,
+    "fat": 30.9,
+    "per100g": {
+      "calories_per_100g": "168.0",
+      "protein_per_100g": "5.8",
+      "carbs_per_100g": "20.7",
+      "fat_per_100g": "6.9"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "饭团",
+    "oldCalories": "",
+    "calories": 535,
+    "fat": 16.9,
+    "per100g": {
+      "calories_per_100g": "152.9",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "20.2",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "冷面",
+    "oldCalories": "",
+    "calories": 890,
+    "fat": 40.9,
+    "per100g": {
+      "calories_per_100g": "178.0",
+      "protein_per_100g": "7.4",
+      "carbs_per_100g": "18.7",
+      "fat_per_100g": "8.2"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "排骨饭",
+    "oldCalories": "",
+    "calories": 899,
+    "fat": 51.7,
+    "per100g": {
+      "calories_per_100g": "179.8",
+      "protein_per_100g": "5.3",
+      "carbs_per_100g": "16.4",
+      "fat_per_100g": "10.3"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "烤鱼饭",
+    "oldCalories": "",
+    "calories": 774,
+    "fat": 34.8,
+    "per100g": {
+      "calories_per_100g": "154.8",
+      "protein_per_100g": "8.3",
+      "carbs_per_100g": "14.8",
+      "fat_per_100g": "7.0"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "石锅饭",
+    "oldCalories": "",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "老妈烫饭",
+    "oldCalories": "",
+    "calories": 728,
+    "fat": 31.5,
+    "per100g": {
+      "calories_per_100g": "145.6",
+      "protein_per_100g": "6.3",
+      "carbs_per_100g": "15.9",
+      "fat_per_100g": "6.3"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园餐厅",
+    "floor": "二层",
+    "name": "小火锅",
+    "oldCalories": "",
+    "calories": 754,
+    "fat": 42.2,
+    "per100g": {
+      "calories_per_100g": "137.1",
+      "protein_per_100g": "6.0",
+      "carbs_per_100g": "11.0",
+      "fat_per_100g": "7.7"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "番茄肥牛小火锅",
+    "oldCalories": "",
+    "calories": 637,
+    "fat": 41.2,
+    "per100g": {
+      "calories_per_100g": "127.4",
+      "protein_per_100g": "3.7",
+      "carbs_per_100g": "9.6",
+      "fat_per_100g": "8.2"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "子衿食园",
+    "floor": "三层",
+    "name": "炒酸奶",
+    "oldCalories": "",
+    "calories": 314,
+    "fat": 10.1,
+    "per100g": {
+      "calories_per_100g": "125.6",
+      "protein_per_100g": "3.0",
+      "carbs_per_100g": "19.3",
+      "fat_per_100g": "4.0"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "紫色糯米饭",
+    "oldCalories": "",
+    "calories": 293,
+    "fat": 1.4,
+    "per100g": {
+      "calories_per_100g": "127.4",
+      "protein_per_100g": "3.0",
+      "carbs_per_100g": "27.5",
+      "fat_per_100g": "0.6"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "豆沙芝麻馅饼",
+    "oldCalories": "",
+    "calories": 474,
+    "fat": 16.2,
+    "per100g": {
+      "calories_per_100g": "296.2",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "44.1",
+      "fat_per_100g": "10.1"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "经典珍珠奶茶",
+    "oldCalories": "",
+    "calories": 357,
+    "fat": 7.2,
+    "per100g": {
+      "calories_per_100g": "71.4",
+      "protein_per_100g": "1.4",
+      "carbs_per_100g": "13.2",
+      "fat_per_100g": "1.4"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "麻辣牛肉滑饭",
+    "oldCalories": "",
+    "calories": 564,
+    "fat": 21.5,
+    "per100g": {
+      "calories_per_100g": "125.3",
+      "protein_per_100g": "6.2",
+      "carbs_per_100g": "14.4",
+      "fat_per_100g": "4.8"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "西区食堂",
+    "floor": "二层",
+    "name": "鸡公煲",
+    "oldCalories": "",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "一层",
+    "name": "汉堡",
+    "oldCalories": "",
+    "calories": 560,
+    "fat": 26.0,
+    "per100g": {
+      "calories_per_100g": "243.5",
+      "protein_per_100g": "9.2",
+      "carbs_per_100g": "26.3",
+      "fat_per_100g": "11.3"
+    }
+  },
+  {
+    "school": "cufe",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "回锅肉炒面",
+    "oldCalories": "",
+    "calories": 731,
+    "fat": 42.1,
+    "per100g": {
+      "calories_per_100g": "162.4",
+      "protein_per_100g": "4.9",
+      "carbs_per_100g": "14.7",
+      "fat_per_100g": "9.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "菠萝溜溜鸡",
+    "oldCalories": "",
+    "calories": 614,
+    "fat": 37.1,
+    "per100g": {
+      "calories_per_100g": "204.7",
+      "protein_per_100g": "8.5",
+      "carbs_per_100g": "14.9",
+      "fat_per_100g": "12.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "香辣跳跳虾",
+    "oldCalories": "",
+    "calories": 360,
+    "fat": 21.9,
+    "per100g": {
+      "calories_per_100g": "144.0",
+      "protein_per_100g": "7.8",
+      "carbs_per_100g": "8.5",
+      "fat_per_100g": "8.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "肉骨茶",
+    "oldCalories": "",
+    "calories": 346,
+    "fat": 20.8,
+    "per100g": {
+      "calories_per_100g": "76.9",
+      "protein_per_100g": "6.6",
+      "carbs_per_100g": "2.3",
+      "fat_per_100g": "4.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "烤鸡沙拉",
+    "oldCalories": "",
+    "calories": 389,
+    "fat": 25.0,
+    "per100g": {
+      "calories_per_100g": "111.1",
+      "protein_per_100g": "7.2",
+      "carbs_per_100g": "4.5",
+      "fat_per_100g": "7.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "椒麻香肉饭",
+    "oldCalories": "",
+    "calories": 641,
+    "fat": 29.8,
+    "per100g": {
+      "calories_per_100g": "142.4",
+      "protein_per_100g": "6.1",
+      "carbs_per_100g": "14.6",
+      "fat_per_100g": "6.6"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "小火锅",
+    "oldCalories": "",
+    "calories": 754,
+    "fat": 42.2,
+    "per100g": {
+      "calories_per_100g": "137.1",
+      "protein_per_100g": "6.0",
+      "carbs_per_100g": "11.0",
+      "fat_per_100g": "7.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "茶树菇牛肉",
+    "oldCalories": "",
+    "calories": 367,
+    "fat": 22.2,
+    "per100g": {
+      "calories_per_100g": "131.1",
+      "protein_per_100g": "11.9",
+      "carbs_per_100g": "3.0",
+      "fat_per_100g": "7.9"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "三层",
+    "name": "鸡公煲",
+    "oldCalories": "",
+    "calories": 807,
+    "fat": 37.0,
+    "per100g": {
+      "calories_per_100g": "161.4",
+      "protein_per_100g": "7.0",
+      "carbs_per_100g": "16.7",
+      "fat_per_100g": "7.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "一品脆皮豆腐",
+    "oldCalories": "",
+    "calories": 484,
+    "fat": 33.8,
+    "per100g": {
+      "calories_per_100g": "172.9",
+      "protein_per_100g": "8.4",
+      "carbs_per_100g": "7.6",
+      "fat_per_100g": "12.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "鲜虾套餐",
+    "oldCalories": "",
+    "calories": 458,
+    "fat": 10.6,
+    "per100g": {
+      "calories_per_100g": "101.8",
+      "protein_per_100g": "5.8",
+      "carbs_per_100g": "14.4",
+      "fat_per_100g": "2.4"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区教职工食堂",
+    "floor": "二层",
+    "name": "金瓜蒸饭系列之老干妈排骨蒸饭",
+    "oldCalories": "",
+    "calories": 623,
+    "fat": 26.5,
+    "per100g": {
+      "calories_per_100g": "138.4",
+      "protein_per_100g": "6.9",
+      "carbs_per_100g": "14.5",
+      "fat_per_100g": "5.9"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "东区食堂",
+    "floor": "二层",
+    "name": "驴肉火烧",
+    "oldCalories": "",
+    "calories": 425,
+    "fat": 13.7,
+    "per100g": {
+      "calories_per_100g": "212.5",
+      "protein_per_100g": "12.2",
+      "carbs_per_100g": "25.4",
+      "fat_per_100g": "6.8"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "鸡排拌饭",
+    "oldCalories": "",
+    "calories": 825,
+    "fat": 41.5,
+    "per100g": {
+      "calories_per_100g": "183.3",
+      "protein_per_100g": "6.8",
+      "carbs_per_100g": "18.2",
+      "fat_per_100g": "9.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "陕西臊子面",
+    "oldCalories": "",
+    "calories": 528,
+    "fat": 21.9,
+    "per100g": {
+      "calories_per_100g": "117.3",
+      "protein_per_100g": "4.7",
+      "carbs_per_100g": "13.6",
+      "fat_per_100g": "4.9"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "麻辣涮",
+    "oldCalories": "",
+    "calories": 514,
+    "fat": 27.6,
+    "per100g": {
+      "calories_per_100g": "114.2",
+      "protein_per_100g": "4.4",
+      "carbs_per_100g": "10.4",
+      "fat_per_100g": "6.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "口水鸡",
+    "oldCalories": "",
+    "calories": 746,
+    "fat": 59.3,
+    "per100g": {
+      "calories_per_100g": "298.4",
+      "protein_per_100g": "15.4",
+      "carbs_per_100g": "5.8",
+      "fat_per_100g": "23.7"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "奶油鸡茸汤",
+    "oldCalories": "",
+    "calories": 371,
+    "fat": 24.1,
+    "per100g": {
+      "calories_per_100g": "106.0",
+      "protein_per_100g": "5.4",
+      "carbs_per_100g": "5.7",
+      "fat_per_100g": "6.9"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "焗鸡腿饭",
+    "oldCalories": "",
+    "calories": 788,
+    "fat": 40.8,
+    "per100g": {
+      "calories_per_100g": "175.1",
+      "protein_per_100g": "8.7",
+      "carbs_per_100g": "14.7",
+      "fat_per_100g": "9.1"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "轻食沙拉",
+    "oldCalories": "",
+    "calories": 352,
+    "fat": 22.6,
+    "per100g": {
+      "calories_per_100g": "100.6",
+      "protein_per_100g": "6.2",
+      "carbs_per_100g": "4.4",
+      "fat_per_100g": "6.5"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "负一层",
+    "name": "杨枝甘露",
+    "oldCalories": "",
+    "calories": 324,
+    "fat": 4.2,
+    "per100g": {
+      "calories_per_100g": "92.6",
+      "protein_per_100g": "1.3",
+      "carbs_per_100g": "19.1",
+      "fat_per_100g": "1.2"
+    }
+  },
+  {
+    "school": "bjfu",
+    "restaurant": "西区食堂",
+    "floor": "一层",
+    "name": "地锅鸡",
+    "oldCalories": "",
+    "calories": 815,
+    "fat": 48.1,
+    "per100g": {
+      "calories_per_100g": "163.0",
+      "protein_per_100g": "8.0",
+      "carbs_per_100g": "11.2",
+      "fat_per_100g": "9.6"
+    }
+  },
+  {
+    "school": "tju",
+    "restaurant": "棠园食堂",
+    "floor": "一层",
+    "name": "香菇青菜小笼包",
+    "oldCalories": "",
+    "calories": 370,
+    "fat": 9.7,
+    "per100g": {
+      "calories_per_100g": "148.0",
+      "protein_per_100g": "3.9",
+      "carbs_per_100g": "24.4",
+      "fat_per_100g": "3.9"
+    }
+  }
+]
