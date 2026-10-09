@@ -61,7 +61,7 @@ export function guard(identity) {
   return s;
 }
 export const scopeKey = (key) =>
-  `zx_${session()?.user.school_id}_${session()?.user.id}_${key}`;
+  `zx_${session()?.user.school_id}_${session()?.user.id}_${session()?.user.demoSession ? session().user.demoSession + "_" : ""}${key}`;
 export function read(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(scopeKey(key))) ?? fallback;

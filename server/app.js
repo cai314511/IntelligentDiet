@@ -1,3 +1,5 @@
+import { initDemoEnvironment, demoSchool, createDemoSession, isolateDemo } from './services/demoEnvironment.js';
+import demoRoutes from './routes/demo.js';
 import { initAdminAccess, isolateTrial } from './services/adminAccess.js';
 import express from 'express';
 import cors from 'cors';
@@ -38,10 +40,15 @@ app.disable('x-powered-by');
 // 初始化数据库
 initDatabase();
 initAdminAccess();
+initDemoEnvironment();
 
+app.get('/api/demo/school', (_req,res)=>res.json({code:200,data:demoSchool()}));
 app.use('/api', optionalAuth);
+app.post('/api/demo/session', createDemoSession);
+app.use('/api', isolateDemo);
 app.use('/api', isolateTrial);
 
+app.use('/api/demo', demoRoutes);
 // API路由
 app.use('/api/dishes', dishRoutes);
 app.use('/api/restaurants', restaurantRoutes);

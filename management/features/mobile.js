@@ -45,25 +45,16 @@ window.visualViewport?.addEventListener('scroll', viewport);
 window.addEventListener('resize', viewport);
 viewport();
 const user = session()?.user;
-if (user?.trial) {
-  const banner = document.createElement('aside');
-  banner.className = 'admin-trial-banner';
-  const label = document.createElement('span');
-  const link = document.createElement('a');
-  link.href = '/?identity=admin';
-  link.textContent = '填写认证号';
-  banner.append(label, link);
-  document.getElementById('main-content').before(banner);
-  const tick = () => {
-    const left = Math.max(0, user.trialExpiresAt - Date.now());
-    label.textContent = left > 0 ? '独立演示环境 · 体验剩余 ' + Math.ceil(left / 60000) + ' 分钟' : '体验已到期，请认证后继续';
-    if (!left) { clearInterval(timer); location.replace('/?identity=admin'); }
-  };
-  const timer = setInterval(tick, 1000);
-  tick();
-}
+if (user?.trial) location.replace('/?identity=admin');
 
 matchMedia('(max-width:767px)').addEventListener('change', event => {
   const filters = document.querySelector('.admin-filter-panel');
   if (filters) filters.open = !event.matches;
 });
+
+if (user?.demoSession) {
+  const banner=document.createElement('aside');
+  banner.className='admin-trial-banner demo-environment-banner';
+  banner.innerHTML='<strong>演示数据</strong><span>独立访客工作台</span>';
+  document.getElementById('main-content').before(banner);
+}

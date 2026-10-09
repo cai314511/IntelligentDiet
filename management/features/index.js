@@ -1,3 +1,4 @@
+import { renderDemo } from './demo-dashboard.js';
 import { scenario } from "../../shared/scenario.js";
 import { applySchool, safeUrl } from "../../shared/core.js";
 import {
@@ -18,10 +19,11 @@ import {
 import { programs } from "./programs.js";
 import { dashboard, forecast } from "./dashboard.js";
 import { operations, dishes, orders, feedback, reviews } from "./operations.js";
+let disposeDemo = () => {};
 let globalQuery = "",
   renderVersion = 0;
 let context = read("admin-context", {
-    from: new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Shanghai" }),
+    from: new Date(Date.now() - (session()?.user.demoSession ? 29 * 86400000 : 0)).toLocaleDateString("sv-SE", { timeZone: "Asia/Shanghai" }),
     to: new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Shanghai" }),
     campus: "",
     restaurantId: "",
@@ -31,6 +33,7 @@ let context = read("admin-context", {
   catalog,
   module = "dashboard";
 window.zxAdminRender = async (selected, root) => {
+  disposeDemo();
   const version = ++renderVersion;
   module = selected;
   catalog = (await api("/workspace/catalog")).data;
@@ -73,7 +76,11 @@ window.zxAdminRender = async (selected, root) => {
     ]));
   const body = root.querySelector("#admin-feature-body");
   try {
-    if (selected === "dashboard") await dashboard(body, context, reload);
+    if (session()?.user.demoSession && ['dashboard','forecast','safety','supplier','inventory','procurement'].includes(selected)) {
+      const cleanup = await renderDemo(body, selected, context, ['safety','supplier','inventory','procurement'].includes(selected) ? ledger => operations(ledger,selected,context,reload) : null);
+      if(version===renderVersion) disposeDemo=cleanup; else cleanup();
+    }
+    else if (selected === "dashboard") await dashboard(body, context, reload);
     else if (selected === "forecast") await forecast(body, context, reload);
     else if (selected === "canteen") await dishes(body, context, reload);
     else if (selected === "reviews") await reviews(body, context, reload);

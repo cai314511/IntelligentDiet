@@ -110,8 +110,8 @@ router.post('/chat', optionalAuth, (req, res) => {
   if(req.body?.surface==='management' && req.user?.role!=='admin')return res.status(req.user?403:401).json({message:'需要后勤管理员权限'});
   if (!(config.aiBaseUrl && config.aiApiKey && config.aiModel)) {
     if(req.body?.surface==='management' && req.user?.role==='admin') {
-      const type=[['forecast',/预测/],['reviews',/评价|口碑/],['supplier',/供应|资质/],['inventory',/库存|批次/],['procurement',/采购/],['safety',/安全|检查/],['feedback',/反馈|投诉/],['orders',/订单|收入/],['conservation',/节约|浪费/],['service',/服务/]].find(([,re])=>re.test(message))?.[0]||'canteen';
-      return res.json({code:200,reply:(()=>{const data=managementQuery({type},req.user,scope);return `查询类型：${type}，学校：${schoolId}\n来源：${data.source}\n`+(data.error?data.error:data.rows.length?data.rows.map(r=>JSON.stringify(r)).join("\n"):'当前筛选范围内暂无记录。');})(),mode:'database'});
+      const type=[['live',/客流|热点|热力|供需矩阵|人流|温度/],['forecast',/预测/],['reviews',/评价|口碑/],['supplier',/供应|资质/],['inventory',/库存|批次/],['procurement',/采购/],['safety',/安全|检查/],['feedback',/反馈|投诉/],['orders',/订单|收入/],['conservation',/节约|浪费/],['service',/服务/]].find(([,re])=>re.test(message))?.[0]||'canteen';
+      return res.json({code:200,reply:(()=>{const data=managementQuery({type},req.user,scope);if(data.clock)return "演示数据 · 场景时钟 "+data.clock.label+"\n"+JSON.stringify(data);return `查询类型：${type}，学校：${schoolId}\n来源：${data.source}\n`+(data.error?data.error:data.rows.length?data.rows.map(r=>JSON.stringify(r)).join("\n"):'当前筛选范围内暂无记录。');})(),mode:'database'});
     }
     return res.json({ code: 200, reply: localAnswer(message, schoolId, req.user?.id), mode: 'database' });
   }

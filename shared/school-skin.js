@@ -21,6 +21,7 @@
     const schoolId = portal
       ? selectedSchoolId || document.getElementById("school")?.value || saved?.user?.school_id
       : saved?.token && saved?.user?.school_id;
+    if (schoolId === "demo" && (location.pathname.startsWith("/management") || (portal && document.querySelector('[data-role="admin"]')?.classList.contains("active")))) return "cufe";
     return schoolId === "cufe" || schoolId === "bjfu" ? schoolId : "";
   }
   function decorateNavigation(skin) {

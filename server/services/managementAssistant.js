@@ -1,11 +1,14 @@
+import { demoInsights } from './demoInsights.js';
 import {db} from '../database.js';
 import {catalog,parse} from './catalog.js';
-export const managementTools=[{type:'function',function:{name:'query_management',description:'查询后勤台账及学生端订单反馈。类型：supplier供应商及资质、inventory库存批次、procurement采购、safety食品安全、canteen运营、conservation节约、service服务、orders全校订单汇总、feedback学生反馈、reviews菜品评价、forecast日均销量预测。可跨类型多次查询。',parameters:{type:'object',properties:{type:{type:'string',enum:['supplier','inventory','procurement','safety','canteen','conservation','service','orders','feedback','forecast','reviews']},query:{type:'string'},offset:{type:'integer',minimum:0,description:'分页起点，每页80条'},allDates:{type:'boolean',description:'供应商、库存等基础目录默认不按日期；查询全部历史订单反馈时设true'}},required:['type']}}}];
+export const managementTools=[{type:'function',function:{name:'query_management',description:'查询后勤台账及学生端订单反馈。类型：supplier供应商及资质、inventory库存批次、procurement采购、safety食品安全、canteen运营、conservation节约、service服务、orders全校订单汇总、feedback学生反馈、reviews菜品评价、forecast日均销量预测。live动态客流热力与供需矩阵。可跨类型多次查询。',parameters:{type:'object',properties:{type:{type:'string',enum:['supplier','inventory','procurement','safety','canteen','conservation','service','orders','feedback','forecast','reviews','live']},query:{type:'string'},offset:{type:'integer',minimum:0,description:'分页起点，每页80条'},allDates:{type:'boolean',description:'供应商、库存等基础目录默认不按日期；查询全部历史订单反馈时设true'}},required:['type']}}}];
 export function managementQuery(args,user,scope={}) {
  if(user?.role!=='admin')return {error:'需要后勤管理员权限'};
  for(const key of ['from','to']) if(scope[key] && (!/^\d{4}-\d{2}-\d{2}$/.test(scope[key])||!Number.isFinite(Date.parse(scope[key]))))return {error:'日期范围无效'};
  if(scope.from&&scope.to&&scope.from>scope.to)return {error:'起止日期范围无效'};
  const schoolId=user.schoolId;
+ if(user.demoSession && ['live','forecast'].includes(args.type)) { const data=demoInsights(scope);return {source:'演示数据',clock:data.clock,method:data.method,summary:data.summary,traffic:data.traffic,temperatures:data.safety.temperatures,safetyRate:data.safety.rate,suppliers:data.suppliers,rows:args.type==='live'?data.matrix:data.forecast}; }
+ if(args.type==='live')return {error:'当前学校未接入动态客流场景'};
  const data=catalog(schoolId);
  const restaurants=data.restaurants.filter(r=>(!scope.campus||r.campus===scope.campus)&&(!scope.restaurantId||r.id===Number(scope.restaurantId)));
  const ids=new Set(restaurants.map(r=>r.id));

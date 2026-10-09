@@ -1,5 +1,5 @@
 import { mainDb, databaseContext } from '../database.js';
-import { validCertificate, trialSession } from '../services/adminAccess.js';
+import { validCertificate } from '../services/adminAccess.js';
 import express from "express";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
@@ -77,7 +77,7 @@ router.post("/development-session", (req, res) => {
   });
 });
 
-router.get("/schools", (_req, res) => {
+router.get("/schools", officialAccounts, (_req, res) => {
   const schools = db
     .prepare(
       "SELECT id, name, short_name AS shortName, accent, logo, background FROM universities ORDER BY name",
@@ -121,9 +121,7 @@ router.post("/login", officialAccounts, (req, res) => {
         mainDb.prepare("UPDATE yonghu SET role='admin' WHERE id=?").run(user.id);
         user.role = 'admin';
       } else if (user.role === 'admin_trial' && !req.body?.adminCode) {
-        const trial = trialSession(user);
-        if (!trial) return res.status(403).json({ message: '体验已到期，请填写高校管理员认证号后登录' });
-        user = trial;
+        return res.status(403).json({message:'请填写高校管理员认证号，或在院校栏选择演示数据'});
       }
     }
     if (identity !== 'admin' && user.role === 'admin_trial')
@@ -170,10 +168,9 @@ router.post("/register", officialAccounts, (req, res) => {
     }
     const identity = req.body?.identity || 'student';
     if (!['student', 'admin'].includes(identity)) return res.status(400).json({ message: '请选择有效身份' });
-    const trial = identity === 'admin' && req.body?.trial === true;
-    if (identity === 'admin' && !trial && !validCertificate(schoolId, req.body?.adminCode))
+    if (identity === 'admin' && !validCertificate(schoolId, req.body?.adminCode))
       return res.status(403).json({ message: '高校管理员认证号无效或与所选学校不符' });
-    const role = identity === 'admin' ? (trial ? 'admin_trial' : 'admin') : 'user';
+    const role = identity === 'admin' ? 'admin' : 'user';
     const result = db.transaction(() => {
     const created = db
       .prepare(
@@ -188,7 +185,6 @@ router.post("/register", officialAccounts, (req, res) => {
         role,
         schoolId,
       );
-    if (trial) mainDb.prepare('INSERT INTO admin_trials(user_id,expires_at) VALUES(?,?)').run(created.lastInsertRowid, Date.now() + 60 * 60 * 1000);
     return created;
     })();
     res

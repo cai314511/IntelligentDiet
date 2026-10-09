@@ -24,3 +24,6 @@ userdata/backups/
 
 # 校方体验数据库与运行日志仅保留在部署机器
 userdata/admin-trials/
+
+# 访客演示工作台的数据独立保留
+userdata/demo-visitors/
