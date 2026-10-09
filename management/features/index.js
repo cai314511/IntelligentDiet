@@ -36,10 +36,10 @@ window.zxAdminRender = async (selected, root) => {
   catalog = (await api("/workspace/catalog")).data;
   if (version !== renderVersion) return true;
   root.innerHTML =
-    card(
+    '<details class="admin-filter-panel" ' + (matchMedia('(max-width:767px)').matches ? '' : 'open') + '><summary>筛选范围 · 日期、校区与食堂</summary>' + card(
       "当前筛选范围",
       `<form id="admin-context" class="zx-grid">${field("from", "开始日期", `<input type="date" value="${context.from}" required>`)}${field("to", "结束日期", `<input type="date" value="${context.to}" required>`)}${field("campus", "校区", `<select>${options([["", "全部校区"], ...[...new Set(catalog.restaurants.map((r) => r.campus))].map((x) => [x, x])], context.campus)}</select>`)}${field("restaurantId", "食堂", `<select>${options([["", "全部食堂"], ...catalog.restaurants.filter((r) => !context.campus || r.campus === context.campus).map((r) => [r.id, r.name])], context.restaurantId)}</select>`)}${field("window", "窗口", `<select>${options([["", "全部窗口"], ...[...new Set(catalog.dishes.filter((d) => (!context.campus || d.campus === context.campus) && (!context.restaurantId || d.restaurantId === Number(context.restaurantId))).map((d) => d.window))].map((x) => [x, x])], context.window)}</select>`)}<button class="zx-button zx-primary" type="submit">更新范围</button></form><p class="zx-source">${esc(session()?.school?.name)} · ${esc(context.campus || "全部校区")} · ${esc(catalog.restaurants.find((r) => r.id === Number(context.restaurantId))?.name || "全部食堂")} · ${esc(context.window || "全部窗口")} · ${esc(context.from)}—${esc(context.to)}</p>`,
-    ) + `<section id="admin-feature-body"></section>`;
+    ) + `</details><section id="admin-feature-body"></section>`;
   const form = root.querySelector("form");
   form.onsubmit = async (e) => {
     e.preventDefault();

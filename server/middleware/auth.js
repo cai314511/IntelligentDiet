@@ -3,9 +3,9 @@ import { config } from '../config.js';
 
 export function signToken(user) {
   return jwt.sign(
-    { id: user.id, zhanghao: user.zhanghao, role: user.role || 'user', schoolId: user.school_id || user.schoolId, development: Boolean(user.development) },
+    { id: user.id, zhanghao: user.zhanghao, role: user.role || 'user', schoolId: user.school_id || user.schoolId, development: Boolean(user.development), trial: Boolean(user.trial), trialExpiresAt: user.trialExpiresAt || null },
     config.jwtSecret,
-    { expiresIn: '7d' }
+    { expiresIn: user.trial ? Math.max(1, Math.floor((user.trialExpiresAt - Date.now()) / 1000)) : '7d' }
   );
 }
 

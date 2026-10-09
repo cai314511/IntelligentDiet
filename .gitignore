@@ -21,3 +21,6 @@ userdata/backups/
 
 # Consistent shared business snapshot; runtime DB and historic backups stay local.
 !userdata/snapshots/*.db
+
+# 校方体验数据库与运行日志仅保留在部署机器
+userdata/admin-trials/

@@ -92,6 +92,14 @@
                 placeholder="手机号"
               />
             </div>
+            <div id="admin-fields" hidden>
+              <label for="admin-code">高校管理员认证号</label>
+              <div class="admin-certification-row">
+                <input id="admin-code" type="password" maxlength="100" autocomplete="off" placeholder="请输入认证号">
+                <button id="trial-entry" class="btn secondary" type="button" aria-pressed="false">体验功能一次性免认证号</button>
+              </div>
+              <p id="admin-help" class="muted" style="font-size:12px;margin-top:8px" ></p>
+            </div>
             <p
               class="muted"
               id="auth-context"

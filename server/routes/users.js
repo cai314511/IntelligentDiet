@@ -1,3 +1,5 @@
+import { mainDb, databaseContext } from '../database.js';
+import { validCertificate, trialSession } from '../services/adminAccess.js';
 import express from "express";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
@@ -6,6 +8,7 @@ import { db } from "../database.js";
 import { signToken, requireAuth, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
+const officialAccounts = (_req, _res, next) => databaseContext.run(mainDb, next);
 const userColumns =
   "id, zhanghao, xingming, touxiang, xingbie, lianxifangshi, jine, role, school_id";
 
@@ -94,7 +97,7 @@ router.get("/schools", (_req, res) => {
   });
 });
 
-router.post("/login", (req, res) => {
+router.post("/login", officialAccounts, (req, res) => {
   try {
     const zhanghao = String(req.body?.zhanghao || "").trim();
     const mima = String(req.body?.mima || "");
@@ -103,7 +106,7 @@ router.post("/login", (req, res) => {
       return res
         .status(400)
         .json({ code: 400, message: "请选择学校并填写账号和密码" });
-    const user = db
+    let user = db
       .prepare(
         `SELECT ${userColumns}, mima FROM yonghu WHERE zhanghao = ? AND school_id = ?`,
       )
@@ -113,10 +116,22 @@ router.post("/login", (req, res) => {
     const identity = req.body?.identity;
     if (identity && !["student", "admin"].includes(identity))
       return res.status(400).json({ code: 400, message: "请选择有效身份" });
+    if (identity === "admin" && user.role !== "admin") {
+      if (validCertificate(schoolId, req.body?.adminCode)) {
+        mainDb.prepare("UPDATE yonghu SET role='admin' WHERE id=?").run(user.id);
+        user.role = 'admin';
+      } else if (user.role === 'admin_trial' && !req.body?.adminCode) {
+        const trial = trialSession(user);
+        if (!trial) return res.status(403).json({ message: '体验已到期，请填写高校管理员认证号后登录' });
+        user = trial;
+      }
+    }
+    if (identity !== 'admin' && user.role === 'admin_trial')
+      return res.status(403).json({ message: '此账号为校方体验账号，请选择我是校方' });
     if (identity === "admin" && user.role !== "admin")
       return res
         .status(403)
-        .json({ code: 403, message: "账号与所选身份不符，请切换身份" });
+        .json({ code: 403, message: req.body?.adminCode ? '高校管理员认证号无效或与所选学校不符' : '账号与所选身份不符，请切换身份' });
     const token = signToken(user);
     const { mima: _password, ...safeUser } = user;
     res.json({
@@ -129,7 +144,7 @@ router.post("/login", (req, res) => {
   }
 });
 
-router.post("/register", (req, res) => {
+router.post("/register", officialAccounts, (req, res) => {
   try {
     const zhanghao = String(req.body?.zhanghao || "").trim();
     const mima = String(req.body?.mima || "");
@@ -153,18 +168,29 @@ router.post("/register", (req, res) => {
         .status(400)
         .json({ code: 400, message: "账号、密码或姓名格式不符合要求" });
     }
-    const result = db
+    const identity = req.body?.identity || 'student';
+    if (!['student', 'admin'].includes(identity)) return res.status(400).json({ message: '请选择有效身份' });
+    const trial = identity === 'admin' && req.body?.trial === true;
+    if (identity === 'admin' && !trial && !validCertificate(schoolId, req.body?.adminCode))
+      return res.status(403).json({ message: '高校管理员认证号无效或与所选学校不符' });
+    const role = identity === 'admin' ? (trial ? 'admin_trial' : 'admin') : 'user';
+    const result = db.transaction(() => {
+    const created = db
       .prepare(
         `INSERT INTO yonghu(zhanghao,mima,xingming,lianxifangshi,jine,role,school_id)
-      VALUES(?,?,?,?,0,'user',?)`,
+      VALUES(?,?,?,?,0,?,?)`,
       )
       .run(
         zhanghao,
         bcrypt.hashSync(mima, 12),
         xingming,
         lianxifangshi,
+        role,
         schoolId,
       );
+    if (trial) mainDb.prepare('INSERT INTO admin_trials(user_id,expires_at) VALUES(?,?)').run(created.lastInsertRowid, Date.now() + 60 * 60 * 1000);
+    return created;
+    })();
     res
       .status(201)
       .json({

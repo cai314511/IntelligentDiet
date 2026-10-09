@@ -160,6 +160,7 @@ function adminChat() {
     log = dialog.querySelector(".pet-chat-log"),
     form = dialog.querySelector("form"),
     history = [];
+  dialog.classList.add("pet-chat-dialog");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const input = form.elements.message,
@@ -201,3 +202,5 @@ function adminChat() {
   });
 }
 window.addEventListener('nutrition-membership-unlocked',()=>{pet.classList.add('nutrition-cheering');bubble.textContent='太棒了！一起开启营养之旅！';bubble.hidden=false;setTimeout(()=>{pet.classList.remove('nutrition-cheering');bubble.hidden=true;},3200);});
+
+window.addEventListener("zx-admin-chat", adminChat);

@@ -1,4 +1,4 @@
-"""学生端浏览器回归：隔离数据库，模型回复使用固定测试数据。"""
+"""学生与后勤端浏览器回归：隔离数据库，模型回复使用固定测试数据。"""
 import json
 from datetime import datetime
 import os
@@ -57,7 +57,8 @@ def check_portal(page, base):
     expect(page.locator('[data-role="student"]')).to_have_attribute("aria-pressed", "false")
     expect(page.locator('[data-role="admin"]')).to_have_attribute("aria-pressed", "true")
     expect(page.locator("#register-fields")).to_be_hidden()
-    expect(page.locator("#switch-register")).to_be_hidden()
+    expect(page.locator("#switch-register")).to_be_visible()
+    expect(page.locator("#admin-fields")).to_be_visible()
     page.locator("#submit").click()
     page.wait_for_function("!document.getElementById('submit').disabled")
     assert captured[-1][1]["identity"] == "admin"
@@ -95,6 +96,73 @@ def check_meal_browsing(page):
             expect(page.locator(".zx-conversation")).to_contain_text("你好，我是小智")
             page.locator('#agent-screen [data-action="close"]').click()
     page.evaluate("window.scrollTo(0, 0)")
+
+
+def check_management(browser, base, engine, width, height):
+    context = browser.new_context(viewport={"width": width, "height": height},
+                                  is_mobile=width < 768, has_touch=width < 768)
+    page = context.new_page()
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.route("**/api/ai/chat", lambda route: route.fulfill(json={"reply": "当前是独立演示环境，可查询食堂运营。"}))
+    page.goto(base + "/?identity=admin", wait_until="networkidle")
+    page.locator("#switch-register").click()
+    expect(page.locator("#admin-code")).to_have_attribute("required", "")
+    page.locator("#account").fill(f"admin_{engine}_{width}")
+    page.locator("#password").fill("admin-browser-test-2026")
+    page.locator("#name").fill("后勤体验员")
+    page.locator("#trial-entry").click()
+    expect(page.locator("#trial-entry")).to_have_attribute("aria-pressed", "true")
+    expect(page.locator("#admin-code")).to_be_disabled()
+    check_width(page)
+    page.screenshot(path=str(OUTPUT / f"{engine}-{width}-admin-register.png"))
+    page.locator("#submit").click()
+    try:
+        page.wait_for_url("**/management/#dashboard", timeout=25000)
+    except Exception:
+        print("后勤注册跳转失败:", page.url, page.locator("body").inner_text()[-1800:], errors, flush=True)
+        raise
+    expect(page.locator("#admin-feature-body .zx-card").first).to_be_visible(timeout=30000)
+    expect(page.locator(".admin-trial-banner")).to_contain_text("独立演示环境")
+    check_width(page)
+    page.screenshot(path=str(OUTPUT / f"{engine}-{width}-admin-dashboard.png"))
+    if width < 768:
+        expect(page.locator(".admin-bottom-nav")).to_be_visible()
+        page.locator('.admin-bottom-nav [data-module="canteen"]').click()
+        expect(page.locator('.admin-bottom-nav [data-module="canteen"]')).to_have_attribute("aria-current", "page")
+        expect(page.locator("#admin-feature-body .zx-table")).to_be_visible()
+        check_width(page)
+        page.screenshot(path=str(OUTPUT / f"{engine}-{width}-admin-canteen.png"))
+        page.locator("#admin-mobile-chat").click()
+    else:
+        expect(page.locator(".admin-bottom-nav")).to_be_hidden()
+        page.locator(".pet-body").click()
+        page.locator('[data-pet="chat"]').click()
+    expect(page.locator(".pet-chat-dialog")).to_be_visible()
+    page.locator('.pet-chat-form input').fill("查询食堂运营")
+    page.locator('.pet-chat-form button').click()
+    expect(page.locator(".pet-chat-log")).to_contain_text("当前是独立演示环境")
+    check_width(page)
+    page.screenshot(path=str(OUTPUT / f"{engine}-{width}-admin-chat.png"))
+    page.locator('.pet-chat-dialog [data-close]').click()
+    for module in ["safety", "conservation", "service", "orders", "inventory", "procurement", "supplier", "programs", "forecast", "feedback", "reviews"]:
+        if width < 768:
+            page.locator("#admin-mobile-more").click()
+            expect(page.locator("#admin-mobile-more")).to_have_attribute("aria-expanded", "true")
+        page.locator(f'#sidebar [data-module="{module}"]').click()
+        page.wait_for_function("document.querySelector('#admin-feature-body')?.children.length > 0")
+        expect(page.locator("#admin-feature-body .zx-status.error")).to_have_count(0)
+        check_width(page)
+    page.locator("#logout-btn").click()
+    page.wait_for_url("**/?identity=admin")
+    page.locator("#account").fill(f"admin_{engine}_{width}")
+    page.locator("#password").fill("admin-browser-test-2026")
+    page.locator("#submit").click()
+    page.wait_for_url("**/management/#dashboard")
+    expect(page.locator(".admin-trial-banner")).to_be_visible()
+    assert not errors, errors
+    print(f"PASS 后勤端 {engine} {width}x{height}", flush=True)
+    context.close()
 
 
 def run():
@@ -145,6 +213,9 @@ def run():
                         for width, height in [(390, 844), (320, 740), (1440, 1000)]:
                             selected_widths = os.environ.get("MOBILE_TEST_WIDTHS")
                             if selected_widths and str(width) not in selected_widths.split(","):
+                                continue
+                            check_management(browser, base, engine, width, height)
+                            if os.environ.get("MOBILE_TEST_ADMIN_ONLY") == "1":
                                 continue
                             context = browser.new_context(viewport={"width": width, "height": height},
                                                           is_mobile=width < 768, has_touch=width < 768)

@@ -2,6 +2,7 @@ import {ensureBjfuCulture} from "./services/bjfuCulture.js";
 import {syncDishImages} from "./services/dishImages.js";
 import {normalizeRestaurants,ensureSeatCapacity} from "./services/restaurantTopology.js";
 import Database from "better-sqlite3";
+import { AsyncLocalStorage } from "node:async_hooks";
 import bcrypt from "bcryptjs";
 import path from "path";
 import fs from "fs";
@@ -20,7 +21,16 @@ if (!fs.existsSync(dbParentDir)) {
 }
 
 // 创建/连接数据库
-export const db = new Database(dbPath);
+export const mainDb = new Database(dbPath);
+export const databaseContext = new AsyncLocalStorage();
+// 每个请求绑定自己的数据库，体验操作不会落入正式业务库。
+export const db = new Proxy({}, {
+  get(_target, key) {
+    const connection = databaseContext.getStore() || mainDb;
+    const value = connection[key];
+    return typeof value === 'function' ? value.bind(connection) : value;
+  }
+});
 
 // 启用外键约束
 db.pragma("foreign_keys = ON");

@@ -1,3 +1,4 @@
+import { initAdminAccess, isolateTrial } from './services/adminAccess.js';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -36,8 +37,10 @@ app.disable('x-powered-by');
 
 // 初始化数据库
 initDatabase();
+initAdminAccess();
 
 app.use('/api', optionalAuth);
+app.use('/api', isolateTrial);
 
 // API路由
 app.use('/api/dishes', dishRoutes);

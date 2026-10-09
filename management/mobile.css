@@ -1,0 +1,59 @@
+/* 后勤端移动布局；桌面沿用现有视觉样式。 */
+.admin-bottom-nav { display:none; }
+.admin-trial-banner { margin:76px 40px 0 280px; padding:12px 16px; border-radius:12px; background:#eaf4ff; color:#245583; display:flex; gap:12px; flex-wrap:wrap; }
+.admin-trial-banner + #main-content { margin-top:0; }
+@media (max-width:767px) {
+  body { padding-bottom:calc(80px + env(safe-area-inset-bottom)); }
+  #navbar { height:auto; position:sticky; top:0; padding-top:env(safe-area-inset-top); }
+  #navbar .nav-container { margin-left:0; grid-template-columns:minmax(0,1fr) auto; padding:10px 12px; align-items:start; }
+  #navbar .nav-menu { grid-template-columns:minmax(0,1fr) 44px 52px; min-width:0; }
+  #navbar .nav-menu li { margin:0; min-width:0; }
+  #navbar .nav-menu > li:first-child { align-self:center; font-size:12px; overflow-wrap:anywhere; }
+  #navbar .nav-user { flex-direction:column; padding:0; gap:4px; }
+  #navbar .nav-user span { font-size:12px; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #navbar .nav-user button { min-height:36px; }
+  #navbar .zx-button { padding:10px 6px; min-height:44px; }
+  #main-content { margin:0; padding:16px 12px !important; min-width:0; }
+  #main-content .zx-grid, #main-content .grid { grid-template-columns:minmax(0,1fr); gap:12px; }
+  .zx-grid > *, .zx-card, #admin-feature-body { min-width:0; }
+  .zx-card { padding:16px; margin-bottom:16px; }
+  .zx-card h3 { font-size:18px; }
+  .zx-field { margin:6px 0; }
+  input, select, textarea, .zx-field input, .zx-field select, .zx-search { font-size:16px; max-width:100%; }
+  button, .zx-button { min-height:44px; }
+  .zx-row { gap:8px; }
+  .zx-row > input { flex:1 1 160px; }
+  .zx-tabs { overflow-x:auto; padding-bottom:6px; }
+  .zx-tabs > * { flex-shrink:0; }
+  .zx-table-scroll, .zx-chart { max-width:100%; overscroll-behavior-x:contain; }
+  .zx-table td:last-child, .zx-table th:last-child { position:static; }
+  .zx-table td { white-space:normal; min-width:100px; }
+  .zx-source { overflow-wrap:anywhere; }
+  #sidebar { top:0; height:100vh; height:100dvh; width:min(300px,86vw); padding:calc(16px + env(safe-area-inset-top)) 0 calc(100px + env(safe-area-inset-bottom)); z-index:1200; }
+  body.zx-menu-open #sidebar { z-index:1200; }
+  body.zx-menu-open::after { inset:0; z-index:1100; }
+  .sidebar-footer { position:static; margin:24px 20px 0; }
+  .sidebar-menu a { min-height:48px; }
+  #footer { margin-left:0; font-size:12px; padding:16px; }
+  .admin-bottom-nav { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); position:fixed; bottom:0; left:0; right:0; z-index:1300; padding:8px 4px calc(8px + env(safe-area-inset-bottom)); background:#fffffff2; backdrop-filter:blur(20px); border-top:1px solid #dde7ef; }
+  .admin-bottom-nav button { border:0; background:transparent; color:#697586; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-size:22px; padding:0; cursor:pointer; }
+  .admin-bottom-nav button span { font-size:12px; }
+  .admin-bottom-nav .active { color:var(--zx-primary,#0071e3); font-weight:700; }
+  #admin-mobile-chat img { width:58px; height:58px; border-radius:50%; border:3px solid white; margin-top:-26px; box-shadow:0 4px 14px #176abb30; object-fit:cover; }
+  .xiaozhi-pet { display:none; }
+  .zx-dialog, dialog.pet-chat-dialog { max-width:calc(100vw - 20px); max-height:calc(var(--admin-viewport-height,100dvh) - 24px); padding:18px; border-radius:18px; overflow:auto; }
+  dialog.pet-chat-dialog[open] { position:fixed; top:calc(var(--admin-viewport-top,0px) + 10px); bottom:auto; margin:0 auto; height:calc(var(--admin-viewport-height,100dvh) - 20px); width:calc(100vw - 20px); display:flex; flex-direction:column; }
+  .pet-chat-dialog .modal-head { flex-shrink:0; align-items:center; }
+  .pet-chat-dialog h2 { font-size:18px; }
+  .pet-chat-dialog .pet-chat-log { flex:1; min-height:0; height:auto; }
+  .pet-chat-dialog .pet-chat-form { flex-shrink:0; padding-bottom:env(safe-area-inset-bottom); }
+  .admin-trial-banner { margin:12px 12px 0; font-size:13px; }
+}
+
+.admin-filter-panel > summary { display:none; }
+@media(max-width:767px) {
+  .admin-filter-panel { margin-bottom:16px; background:#ffffffed; border:1px solid #e5e5ea; border-radius:18px; }
+  .admin-filter-panel > summary { display:list-item; cursor:pointer; padding:16px; font-weight:600; font-size:14px; }
+  .admin-filter-panel .zx-card { border:0; margin-bottom:0; background:transparent; box-shadow:none; }
+  .admin-filter-panel .zx-card h3 { display:none; }
+}

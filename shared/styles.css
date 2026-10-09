@@ -824,3 +824,8 @@ table input[type="checkbox"] {
   object-fit: contain;
   transform: scale(1.75) translateY(-3%);
 }
+
+.admin-certification-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.admin-certification-row input { flex:1 1 180px; min-width:0; }
+.admin-certification-row .btn { flex:1 1 180px; margin:0; white-space:normal; }
+#trial-entry[aria-pressed="true"] { outline:2px solid var(--primary, #2357d8); }

@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .forEach((el) =>
         el.classList.toggle("active", el.dataset.module === module),
       );
+    window.dispatchEvent(new Event("zx-admin-navigation"));
     try {
       if (!window.zxAdminRender)
         throw new Error("页面功能未能加载，请刷新重试");
