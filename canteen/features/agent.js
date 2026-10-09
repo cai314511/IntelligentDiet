@@ -1,3 +1,4 @@
+import { createUuid } from "../../shared/uuid.js";
 import {dishPhoto,dishImage} from '../../shared/dish-photo.js';
 import { streamTask } from "../../shared/core.js";
 import {
@@ -25,6 +26,8 @@ export function closeAgent() {
   revision++;
   busy = false;
   host?.remove();
+  document.body.classList.remove("zx-agent-open");
+  document.dispatchEvent(new Event("zx:navigation"));
 }
 function active(run) {
   return run === revision && host?.isConnected;
@@ -42,7 +45,7 @@ function localTime(iso) {
 }
 export async function openAgent(message = "", constraints = {}) {
   saveConversation();
-  conversationId = crypto.randomUUID();
+  conversationId = createUuid();
   const run = ++revision;
   catalog = (await api("/workspace/catalog")).data;
   window.syncLiveCatalog(catalog);
@@ -53,6 +56,8 @@ export async function openAgent(message = "", constraints = {}) {
   host.id = "agent-screen";
   host.className = "zx-agent";
   document.body.append(host);
+  document.body.classList.add("zx-agent-open");
+  document.dispatchEvent(new Event("zx:navigation"));
   if (location.hash !== "#agent") history.pushState({ view: "agent" }, "", "#agent");
   plan = null;
   task = null;
@@ -111,10 +116,11 @@ function choicePhoto(choice) {
 function draw(prefill = "") {
   saveConversation();
   host.innerHTML = `<div class="zx-row" style="justify-content:space-between">${button("返回点餐", "close")}<span>${esc(session()?.school?.name)} · 小智</span>${button("查看订单", "orders")}</div><img class="zx-agent-mascot" src="/assets/brand/xiaozhi-body.png" alt="小智"><h1>不知道吃什么？让<em>小智</em>帮您决定！</h1>${card("和小智聊聊", `<div class="zx-chat-tools">${button("新对话", "new")}${button("历史对话", "history")}</div><section id="agent-history" class="zx-history" hidden></section><div class="zx-conversation" aria-live="polite">${transcript.map((m) => `<div class="zx-chat-message ${m.role}"><b>${m.role === "assistant" ? "小智" : m.role === "system" ? "系统" : "我"}</b><p>${esc(m.content)}</p></div>`).join("")}</div><div class="zx-choice-list">${choices.map((c,i)=>`<button type="button" class="zx-button" data-action="choice" data-index="${i}" ${busy?'disabled':''}>${choicePhoto(c)}${esc(c.label)}</button>`).join('')}</div><div class="zx-execution" aria-live="polite">${execution()}</div><form id="agent-chat">${field("message", "回复小智", `<button type="button" class="zx-mic" data-action="voice" aria-label="语音输入"><i class="fa-solid fa-microphone" aria-hidden="true"></i></button><textarea maxlength="2000" placeholder="说说你想吃什么…" class="zx-chat-input">${esc(prefill)}</textarea>`)}<div class="zx-row"><button type="submit" class="zx-button zx-primary" ${busy ? "disabled" : ""}>${busy ? "小智处理中…" : "发送"}</button></div></form><div data-status></div>`)}<section id="agent-result">${planHTML()}</section>`;
+  host.querySelector(".zx-chat-tools").closest(".zx-card").classList.add("zx-chat-card");
   bind(host, {
     close: () => {
-      closeAgent();
       history.replaceState({ view: "order" }, "", "#order");
+      window.navigate("order");
     },
     orders: () => {
       closeAgent();

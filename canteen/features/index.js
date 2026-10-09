@@ -1,3 +1,4 @@
+import { mountMobileNavigation } from "./mobile.js";
 import { preflight, scenario } from "../../shared/scenario.js";
 import { applySchool } from "../../shared/core.js";
 import {
@@ -36,7 +37,9 @@ window.navigate = (view) => {
     if (location.hash !== "#" + view)
       history.pushState({ view }, "", "#" + view);
   }
-  return originalNavigate(view);
+  const result = originalNavigate(view);
+  document.dispatchEvent(new Event("zx:navigation"));
+  return result;
 };
 window.addEventListener("popstate", () => {
   closeAgent();
@@ -138,3 +141,5 @@ mobileMenu.onclick = () => {
 document
   .querySelector("nav [onclick=\"navigate('order')\"]")
   ?.before(mobileMenu);
+
+mountMobileNavigation();
