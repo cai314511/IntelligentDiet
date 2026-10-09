@@ -8,7 +8,7 @@ test('Beijing meal windows start inclusively and close exclusively', () => {
   }
   assert.equal(currentMeal(new Date('2026-10-04T22:30:00Z')).meal,'早餐');
 });
-test('direct ordering hides breakfast during main meals and all dishes off hours', () => {
+test('直接购买按餐次和北京时间校验，浏览与预约不使用该限制', () => {
   const breakfast = {category:'早餐',name:'豆浆'}, main={category:'热菜',name:'鸭血豆腐'};
   assert.equal(availableForDirectOrder(breakfast,at('07:00')),true);
   assert.equal(availableForDirectOrder(main,at('07:00')),false);
@@ -16,7 +16,7 @@ test('direct ordering hides breakfast during main meals and all dishes off hours
   assert.equal(availableForDirectOrder(main,at('11:00')),true);
   assert.equal(availableForDirectOrder(main,at('18:00')),true);
   assert.equal(availableForDirectOrder(main,at('15:00')),false);
-  // Reservation catalogs remain complete: filtering is only in the direct-order view.
+  // 菜品浏览与预约保留完整目录，该判断仅用于直接购买。
   assert.deepEqual(servingMeals(breakfast),['早餐']);
   assert.deepEqual(servingMeals(main),['午餐','晚餐']);
 });

@@ -6,14 +6,18 @@ import {
   options,
   applySchool,
 } from "./shared/core.js";
-let identity = new URLSearchParams(location.search).get("identity") || "",
+let identity = new URLSearchParams(location.search).get("identity") === "admin" ? "admin" : "student",
   register = false,
   schools = [];
 const $ = (id) => document.getElementById(id);
 function update() {
   document
     .querySelectorAll("[data-role]")
-    .forEach((b) => b.classList.toggle("active", b.dataset.role === identity));
+    .forEach((b) => {
+      const selected = b.dataset.role === identity;
+      b.classList.toggle("active", selected);
+      b.setAttribute("aria-pressed", String(selected));
+    });
   $("switch-register").hidden = identity !== "student";
   if (identity === "admin") register = false;
   $("register-fields").hidden = !register;

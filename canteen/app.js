@@ -105,7 +105,7 @@ function addToCart(id) {
   const dish = DB.menu.find((m) => m.id === id);
   if (!dish) return;
   if (window.canDirectOrderDish && !window.canDirectOrderDish(dish)) {
-    return toast('该菜品当前不在供餐时段，可通过小智提前预约', 'warning');
+    return toast('非当前用餐时段菜品无法购买，可通过小智提前预约', 'warning');
   }
   if (dish.stock !== undefined && dish.stock <= 0) {
     return toast(`「${dish.name}」今日已售罄`, "warning");

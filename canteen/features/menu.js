@@ -56,10 +56,10 @@ function draw() {
   window.currentDiningCampus = f.campus || "";
   const meal = currentMeal();
   shownMeal = meal?.meal || '';
-  const visibleCatalog = {...catalog, dishes:catalog.dishes.filter(d => d.forSale && availableForDirectOrder(d))};
+  const visibleCatalog = {...catalog, dishes:catalog.dishes.filter(d => d.forSale)};
   const {restaurants:places,dishes:choices}=scopedMenu(visibleCatalog,f);
   if (f.category && !choices.some(d => d.category === f.category)) f.category = '';
-  const mealNotice = meal ? `当前供应${meal.meal}（${meal.label}，北京时间）。其他餐次可通过小智提前预约。` : '当前不在供餐时段。早餐 06:30–08:30、午餐 10:30–13:00、晚餐 17:00–19:00（北京时间）；可通过小智提前预约。';
+  const mealNotice = meal ? `当前供应${meal.meal}（${meal.label}，北京时间）。全部菜品均可浏览，非当前餐次菜品无法直接购买，可通过小智提前预约。` : '当前不在供餐时段，全部菜品及图片仍可浏览，暂不能直接购买。早餐 06:30–08:30、午餐 10:30–13:00、晚餐 17:00–19:00（北京时间）；小智预订功能正常开放。';
   root.innerHTML = `${recommendationBanner()}<h1 class="text-4xl font-bold mb-2 tracking-tight">智能点餐</h1><div class="zx-grid" style="margin:24px 0">${restaurantCards(f)}</div>${notice(mealNotice)}${card(
     "查找本校菜品",
     `<form id="menu-filter"><div class="zx-menu-location">${field("campus", "校区", `<select>${options([["", "全部校区"], ...[...new Set(catalog.restaurants.map((r) => r.campus))].map((v) => [v, v])], f.campus)}</select>`)}${field("restaurantId", "食堂", `<select>${options([["", "全部食堂"], ...places.map((r) => [r.id, r.name])], f.restaurantId)}</select>`)}${field("floor", "楼层", `<select>${options([["", "全部楼层"], ...[...new Set(visibleCatalog.dishes.filter(d => (!f.campus || d.campus === f.campus) && (!f.restaurantId || d.restaurantId === Number(f.restaurantId))).map(d => d.floor).filter(Boolean))].map((x) => [x, x])], f.floor)}</select>`)}</div><div class="zx-menu-dishes">${field("category", "品类", `<select>${options([["", "全部品类"], ...[...new Set(choices.map((d) => d.category))].map((v) => [v, v])], f.category)}</select>`)}${field("dishName", "菜名", `<select>${options([["", "全部菜品"], ...[...new Set(choices.map((d) => d.name))].map((x) => [x, x])], f.dishName)}</select>`)}<div class="zx-field"><span>价格区间</span><div class="zx-price-range"><input aria-label="最低价格" name="minPrice" type="number" min="0" step="0.1" placeholder="最低价" value="${esc(f.minPrice || "")}"><span>—</span><input aria-label="最高价格" name="maxPrice" type="number" min="0" step="0.1" placeholder="最高价" value="${esc(f.maxPrice || "")}"></div></div>${field("exclude", "忌口食材", `<input value="${esc(f.exclude || "")}" placeholder="例如：花生、香菜">`)}${field(
@@ -127,7 +127,7 @@ function eligible(f) {
   return catalog.dishes
     .filter(
       (d) =>
-        d.forSale && availableForDirectOrder(d) &&
+        d.forSale &&
         (!f.dishName || d.name === f.dishName) &&
         (!f.restaurantId || d.restaurantId === Number(f.restaurantId)) &&
         (!f.floor || d.floor === f.floor) &&
@@ -198,7 +198,7 @@ function results(f) {
           ),
         )
         .join("")}</div>`
-    : notice(currentMeal() ? "当前餐次没有匹配菜品，请调整筛选或通过小智预约其他餐次。" : "当前暂无供餐，请通过小智预约早、中、晚餐。") + button("让小智帮我预约", "agent", true);
+    : notice("没有匹配的已上架菜品，请调整筛选条件。") + button("让小智帮我预约", "agent", true);
 }
 function selectRestaurant(id) {
   currentFilters = { ...currentFilters, campus: catalog.restaurants.find(r => r.id === id).campus, restaurantId: String(id), floor: "", dishName: "" };

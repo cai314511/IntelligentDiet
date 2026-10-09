@@ -1,5 +1,6 @@
 """学生端浏览器回归：隔离数据库，模型回复使用固定测试数据。"""
 import json
+from datetime import datetime
 import os
 from pathlib import Path
 import socket
@@ -32,6 +33,68 @@ def request(url, data=None):
 
 def check_width(page):
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), "页面横向溢出"
+
+
+def check_portal(page, base):
+    captured = []
+
+    def capture(route):
+        captured.append((route.request.url, route.request.post_data_json))
+        route.fulfill(status=400, json={"message": "登录提交验证完成"})
+
+    page.route("**/api/users/login", capture)
+    page.goto(base + "/", wait_until="networkidle")
+    expect(page.locator('[data-role="student"]')).to_have_attribute("aria-pressed", "true")
+    expect(page.locator("#switch-register")).to_be_visible()
+    page.locator("#account").fill("mobile_review")
+    page.locator("#password").fill("mobile-review-only-2026")
+    page.locator("#submit").click()
+    expect(page.locator("#auth-status")).to_have_text("登录提交验证完成")
+    assert captured[-1][1]["identity"] == "student"
+    page.locator("#switch-register").click()
+    expect(page.locator("#register-fields")).to_be_visible()
+    page.locator('[data-role="admin"]').click()
+    expect(page.locator('[data-role="student"]')).to_have_attribute("aria-pressed", "false")
+    expect(page.locator('[data-role="admin"]')).to_have_attribute("aria-pressed", "true")
+    expect(page.locator("#register-fields")).to_be_hidden()
+    expect(page.locator("#switch-register")).to_be_hidden()
+    page.locator("#submit").click()
+    page.wait_for_function("!document.getElementById('submit').disabled")
+    assert captured[-1][1]["identity"] == "admin"
+    page.locator('[data-role="student"]').click()
+    expect(page.locator("#switch-register")).to_be_visible()
+    page.unroute("**/api/users/login", capture)
+
+
+def check_meal_browsing(page):
+    catalog = page.evaluate("async () => (await (await import('/shared/core.js')).api('/workspace/catalog')).data")
+    count = sum(bool(d["forSale"]) for d in catalog["dishes"])
+    assert count > 0
+    for hour in [7, 11, 18, 15]:
+        page.clock.set_fixed_time(datetime.fromisoformat(f"2026-10-09T{hour:02}:00:00+08:00"))
+        page.evaluate("window.navigate('order')")
+        expect(page.locator('#menu-results [data-action="cart"]')).to_have_count(count)
+        expect(page.locator("#menu-results img").first).to_be_attached()
+        candidates = page.evaluate("""async () => {
+          const {availableForDirectOrder} = await import('/shared/meal-service.mjs');
+          const data = (await (await import('/shared/core.js')).api('/workspace/catalog')).data;
+          const all = data.dishes.filter(d => d.forSale);
+          return {blocked:all.find(d => !availableForDirectOrder(d))?.id,
+                  allowed:all.find(d => availableForDirectOrder(d) && d.stock > 0)?.id};
+        }""")
+        blocked = candidates["blocked"]
+        page.locator(f'#menu-results [data-action="cart"][data-id="{blocked}"]').click()
+        expect(page.locator("#zx-toast")).to_contain_text("非当前用餐时段菜品无法购买")
+        if candidates.get("allowed"):
+            allowed = candidates["allowed"]
+            page.locator(f'#menu-results [data-action="cart"][data-id="{allowed}"]').click()
+            expect(page.locator("#zx-toast")).to_contain_text("已加入餐盘")
+        if hour == 15:
+            page.locator(f'#menu-results [data-action="plan"][data-id="{blocked}"]').click()
+            expect(page.locator("#agent-screen")).to_be_visible()
+            expect(page.locator(".zx-conversation")).to_contain_text("你好，我是小智")
+            page.locator('#agent-screen [data-action="close"]').click()
+    page.evaluate("window.scrollTo(0, 0)")
 
 
 def run():
@@ -93,8 +156,10 @@ def run():
                                 "code": 200, "data": {"reply": "你好，我是小智！今天想吃什么？", "intent": "continue",
                                                       "ready": False, "constraints": {}, "choices": []},
                             }))
+                            check_portal(page, base)
                             page.goto(base + "/canteen/", wait_until="networkidle")
                             expect(page.locator("#menu-filter")).to_be_attached()
+                            check_meal_browsing(page)
                             check_width(page)
                             result = page.evaluate("""async () => {
                               const {createUuid} = await import('/shared/uuid.js');
