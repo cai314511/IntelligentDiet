@@ -74,3 +74,36 @@ test('填充管理员凭据不创建登录会话，随后可按两种身份正�
   const invalid = await request(target).post('/api/users/development-account').send({ schoolId: 'invalid' });
   assert.equal(invalid.status, 400);
 });
+
+
+test('学生体验账号三校独立且会员需购买，重复登录保留消费', async () => {
+ const ids=[];
+ for(const schoolId of ['cufe','bjfu','tju']) {
+ const credentials={zhanghao:'guanliyuan',mima:'guanliyuan',schoolId,identity:'student'};
+ const login=await request(target).post('/api/users/login').send(credentials);
+ assert.equal(login.status,200);
+ const {user,token}=login.body.data; ids.push(user.id);
+ assert.equal(user.zhanghao,'guanliyuan'); assert.equal(user.role,'user'); assert.equal(user.jine,1000);
+ const points=()=>db.prepare('SELECT SUM(points) total FROM point_ledger WHERE user_id=? AND school_id=?').get(user.id,schoolId).total;
+ assert.equal(points(),1000);
+ const auth={Authorization:'Bearer '+token};
+ assert.equal((await request(target).get('/api/nutrition/trend').set(auth)).status,403);
+ assert.equal((await request(target).get('/api/users/').set(auth)).status,403);
+ const purchase=await request(target).post('/api/nutrition/membership').set(auth).send({plan:'month',requestId:'experience-'+schoolId});
+ assert.equal(purchase.status,200); assert.equal(purchase.body.data.amount,6);
+ db.prepare("INSERT INTO point_ledger(user_id,school_id,reason,reference,points) VALUES(?,?,'兑换','test',-100)").run(user.id,schoolId);
+ const again=await request(target).post('/api/users/login').send(credentials);
+ assert.equal(again.body.data.user.id,user.id); assert.equal(again.body.data.user.jine,994); assert.equal(points(),900);
+ assert.equal((await request(target).get('/api/nutrition/trend').set({Authorization:'Bearer '+again.body.data.token})).status,200);
+ }
+ assert.equal(new Set(ids).size,3);
+});
+
+test('体验账号拒绝校方身份、内部账号、错误密码和非正式学校并保留注册名称',async()=>{
+ for(const override of [{identity:'admin'},{identity:'admin',adminCode:'invalid'},{zhanghao:'guanliyuan@cufe'},{mima:'wrong'},{schoolId:'demo'},{schoolId:'unknown'}]) {
+ const result=await request(target).post('/api/users/login').send({zhanghao:'guanliyuan',mima:'guanliyuan',schoolId:'cufe',identity:'student',...override});
+ assert.ok([401,403].includes(result.status));
+ }
+ const result=await request(target).post('/api/users/register').send({zhanghao:'guanliyuan',mima:'guanliyuan',xingming:'测试',schoolId:'cufe'});
+ assert.equal(result.status,409);
+});

@@ -1,3 +1,4 @@
+import { initNutritionMembership } from '../services/nutritionMembership.js';
 import { mainDb, databaseContext } from '../database.js';
 import { validCertificate } from '../services/adminAccess.js';
 import express from "express";
@@ -10,7 +11,7 @@ import { signToken, requireAuth, requireAdmin } from "../middleware/auth.js";
 const router = express.Router();
 const officialAccounts = (_req, _res, next) => databaseContext.run(mainDb, next);
 const userColumns =
-  "id, zhanghao, xingming, touxiang, xingbie, lianxifangshi, jine, role, school_id";
+  `id, CASE WHEN zhanghao IN ('guanliyuan@cufe','guanliyuan@bjfu','guanliyuan@tju') THEN 'guanliyuan' ELSE zhanghao END AS zhanghao, xingming, touxiang, xingbie, lianxifangshi, jine, role, school_id`;
 
 const localRequest = (req) =>
   ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress);
@@ -106,16 +107,38 @@ router.post("/login", officialAccounts, (req, res) => {
       return res
         .status(400)
         .json({ code: 400, message: "请选择学校并填写账号和密码" });
+    const identity = req.body?.identity;
+    if (identity && !["student", "admin"].includes(identity))
+      return res.status(400).json({ code: 400, message: "请选择有效身份" });
+    let account = zhanghao;
+    if (zhanghao === 'guanliyuan') {
+      if (mima !== 'guanliyuan' || !['cufe', 'bjfu', 'tju'].includes(schoolId))
+        return res.status(401).json({ code: 401, message: '账号或密码错误' });
+      if (identity === 'admin')
+        return res.status(403).json({ code: 403, message: '此账号仅支持学生端登录' });
+      // 内部账号按学校区分，兼容现有账号全局唯一约束。
+      account = 'guanliyuan@' + schoolId;
+      initNutritionMembership(db);
+      db.transaction(() => {
+        if (db.prepare('SELECT id FROM yonghu WHERE zhanghao=?').get(account)) return;
+        const created = db.prepare("INSERT INTO yonghu(zhanghao,mima,xingming,school_id,role,jine) VALUES(?,?,?,?,'user',1000)")
+          .run(account, bcrypt.hashSync(mima, 12), '学生体验账号', schoolId);
+        db.prepare('INSERT INTO point_ledger(user_id,school_id,reason,reference,points) VALUES(?,?,?,?,1000)')
+          .run(created.lastInsertRowid, schoolId, '初始赠送', 'student-experience');
+        // 不赠送三天试用，购买后沿用普通学生会员规则。
+        db.prepare('INSERT INTO nutrition_memberships(user_id,trial_started_at) VALUES(?,?)')
+          .run(created.lastInsertRowid, new Date(Date.now() - 3 * 86400000).toISOString());
+      })();
+    } else if (zhanghao.startsWith('guanliyuan@')) {
+      return res.status(401).json({ code: 401, message: '账号或密码错误' });
+    }
     let user = db
       .prepare(
         `SELECT ${userColumns}, mima FROM yonghu WHERE zhanghao = ? AND school_id = ?`,
       )
-      .get(zhanghao, schoolId);
+      .get(account, schoolId);
     if (!user || !bcrypt.compareSync(mima, user.mima))
       return res.status(401).json({ code: 401, message: "账号或密码错误" });
-    const identity = req.body?.identity;
-    if (identity && !["student", "admin"].includes(identity))
-      return res.status(400).json({ code: 400, message: "请选择有效身份" });
     if (identity === "admin" && user.role !== "admin") {
       if (validCertificate(schoolId, req.body?.adminCode)) {
         mainDb.prepare("UPDATE yonghu SET role='admin' WHERE id=?").run(user.id);
@@ -166,6 +189,7 @@ router.post("/register", officialAccounts, (req, res) => {
         .status(400)
         .json({ code: 400, message: "账号、密码或姓名格式不符合要求" });
     }
+    if (zhanghao === 'guanliyuan') return res.status(409).json({ code: 409, message: '此账号为学生体验账号，请直接登录' });
     const identity = req.body?.identity || 'student';
     if (!['student', 'admin'].includes(identity)) return res.status(400).json({ message: '请选择有效身份' });
     if (identity === 'admin' && !validCertificate(schoolId, req.body?.adminCode))
