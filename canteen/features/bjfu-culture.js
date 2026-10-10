@@ -1,5 +1,5 @@
 import {esc,money,dateTime,source,button} from '../../shared/feature-ui.js';
-const asset=file=>`/assets/schools/bjfu/${file}`;
+const asset=file=>`/assets/schools/bjfu/${file}${file === "culture-reference.png" ? "?v=motto-corrected" : ""}`;
 const products=new Map([['北林校园风物笔记本',asset('culture-notebook.png')],['四季北林·森语同行',asset('culture-seasons.png')],['龙林时藏——北林文创文具',asset('culture-stationery.png')]]);
 const productOrder = title => products.has(title) ? [...products.keys()].indexOf(title) : products.size;
 const leaf=`<svg viewBox="0 0 100 90" aria-hidden="true"><path d="M48 66C24 62 5 36 7 22 20 24 29 8 43 5 48 21 52 20 59 4 74 9 88 22 95 27 90 43 74 61 53 66L64 86 59 89Z" fill="currentColor"/><path d="M49 63 25 20M50 63 46 13M52 62 69 16M53 63 85 31" fill="none" stroke="#fff5dc" stroke-width="1.5"/></svg>`;

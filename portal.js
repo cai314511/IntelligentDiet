@@ -52,9 +52,9 @@ function campuses() {
   $("campus").innerHTML = options(
     [
       { value: "", label: "全校" },
-      ...(school?.campuses || []).map((c) => ({ value: c, label: c })),
+      ...(school?.id === "bjfu" ? [] : school?.campuses || []).map((c) => ({ value: c, label: c })),
     ],
-    session()?.campus || "",
+    school?.id === "bjfu" ? "" : session()?.campus || "",
   );
   update();
 }
